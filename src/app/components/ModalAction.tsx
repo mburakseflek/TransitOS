@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+import { confirmDirtyFormExit } from "@/app/components/InteractionGuards";
 
 const focusableSelector = [
   "button:not([disabled])",
@@ -80,6 +81,7 @@ export function ModalAction({
 
   function close() {
     if (submitting) return;
+    if (dialogRef.current && !confirmDirtyFormExit(dialogRef.current)) return;
     setOpen(false);
     window.requestAnimationFrame(() => triggerRef.current?.focus());
   }

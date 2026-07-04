@@ -111,12 +111,12 @@ export async function AppShell({
           })}
           <Link className="site-return-link mobile-site-return-link" href="/seflektur">
             <House size={17} />
-            <span>Şeflek Tur sitesine dön</span>
+            <span>Siteye dön</span>
           </Link>
         </nav>
-        <Link className="site-return-link" href="/seflektur">
+        <Link className="site-return-link" href="/seflektur" title="Şeflek Tur sitesine dön">
           <House size={17} />
-          <span>Şeflek Tur sitesine dön</span>
+          <span>Siteye dön</span>
         </Link>
       </aside>
 

@@ -12680,3 +12680,127 @@ body {
     border-radius: 20px !important;
   }
 }
+
+/* TransitOS final release guard: no rail ghosting, no sidebar overflow, safer fixed chrome */
+.transitos-shell.shell {
+  grid-template-columns: clamp(276px, 18vw, 326px) minmax(0, 1fr) !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: clip !important;
+}
+
+.transitos-shell .aceternity-sidebar-rail-label {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] {
+  width: calc(100% - 24px) !important;
+  max-width: calc(100% - 24px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .brand,
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .desktop-nav,
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .site-return-link {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .brand {
+  overflow: hidden !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .aceternity-sidebar-link,
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .site-return-link {
+  display: flex !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .aceternity-sidebar-link span,
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .site-return-link span,
+.transitos-shell .sidebar-brand-title,
+.transitos-shell .sidebar-brand-meta {
+  display: block !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .aceternity-sidebar-link svg,
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .site-return-link svg {
+  flex: 0 0 auto !important;
+}
+
+.transitos-rate-ticker {
+  left: calc(clamp(276px, 18vw, 326px) + 18px) !important;
+  right: max(18px, env(safe-area-inset-right)) !important;
+  z-index: 340 !important;
+}
+
+.transitos-shell .content {
+  max-width: calc(100vw - clamp(276px, 18vw, 326px)) !important;
+  overflow-x: clip !important;
+}
+
+.transitos-shell .topbar,
+.transitos-shell .card,
+.modal-window {
+  isolation: isolate !important;
+}
+
+form[data-dirty="true"] :is(input, select, textarea):not([type="hidden"]) {
+  border-color: rgba(201, 31, 47, 0.36) !important;
+  box-shadow: 0 0 0 3px rgba(201, 31, 47, 0.08) !important;
+}
+
+@media (max-width: 980px) {
+  .transitos-shell.shell {
+    display: block !important;
+    max-width: 100vw !important;
+    padding: calc(10px + env(safe-area-inset-top)) 10px calc(146px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .transitos-shell .content {
+    max-width: 100% !important;
+  }
+
+  .transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 64px !important;
+  }
+
+  .transitos-shell .mobile-drawer-open span {
+    max-width: min(144px, 42vw) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .transitos-rate-ticker {
+    left: max(10px, env(safe-area-inset-left)) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .transitos-shell .mobile-drawer-open {
+    min-width: 52px !important;
+    width: 52px !important;
+    padding-inline: 0 !important;
+  }
+
+  .transitos-shell .mobile-drawer-open span {
+    display: none !important;
+  }
+}

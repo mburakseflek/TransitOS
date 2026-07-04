@@ -25,11 +25,11 @@ export async function POST(request: Request) {
 
   const { role, loginId, password, next } = body.data;
   const adminId = process.env.ADMIN_LOGIN_ID ?? "admin";
-  const adminPassword = process.env.ADMIN_PASSWORD ?? "seflektur";
+  const adminPassword = process.env.ADMIN_PASSWORD ?? "";
   const successPath = safeNextPath(next);
 
   if (role === "MANAGER") {
-    const isBuiltInAdmin = loginId.trim().toLowerCase() === adminId && password === adminPassword;
+    const isBuiltInAdmin = adminPassword.length > 0 && loginId.trim().toLowerCase() === adminId.toLowerCase() && password === adminPassword;
     if (!isBuiltInAdmin) {
       const manager = await prisma.user.findUnique({ where: { loginId: loginId.trim() } });
       const managerPasswordMatches = manager ? await bcrypt.compare(password, manager.passwordHash) : false;

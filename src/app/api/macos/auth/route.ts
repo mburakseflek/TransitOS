@@ -19,9 +19,9 @@ export async function POST(request: Request) {
   const { role, loginId, password } = parsed.data;
   const normalizedLogin = loginId.trim();
   const adminId = process.env.ADMIN_LOGIN_ID ?? "admin";
-  const adminPassword = process.env.ADMIN_PASSWORD ?? "seflektur";
+  const adminPassword = process.env.ADMIN_PASSWORD ?? "";
 
-  if (role === "MANAGER" && normalizedLogin.toLowerCase() === adminId.toLowerCase() && password === adminPassword) {
+  if (role === "MANAGER" && adminPassword.length > 0 && normalizedLogin.toLowerCase() === adminId.toLowerCase() && password === adminPassword) {
     const user = {
       id: "admin",
       displayName: "Şeflek Tur",

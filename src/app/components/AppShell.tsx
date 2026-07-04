@@ -19,7 +19,7 @@ import {
 import { readSessionToken } from "@/lib/auth";
 import { getMarketTickerItems } from "@/lib/market-data";
 import { roleTitle } from "@/lib/permissions";
-import { ExpandableProfileCard, SkiperPanel, SkiperTickerRail } from "@/app/components/RegistryInterfaceKit";
+import { ExpandableProfileCard, SkiperTickerRail } from "@/app/components/RegistryInterfaceKit";
 import { LogoutButton } from "@/app/components/LogoutButton";
 export { ModalAction } from "@/app/components/ModalAction";
 
@@ -137,11 +137,6 @@ export async function AppShell({
             </ExpandableProfileCard>
           </div>
         </div>
-        <SkiperPanel className="transitos-ui-tool-strip" tone="blue">
-          <strong>UI kit aktif</strong>
-          <span>Cam yüzeyler, açılır işlem menüleri, canlı bant ve rol bazlı paneller birlikte çalışıyor.</span>
-          <small>{currentRoleTitle} görünümü</small>
-        </SkiperPanel>
         {children}
         <div className="transitos-rate-ticker" aria-label="Döviz ve akaryakıt bilgi bandı">
           <SkiperTickerRail items={tickerItems} />

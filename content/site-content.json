@@ -3,10 +3,10 @@
   "brandLine": "Turizm & Yolcu Taşımacılığı",
   "heroTitle": "Şeflek Tur Turizm & Yolcu Taşımacılığı",
   "heroSubtitle": "Operasyonlarınız için tercih edebileceğiniz teknolojiyi konforla buluşturan çevre dostu ve bütçe dostu çözümler sunan yolculuğun yeni adı.",
-  "gatewayImageUrl": "/uploads/1782067215389-dagqbpclyba.png",
-  "homeHeroImageUrl": "/uploads/1782067229696-elulxybflp9.png",
-  "fleetHeroImageUrl": "/uploads/1782069507162-64rsn1day4e.png",
-  "vipHeroImageUrl": "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=2200&q=86",
+  "gatewayImageUrl": "/site-media/hero-gateway.png",
+  "homeHeroImageUrl": "/site-media/hero-home.png",
+  "fleetHeroImageUrl": "/site-media/hero-fleet.png",
+  "vipHeroImageUrl": "/site-media/hero-vip.png",
   "companySummary": "Şeflek Tur; İstanbul merkezli servis, turizm ve yolcu taşımacılığı süreçlerini modern filo yönetimi, düzenli operasyon takibi ve 7/24 ulaşılabilir iletişim anlayışıyla yürütür. TransitOS altyapısı sayesinde araç, güzergah, hakediş ve operasyon bilgileri kontrollü şekilde takip edilir.",
   "contactPhone": "+90 (539) 734 52 93",
   "contactEmail": "info@seflektur.com",
@@ -20,49 +20,49 @@
       "title": "Mercedes-Benz Sprinter",
       "subtitle": "Uzun Mesafeler",
       "body": "Aynı şehirde uzak yolları konforu ile kısaltan tercihimiz.",
-      "imageUrl": "/uploads/1782028010544-s6gqbp67il.webp",
+      "imageUrl": "/site-media/fleet-sprinter.webp",
       "meta": "Servis / Minibüs"
     },
     {
       "title": "Volkswagen Crafter Volt",
       "subtitle": "Extra Uzun Yolculuklar",
       "body": "Gezi turları, şehirler arası organizasyonlar ve kalabalık gruplar için yüksek konforlu seri seçenek.",
-      "imageUrl": "/uploads/1782028194348-mruo5ibad6c.webp",
+      "imageUrl": "/site-media/fleet-crafter.webp",
       "meta": "Servis / Minibüs"
     },
     {
       "title": "Renault Master",
       "subtitle": "Seri Operasyonel Hareket Çözümü",
       "body": "Filonun en aktif çevre ve kullanıcı dostu aracı olan Master, filomuza üst kabiliyetler kazandıran seçenektir.",
-      "imageUrl": "/uploads/1782027978943-4l8tjr9sqq5.webp",
+      "imageUrl": "/site-media/fleet-master.webp",
       "meta": "Servis / Minibüs"
     },
     {
       "title": "Ford Transit",
       "subtitle": "Kurumsal Filo Destek Araçları",
       "body": "Personel taşımacılığı, vardiya operasyonları ve günlük genel yolculuk hizmetlerinde yüksek kullanılabilirlik.",
-      "imageUrl": "/uploads/1782028264865-7qtg12rleno.webp",
+      "imageUrl": "/site-media/fleet-transit.webp",
       "meta": "Servis / Minibüs"
     },
     {
       "title": "Fiat Ducato",
       "subtitle": "Kurumsal Filo Destek Araçları",
       "body": "Personel taşımacılığı, vardiya operasyonları ve günlük genel yolculuk hizmetlerinde yüksek kullanılabilirlik.",
-      "imageUrl": "/uploads/1782028296103-igo2dqr7yjs.webp",
+      "imageUrl": "/site-media/fleet-ducato.webp",
       "meta": "Servis / Minibüs"
     },
     {
       "title": "Otokar Sultan Comfort/Giga",
       "subtitle": "Yoğun Hat",
       "body": "27 Kişi kapasitesi ile yoğun hatlarda tercih edebileceğiniz seçenek.",
-      "imageUrl": "/uploads/1782029262097-250ymokn1ge.webp",
+      "imageUrl": "/site-media/fleet-midibus.webp",
       "meta": "Servis / Midibüs"
     },
     {
       "title": "Mercedes Benz Travego",
       "subtitle": "Rota Oluşturuldu",
       "body": "İster bir gezi, ister bir turne, isterseniz de kalabalık yapacağınız seyahat planlarının tercihi.",
-      "imageUrl": "/uploads/1782028441814-ka6k9ds2m9.webp",
+      "imageUrl": "/site-media/fleet-travego.webp",
       "meta": "Turizm / Otobüs"
     }
   ],
@@ -71,28 +71,28 @@
       "title": "Mercedes-Benz Vito",
       "subtitle": "VIP transfer ve özel yolculuk",
       "body": "Misafir karşılama, yönetici transferleri ve özel organizasyonlar için sessiz, konforlu ve prestijli ulaşım.",
-      "imageUrl": "/uploads/1782029481424-33turrfuxpa.webp",
+      "imageUrl": "/site-media/vip-vito.webp",
       "meta": "VIP"
     },
     {
       "title": "Volkswagen Transporter",
       "subtitle": "Konforlu grup transferi",
       "body": "Havalimanı, otel, toplantı ve günlük özel ulaşım talepleri için planlanabilir VIP araç alternatifi.",
-      "imageUrl": "/uploads/1782029556232-xv9htcj0qv9.webp",
+      "imageUrl": "/site-media/vip-transporter.webp",
       "meta": "VIP"
     },
     {
       "title": "Mercedes-Benz Sprinter",
       "subtitle": "Konaklamalı VIP Yolculuk",
       "body": "İster bir sanatçı turnesi, ister misafirinize özel hissettirecek premium bir seçenek alternatifi.",
-      "imageUrl": "/uploads/1782029647090-y0iuc6yo5a.webp",
+      "imageUrl": "/site-media/vip-sprinter.webp",
       "meta": "VIP"
     },
     {
       "title": "Mercedes E200d",
       "subtitle": "Bireysel Premium Yolculuk",
       "body": "Tekil VIP transferlerde kurumsal temsil gücü yüksek, konfor odaklı sedan ulaşım hizmeti.",
-      "imageUrl": "/uploads/1782029807960-gtyvurpui4q.webp",
+      "imageUrl": "/site-media/vip-e200.webp",
       "meta": "Executive"
     }
   ],
@@ -101,35 +101,35 @@
       "title": "Öğrenci ve Okul Taşımacılığı",
       "subtitle": "Güvenli servis planlaması",
       "body": "Okul saatleri, veli beklentileri ve güzergah güvenliği dikkate alınarak düzenlenen öğrenci taşıma hizmetleri.",
-      "imageUrl": "/uploads/1782067503969-i9k64a1jmy.png",
+      "imageUrl": "/site-media/service-school.png",
       "meta": "Okul"
     },
     {
       "title": "Personel Taşımacılığı",
       "subtitle": "Vardiya ve güzergah yönetimi",
       "body": "Sabah, akşam, gece ve mesai servisleri için kurumsal güzergah planlama ve araç atama süreçleri.",
-      "imageUrl": "/uploads/1782067946574-dq9t74skzqf.png",
+      "imageUrl": "/site-media/service-personnel.png",
       "meta": "Kurumsal"
     },
     {
       "title": "Turizm ve Gezi Turları",
       "subtitle": "Planlı grup ulaşımı",
       "body": "Şehir içi ve şehir dışı gezi, tur, etkinlik ve organizasyon taşımacılığı.",
-      "imageUrl": "/uploads/1782068251487-tlk8svd5bt.png",
+      "imageUrl": "/site-media/service-tourism.png",
       "meta": "Turizm"
     },
     {
       "title": "Günlük Genel Yolculuk Hizmetleri",
       "subtitle": "Tek seferlik veya dönemsel ulaşım",
       "body": "Firma, kurum veya şahısların günlük ulaşım ihtiyaçlarına özel planlanan esnek servis çözümleri.",
-      "imageUrl": "/uploads/1782068382445-811b893rsvi.png",
+      "imageUrl": "/site-media/service-daily.png",
       "meta": "Günlük"
     },
     {
       "title": "VIP Yolculuk",
       "subtitle": "Özel transfer deneyimi",
       "body": "Yönetici, misafir ve özel davet transferlerinde prestijli araçlarla kontrollü ulaşım.",
-      "imageUrl": "/uploads/1782068614952-w1vwsjn1l1a.png",
+      "imageUrl": "/site-media/service-vip.png",
       "meta": "VIP"
     }
   ],
@@ -161,28 +161,28 @@
       "title": "McDonald's",
       "subtitle": "Referans marka",
       "body": "Kurumsal yolcu taşımacılığı ve operasyonel hizmet ağı içinde takip edilebilen iş ortaklığı referansı.",
-      "imageUrl": "/uploads/1782059453243-ai6rzmcn7od.png",
+      "imageUrl": "/site-media/ref-mcdonalds.png",
       "meta": "Gıda & Perakende"
     },
     {
       "title": "KFC",
       "subtitle": "Referans marka",
       "body": "Servis ve dönemsel ulaşım planlarında kurumsal marka operasyonu.",
-      "imageUrl": "/uploads/1782059462659-1drp99mjz5y.png",
+      "imageUrl": "/site-media/ref-kfc.png",
       "meta": "Gıda & Perakende"
     },
     {
       "title": "Pizza Hut",
       "subtitle": "Referans marka",
       "body": "Şehir içi operasyon, personel ve saha ulaşımı süreçlerinde planlı taşıma desteği.",
-      "imageUrl": "/uploads/1782059474609-h3eut8mk6qu.png",
+      "imageUrl": "/site-media/ref-pizzahut.png",
       "meta": "Gıda & Perakende"
     },
     {
       "title": "Cinemaximum",
       "subtitle": "Referans marka",
       "body": "Etkinlik, vardiya ve kurumsal ulaşım süreçlerine uygun operasyon modeli.",
-      "imageUrl": "/uploads/1782059484495-3xad0b1zayp.png",
+      "imageUrl": "/site-media/ref-cinemaximum.png",
       "meta": "Eğlence"
     },
     {
@@ -196,49 +196,49 @@
       "title": "SushiCo",
       "subtitle": "Referans marka",
       "body": "Kurumsal saha ve personel ulaşımı kapsamında takip edilebilir hizmet yaklaşımı.",
-      "imageUrl": "/uploads/1782059498405-x31r3hky4jp.png",
+      "imageUrl": "/site-media/ref-sushico.png",
       "meta": "Restoran"
     },
     {
       "title": "İETT",
       "subtitle": "Kurumsal iş ortağı",
       "body": "Toplu ulaşım ve şehir içi hareketlilik alanındaki kurumsal temaslar için referans alanı.",
-      "imageUrl": "/uploads/1782059610223-snq259tzbed.png",
+      "imageUrl": "/site-media/ref-iett.png",
       "meta": "Ulaşım"
     },
     {
       "title": "Little Caesars",
       "subtitle": "Referans marka",
       "body": "Restoran zinciri operasyonları için planlanabilir yolcu taşıma ve servis desteği.",
-      "imageUrl": "/uploads/1782059617922-i3inv944zm.png",
+      "imageUrl": "/site-media/ref-little-caesars.png",
       "meta": "Gıda & Perakende"
     },
     {
       "title": "Burger Yiyelim",
       "subtitle": "Referans marka",
       "body": "Günlük operasyon ve personel hareketliliği için esnek taşıma yaklaşımı.",
-      "imageUrl": "/uploads/1782059625215-dxrohbv8f8w.png",
+      "imageUrl": "/site-media/ref-burger-yiyelim.png",
       "meta": "Restoran"
     },
     {
       "title": "Divane Lounge",
       "subtitle": "Referans marka",
       "body": "Misafir, ekip ve etkinlik taşımacılığına uygun kurumsal hizmet modeli.",
-      "imageUrl": "/uploads/1782059646859-hnpzryh8kcs.png",
+      "imageUrl": "/site-media/ref-divane.png",
       "meta": "Lounge"
     },
     {
       "title": "Happy Moons",
       "subtitle": "Referans marka",
       "body": "Personel ve operasyonel ulaşım planları için referans marka alanı.",
-      "imageUrl": "/uploads/1782059656603-0say6zn2z4dg.png",
+      "imageUrl": "/site-media/ref-happy-moons.png",
       "meta": "Restoran"
     },
     {
       "title": "Midpoint",
       "subtitle": "Referans marka",
       "body": "Kurumsal restoran operasyonları için ulaşım ve servis planlama desteği.",
-      "imageUrl": "/uploads/1782059663205-oqih99etej.png",
+      "imageUrl": "/site-media/ref-midpoint.png",
       "meta": "Restoran"
     },
     {
@@ -260,14 +260,14 @@
   "transitosBody": "TransitOS, Şeflek Tur operasyonunda taşeron, araç, sürücü, güzergah, hakediş, gider, rota ve rapor süreçlerini tek merkezde toplamaya yardımcı olan özel yönetim altyapısıdır.",
   "mobileAppTitle": "TransitOS Mobil App çok yakında uygulama mağazalarında",
   "mobileAppBody": "Şeflek Tur operasyonlarını mobil cihazlardan takip etmeyi sağlayacak TransitOS Mobil App yakında iOS ve Android uygulama mağazalarında yerini alacak.",
-  "mobileAppImageUrl": "/uploads/1782068694955-3w1t0qyetxa.png",
+  "mobileAppImageUrl": "/site-media/transitos-mobile.png",
   "customPages": [
     {
       "id": "kurumsal-yolculuk",
       "title": "Kurumsal Yolculuk Planlama",
       "slug": "kurumsal-yolculuk",
       "summary": "Şirketinizin servis ve transfer ihtiyaçları için özel planlama yaklaşımı.",
-      "heroImageUrl": "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1800&q=86",
+      "heroImageUrl": "/site-media/hero-home.png",
       "blocks": [
         {
           "id": "kurumsal-yolculuk-metin",

@@ -34,11 +34,11 @@ export default async function LoginPage({
         )}
 
         <div className="field">
-          <FloatingInput name="loginId" label={isSiteAdminLogin ? "Site yönetici ID" : "Kullanıcı ID"} defaultValue="admin" autoComplete="username" />
+          <FloatingInput name="loginId" label={isSiteAdminLogin ? "Site yönetici ID" : "Kullanıcı ID"} required autoComplete="off" />
         </div>
 
         <div className="field">
-          <FloatingInput name="password" label="Şifre" type="password" defaultValue="seflektur" autoComplete="current-password" />
+          <FloatingInput name="password" label="Şifre" type="password" required autoComplete="new-password" />
         </div>
 
         {params?.error ? <p className="login-error">{params.error}</p> : null}

@@ -5,7 +5,7 @@ import { SkiperMotionFrame } from "@/app/components/RegistryInterfaceKit";
 import { readSiteContent } from "@/lib/site-content";
 
 const heroFleetImage =
-  "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=2200&q=86";
+  "/site-media/hero-gateway.png";
 
 export default async function HomePage() {
   const content = await readSiteContent();

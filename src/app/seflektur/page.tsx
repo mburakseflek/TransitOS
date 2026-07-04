@@ -6,7 +6,7 @@ import { CompanyInfoList } from "@/app/seflektur/CompanyInfoList";
 import { MobileAppPromo, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
 
 const heroFleetImage =
-  "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=2200&q=86";
+  "/site-media/hero-home.png";
 
 const pageCards = [
   {

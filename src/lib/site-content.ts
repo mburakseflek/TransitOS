@@ -71,16 +71,98 @@ const carrierApplicationsPath = path.join(dataDir, "carrier-applications.json");
 const serviceRequestsPath = path.join(dataDir, "service-requests.json");
 const siteContentKey = "site-content";
 
+const siteImageAliases: Record<string, string> = {
+  "/uploads/1782067215389-dagqbpclyba.png": "/site-media/hero-gateway.png",
+  "/uploads/1782067229696-elulxybflp9.png": "/site-media/hero-home.png",
+  "/uploads/1782069507162-64rsn1day4e.png": "/site-media/hero-fleet.png",
+  "/uploads/1782068694955-3w1t0qyetxa.png": "/site-media/transitos-mobile.png",
+  "/uploads/1782028010544-s6gqbp67il.webp": "/site-media/fleet-sprinter.webp",
+  "/uploads/1782028194348-mruo5ibad6c.webp": "/site-media/fleet-crafter.webp",
+  "/uploads/1782027978943-4l8tjr9sqq5.webp": "/site-media/fleet-master.webp",
+  "/uploads/1782028264865-7qtg12rleno.webp": "/site-media/fleet-transit.webp",
+  "/uploads/1782028296103-igo2dqr7yjs.webp": "/site-media/fleet-ducato.webp",
+  "/uploads/1782029262097-250ymokn1ge.webp": "/site-media/fleet-midibus.webp",
+  "/uploads/1782028441814-ka6k9ds2m9.webp": "/site-media/fleet-travego.webp",
+  "/uploads/1782029481424-33turrfuxpa.webp": "/site-media/vip-vito.webp",
+  "/uploads/1782029556232-xv9htcj0qv9.webp": "/site-media/vip-transporter.webp",
+  "/uploads/1782029647090-y0iuc6yo5a.webp": "/site-media/vip-sprinter.webp",
+  "/uploads/1782029807960-gtyvurpui4q.webp": "/site-media/vip-e200.webp",
+  "/uploads/1782067503969-i9k64a1jmy.png": "/site-media/service-school.png",
+  "/uploads/1782067946574-dq9t74skzqf.png": "/site-media/service-personnel.png",
+  "/uploads/1782068251487-tlk8svd5bt.png": "/site-media/service-tourism.png",
+  "/uploads/1782068382445-811b893rsvi.png": "/site-media/service-daily.png",
+  "/uploads/1782068614952-w1vwsjn1l1a.png": "/site-media/service-vip.png",
+  "/uploads/1782059453243-ai6rzmcn7od.png": "/site-media/ref-mcdonalds.png",
+  "/uploads/1782059462659-1drp99mjz5y.png": "/site-media/ref-kfc.png",
+  "/uploads/1782059474609-h3eut8mk6qu.png": "/site-media/ref-pizzahut.png",
+  "/uploads/1782059484495-3xad0b1zayp.png": "/site-media/ref-cinemaximum.png",
+  "/uploads/1782059498405-x31r3hky4jp.png": "/site-media/ref-sushico.png",
+  "/uploads/1782059610223-snq259tzbed.png": "/site-media/ref-iett.png",
+  "/uploads/1782059617922-i3inv944zm.png": "/site-media/ref-little-caesars.png",
+  "/uploads/1782059625215-dxrohbv8f8w.png": "/site-media/ref-burger-yiyelim.png",
+  "/uploads/1782059646859-hnpzryh8kcs.png": "/site-media/ref-divane.png",
+  "/uploads/1782059656603-0say6zn2z4dg.png": "/site-media/ref-happy-moons.png",
+  "/uploads/1782059663205-oqih99etej.png": "/site-media/ref-midpoint.png",
+  "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=2200&q=86": "/site-media/hero-gateway.png",
+  "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=2200&q=86": "/site-media/hero-fleet.png",
+  "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=2200&q=86": "/site-media/hero-vip.png",
+  "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=1600&q=86": "/site-media/transitos-mobile.png"
+};
+
+const fleetImagesByTitle: Record<string, string> = {
+  "mercedes-benz sprinter": "/site-media/fleet-sprinter.webp",
+  "mercedes benz sprinter": "/site-media/fleet-sprinter.webp",
+  "volkswagen crafter volt": "/site-media/fleet-crafter.webp",
+  "renault master": "/site-media/fleet-master.webp",
+  "ford transit": "/site-media/fleet-transit.webp",
+  "fiat ducato": "/site-media/fleet-ducato.webp",
+  "otokar sultan comfort/giga": "/site-media/fleet-midibus.webp",
+  "mercedes benz travego": "/site-media/fleet-travego.webp",
+  "mercedes-benz travego & tourismo": "/site-media/fleet-travego.webp",
+  "renault master / fiat ducato": "/site-media/fleet-master.webp",
+  "volkswagen crafter volt / ford transit": "/site-media/fleet-crafter.webp"
+};
+
+const vipImagesByTitle: Record<string, string> = {
+  "mercedes-benz vito": "/site-media/vip-vito.webp",
+  "volkswagen transporter": "/site-media/vip-transporter.webp",
+  "mercedes-benz sprinter": "/site-media/vip-sprinter.webp",
+  "mercedes e200d": "/site-media/vip-e200.webp",
+  "mercedes-benz e200": "/site-media/vip-e200.webp"
+};
+
+const serviceImagesByTitle: Record<string, string> = {
+  "öğrenci ve okul taşımacılığı": "/site-media/service-school.png",
+  "personel taşımacılığı": "/site-media/service-personnel.png",
+  "turizm ve gezi turları": "/site-media/service-tourism.png",
+  "günlük genel yolculuk hizmetleri": "/site-media/service-daily.png",
+  "vip yolculuk": "/site-media/service-vip.png"
+};
+
+const referenceImagesByTitle: Record<string, string> = {
+  "mcdonald's": "/site-media/ref-mcdonalds.png",
+  "kfc": "/site-media/ref-kfc.png",
+  "pizza hut": "/site-media/ref-pizzahut.png",
+  "cinemaximum": "/site-media/ref-cinemaximum.png",
+  "sushico": "/site-media/ref-sushico.png",
+  "iett": "/site-media/ref-iett.png",
+  "little caesars": "/site-media/ref-little-caesars.png",
+  "burger yiyelim": "/site-media/ref-burger-yiyelim.png",
+  "divane lounge": "/site-media/ref-divane.png",
+  "happy moons": "/site-media/ref-happy-moons.png",
+  "midpoint": "/site-media/ref-midpoint.png"
+};
+
 export const defaultSiteContent: SiteContent = {
   companyName: "Şeflek Tur",
   brandLine: "Turizm & Yolcu Taşımacılığı",
   heroTitle: "Şeflek Tur Turizm & Yolcu Taşımacılığı",
   heroSubtitle:
     "Kurumsal personel taşımacılığı, okul servisleri, VIP transfer, turizm ve günlük yolculuk hizmetlerinde güvenli, izlenebilir ve profesyonel operasyon.",
-  gatewayImageUrl: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=2200&q=86",
-  homeHeroImageUrl: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=2200&q=86",
-  fleetHeroImageUrl: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=2200&q=86",
-  vipHeroImageUrl: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=2200&q=86",
+  gatewayImageUrl: "/site-media/hero-gateway.png",
+  homeHeroImageUrl: "/site-media/hero-home.png",
+  fleetHeroImageUrl: "/site-media/hero-fleet.png",
+  vipHeroImageUrl: "/site-media/hero-vip.png",
   companySummary:
     "Şeflek Tur; İstanbul merkezli servis, turizm ve yolcu taşımacılığı süreçlerini modern filo yönetimi, düzenli operasyon takibi ve 7/24 ulaşılabilir iletişim anlayışıyla yürütür. TransitOS altyapısı sayesinde araç, güzergah, hakediş ve operasyon bilgileri kontrollü şekilde takip edilir.",
   contactPhone: "+90 (000) 000 00 00",
@@ -95,28 +177,28 @@ export const defaultSiteContent: SiteContent = {
       title: "Mercedes-Benz Sprinter",
       subtitle: "16+1 / 19+1 / 21+1 servis çözümleri",
       body: "Personel, öğrenci ve kurumsal servis operasyonları için konforlu, yüksek tavanlı ve düzenli takip edilebilir filo seçeneği.",
-      imageUrl: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/fleet-sprinter.webp",
       meta: "Servis / Minibüs"
     },
     {
       title: "Mercedes-Benz Travego & Tourismo",
       subtitle: "Uzun yol ve turizm otobüsleri",
       body: "Gezi turları, şehirler arası organizasyonlar ve kalabalık gruplar için yüksek konforlu otobüs planlaması.",
-      imageUrl: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/fleet-travego.webp",
       meta: "Turizm / Otobüs"
     },
     {
       title: "Renault Master / Fiat Ducato",
       subtitle: "Esnek servis kapasitesi",
       body: "Farklı personel sayıları ve güzergah yoğunlukları için ekonomik, çevik ve düzenli servis seçenekleri.",
-      imageUrl: "https://images.unsplash.com/photo-1601981875583-a9b0701f0778?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/fleet-master.webp",
       meta: "Servis / Minibüs"
     },
     {
       title: "Volkswagen Crafter Volt / Ford Transit",
       subtitle: "Kurumsal filo destek araçları",
       body: "Personel taşımacılığı, vardiya operasyonları ve günlük genel yolculuk hizmetlerinde yüksek kullanılabilirlik.",
-      imageUrl: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/fleet-crafter.webp",
       meta: "Kurumsal Servis"
     }
   ],
@@ -125,21 +207,21 @@ export const defaultSiteContent: SiteContent = {
       title: "Mercedes-Benz Vito",
       subtitle: "VIP transfer ve özel yolculuk",
       body: "Misafir karşılama, yönetici transferleri ve özel organizasyonlar için sessiz, konforlu ve prestijli ulaşım.",
-      imageUrl: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/vip-vito.webp",
       meta: "VIP"
     },
     {
       title: "Volkswagen Transporter",
       subtitle: "Konforlu grup transferi",
       body: "Havalimanı, otel, toplantı ve günlük özel ulaşım talepleri için planlanabilir VIP araç alternatifi.",
-      imageUrl: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/vip-transporter.webp",
       meta: "VIP"
     },
     {
       title: "Mercedes-Benz E200",
       subtitle: "Yönetici sınıfı sedan",
       body: "Tekil VIP transferlerde kurumsal temsil gücü yüksek, konfor odaklı sedan ulaşım hizmeti.",
-      imageUrl: "https://images.unsplash.com/photo-1616788494672-ec7ca25fdda9?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/vip-e200.webp",
       meta: "Executive"
     }
   ],
@@ -148,35 +230,35 @@ export const defaultSiteContent: SiteContent = {
       title: "Öğrenci ve Okul Taşımacılığı",
       subtitle: "Güvenli servis planlaması",
       body: "Okul saatleri, veli beklentileri ve güzergah güvenliği dikkate alınarak düzenlenen öğrenci taşıma hizmetleri.",
-      imageUrl: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/service-school.png",
       meta: "Okul"
     },
     {
       title: "Personel Taşımacılığı",
       subtitle: "Vardiya ve güzergah yönetimi",
       body: "Sabah, akşam, gece ve mesai servisleri için kurumsal güzergah planlama ve araç atama süreçleri.",
-      imageUrl: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/service-personnel.png",
       meta: "Kurumsal"
     },
     {
       title: "Turizm ve Gezi Turları",
       subtitle: "Planlı grup ulaşımı",
       body: "Şehir içi ve şehir dışı gezi, tur, etkinlik ve organizasyon taşımacılığı.",
-      imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/service-tourism.png",
       meta: "Turizm"
     },
     {
       title: "Günlük Genel Yolculuk Hizmetleri",
       subtitle: "Tek seferlik veya dönemsel ulaşım",
       body: "Firma, kurum veya şahısların günlük ulaşım ihtiyaçlarına özel planlanan esnek servis çözümleri.",
-      imageUrl: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/service-daily.png",
       meta: "Günlük"
     },
     {
       title: "VIP Yolculuk",
       subtitle: "Özel transfer deneyimi",
       body: "Yönetici, misafir ve özel davet transferlerinde prestijli araçlarla kontrollü ulaşım.",
-      imageUrl: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=1400&q=86",
+      imageUrl: "/site-media/service-vip.png",
       meta: "VIP"
     }
   ],
@@ -309,14 +391,14 @@ export const defaultSiteContent: SiteContent = {
   mobileAppTitle: "TransitOS Mobil App çok yakında uygulama mağazalarında",
   mobileAppBody:
     "Şeflek Tur operasyonlarını mobil cihazlardan takip etmeyi sağlayacak TransitOS Mobil App yakında iOS ve Android uygulama mağazalarında yerini alacak.",
-  mobileAppImageUrl: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=1600&q=86",
+  mobileAppImageUrl: "/site-media/transitos-mobile.png",
   customPages: [
     {
       id: "kurumsal-yolculuk",
       title: "Kurumsal Yolculuk Planlama",
       slug: "kurumsal-yolculuk",
       summary: "Şirketinizin servis ve transfer ihtiyaçları için özel planlama yaklaşımı.",
-      heroImageUrl: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1800&q=86",
+      heroImageUrl: "/site-media/hero-home.png",
       blocks: [
         {
           id: "kurumsal-yolculuk-metin",
@@ -343,6 +425,52 @@ export const defaultSiteContent: SiteContent = {
   ]
 };
 
+function cardKey(value: string) {
+  return value.trim().toLocaleLowerCase("tr-TR");
+}
+
+function canonicalImageUrl(value: string | undefined, fallback = "") {
+  const trimmed = value?.trim() ?? "";
+  if (!trimmed) return fallback;
+  if (siteImageAliases[trimmed]) return siteImageAliases[trimmed];
+  if (trimmed.includes("images.unsplash.com")) return fallback;
+  return trimmed;
+}
+
+function canonicalCards(cards: SiteCard[], fallbacksByTitle: Record<string, string>) {
+  return cards.map((card) => ({
+    ...card,
+    imageUrl: canonicalImageUrl(card.imageUrl, fallbacksByTitle[cardKey(card.title)] ?? "")
+  }));
+}
+
+function canonicalCustomPages(pages: CustomPage[]) {
+  return pages.map((page) => ({
+    ...page,
+    heroImageUrl: canonicalImageUrl(page.heroImageUrl, defaultSiteContent.homeHeroImageUrl),
+    blocks: page.blocks.map((block) => ({
+      ...block,
+      imageUrl: canonicalImageUrl(block.imageUrl)
+    }))
+  }));
+}
+
+function canonicalSiteContent(content: SiteContent): SiteContent {
+  return {
+    ...content,
+    gatewayImageUrl: canonicalImageUrl(content.gatewayImageUrl, defaultSiteContent.gatewayImageUrl),
+    homeHeroImageUrl: canonicalImageUrl(content.homeHeroImageUrl, defaultSiteContent.homeHeroImageUrl),
+    fleetHeroImageUrl: canonicalImageUrl(content.fleetHeroImageUrl, defaultSiteContent.fleetHeroImageUrl),
+    vipHeroImageUrl: canonicalImageUrl(content.vipHeroImageUrl, defaultSiteContent.vipHeroImageUrl),
+    mobileAppImageUrl: canonicalImageUrl(content.mobileAppImageUrl, defaultSiteContent.mobileAppImageUrl),
+    fleet: canonicalCards(content.fleet, fleetImagesByTitle),
+    vipFleet: canonicalCards(content.vipFleet, vipImagesByTitle),
+    services: canonicalCards(content.services, serviceImagesByTitle),
+    references: canonicalCards(content.references, referenceImagesByTitle),
+    customPages: canonicalCustomPages(content.customPages)
+  };
+}
+
 export function cardsToText(cards: SiteCard[]) {
   return cards.map((card) => [
     card.title,
@@ -358,7 +486,7 @@ export function customPagesToText(pages: CustomPage[]) {
 }
 
 function sanitizeSiteContent(value: Partial<SiteContent>): SiteContent {
-  return {
+  return canonicalSiteContent({
     ...defaultSiteContent,
     ...value,
     companyName: value.companyName || defaultSiteContent.companyName,
@@ -396,7 +524,7 @@ function sanitizeSiteContent(value: Partial<SiteContent>): SiteContent {
     mobileAppImageUrl: value.mobileAppImageUrl || defaultSiteContent.mobileAppImageUrl,
     customPages: Array.isArray(value.customPages) ? value.customPages : defaultSiteContent.customPages,
     tickerItems: Array.isArray(value.tickerItems) ? value.tickerItems : defaultSiteContent.tickerItems
-  };
+  });
 }
 
 async function ensureContentDir() {
@@ -472,7 +600,7 @@ export async function readSiteContent(): Promise<SiteContent> {
     const raw = await fs.readFile(contentPath, "utf8");
     return sanitizeSiteContent(JSON.parse(raw));
   } catch {
-    return defaultSiteContent;
+    return canonicalSiteContent(defaultSiteContent);
   }
 }
 

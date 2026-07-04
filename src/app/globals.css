@@ -11520,3 +11520,163 @@ textarea {
     height: 44px !important;
   }
 }
+
+/* Final safe-zone repair: keep decorative blur out of readable content */
+.new-site-page::before,
+.form-site-page::before,
+.transitos-info-page::before,
+.live-edit-page::before,
+.site-admin-page::before,
+.new-gateway::before,
+.transitos-shell .content::before,
+.new-site-page::after,
+.form-site-page::after,
+.transitos-info-page::after,
+.live-edit-page::after,
+.site-admin-page::after,
+.new-gateway::after,
+.transitos-shell .content::after {
+  content: none !important;
+  display: none !important;
+}
+
+.transitos-ui-tool-strip {
+  display: none !important;
+}
+
+.transitos-shell.shell {
+  display: grid !important;
+  grid-template-columns: clamp(248px, 17vw, 300px) minmax(0, 1fr) !important;
+  gap: 0 !important;
+  align-items: start !important;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+.transitos-shell .content {
+  width: min(100%, 1760px) !important;
+  min-width: 0;
+  margin-inline: auto !important;
+  padding: clamp(16px, 2vw, 28px) clamp(16px, 2vw, 30px) calc(120px + env(safe-area-inset-bottom)) !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] {
+  position: sticky !important;
+  top: max(12px, env(safe-area-inset-top)) !important;
+  width: auto !important;
+  height: calc(100dvh - max(24px, env(safe-area-inset-top))) !important;
+  min-height: 0 !important;
+  margin: 12px !important;
+  padding: 18px !important;
+  overflow: auto !important;
+  border-radius: 28px;
+  z-index: 260 !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"]:hover,
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"]:focus-within {
+  width: auto !important;
+  padding: 18px !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] :is(
+  .sidebar-brand-title,
+  .sidebar-brand-meta,
+  .site-return-link span,
+  .aceternity-sidebar-link span
+) {
+  max-width: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: none !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar .brand {
+  align-items: start !important;
+  justify-items: start !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar .brand img,
+.transitos-shell .sidebar.aceternity-sidebar:hover .brand img,
+.transitos-shell .sidebar.aceternity-sidebar:focus-within .brand img {
+  width: min(198px, 100%) !important;
+  height: auto !important;
+  padding: 10px !important;
+  border-radius: 18px !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .nav {
+  align-items: stretch !important;
+}
+
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .aceternity-sidebar-link,
+.transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .site-return-link {
+  justify-content: flex-start !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  padding: 11px 12px !important;
+  border-radius: 14px !important;
+}
+
+.transitos-shell .topbar {
+  position: relative !important;
+  top: auto !important;
+  z-index: 120 !important;
+  margin: 0 0 22px !important;
+  width: 100%;
+}
+
+.transitos-shell :is(.card, .topbar, .traffic-row, .route-card, .timeline-item, .route-assignment-card, .assignment-line) {
+  overflow: hidden;
+}
+
+.transitos-rate-ticker {
+  position: fixed !important;
+  left: calc(clamp(248px, 17vw, 300px) + 18px) !important;
+  right: max(18px, env(safe-area-inset-right)) !important;
+  bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  z-index: 300 !important;
+  max-height: 58px;
+  margin: 0 !important;
+  pointer-events: none;
+}
+
+.new-rate-ticker,
+.whatsapp-float {
+  pointer-events: auto;
+}
+
+@media (max-width: 980px) {
+  .transitos-shell.shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  .transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] {
+    position: relative !important;
+    top: auto !important;
+    width: calc(100% - 24px) !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .brand {
+    display: none;
+  }
+
+  .transitos-shell .desktop-nav {
+    display: flex !important;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .transitos-shell .desktop-nav .aceternity-sidebar-link {
+    flex: 0 0 auto;
+    width: auto !important;
+  }
+
+  .transitos-rate-ticker {
+    left: max(12px, env(safe-area-inset-left)) !important;
+    right: max(12px, env(safe-area-inset-right)) !important;
+  }
+}

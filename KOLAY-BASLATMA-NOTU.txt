@@ -1,0 +1,17 @@
+SeflekTur TransitOS Web kolay baslatma
+
+1. Docker Desktop uygulamasinin Mac'e yuklu oldugundan emin olun.
+2. TransitOSCloud klasorundeki TransitOS-Web-Arkaplanda-Baslat.command dosyasina cift tiklayin.
+3. Ilk acilista Docker'in hazir olmasi biraz surebilir.
+4. Bu arka plan baslaticisinda Terminal'i kapatabilirsiniz.
+5. Web adresi:
+
+http://127.0.0.1:3000
+
+Web'i kapatmak icin:
+
+TransitOS-Web-Durdur.command dosyasina cift tiklayin.
+
+Yonetici girisi:
+ID: admin
+Sifre: seflektur

@@ -1,0 +1,11 @@
+.DS_Store
+.env
+.env*.local
+.local/
+.next/
+.next-check/
+.vercel/
+node_modules/
+public/uploads/
+*.log
+tsconfig.tsbuildinfo

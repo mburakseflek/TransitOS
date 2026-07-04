@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: transitos-cloud-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: transitos_cloud
+      POSTGRES_USER: transitos
+      POSTGRES_PASSWORD: transitos
+    ports:
+      - "55432:5432"
+    volumes:
+      - transitos_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  transitos_postgres_data:

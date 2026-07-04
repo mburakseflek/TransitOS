@@ -1,0 +1,50 @@
+{
+  "name": "seflektur-transitos-cloud",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "bash scripts/start-development.sh",
+    "dev:web": "next dev --hostname 127.0.0.1 --port ${PORT:-3100}",
+    "dev:clean": "rm -rf .next && bash scripts/start-development.sh",
+    "build": "prisma generate && next build",
+    "build:vercel": "prisma generate && prisma migrate deploy && next build",
+    "build:check": "rm -rf .next-check && NEXT_DIST_DIR=.next-check next build && rm -rf .next-check",
+    "typecheck": "prisma generate && tsc --noEmit --incremental false",
+    "check": "npm run typecheck && npm run build:check",
+    "start": "bash scripts/ensure-database.sh && next build && next start --hostname 127.0.0.1",
+    "start:server": "bash scripts/ensure-database.sh && next start --hostname 127.0.0.1",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:ensure": "bash scripts/ensure-database.sh",
+    "db:local:setup": "bash scripts/ensure-database.sh",
+    "db:import:mac": "prisma db seed",
+    "db:sync:mac": "npm run db:local:setup && prisma migrate deploy && npm run db:import:mac",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "test:roles": "node scripts/role-smoke-test.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6",
+    "lucide-react": "^0.468.0",
+    "next": "^15.0.4",
+    "prisma": "^5.22.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "eslint": "^9.16.0",
+    "eslint-config-next": "^15.0.4",
+    "typescript": "^5.7.2"
+  }
+}

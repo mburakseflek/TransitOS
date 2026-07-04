@@ -1,0 +1,1 @@
+ALTER TYPE "ServiceDirection" ADD VALUE IF NOT EXISTS 'NIGHT';

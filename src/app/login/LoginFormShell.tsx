@@ -28,6 +28,7 @@ export function LoginFormShell({
         className={className}
         action="/api/auth/login"
         method="post"
+        autoComplete="off"
         onSubmit={handleSubmit}
         aria-busy={isSubmitting}
       >

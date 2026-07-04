@@ -19,6 +19,7 @@
     "db:ensure": "bash scripts/ensure-database.sh",
     "db:local:setup": "bash scripts/ensure-database.sh",
     "db:import:mac": "prisma db seed",
+    "db:upload:mac": "node scripts/upload-mac-data-to-cloud.js",
     "db:sync:mac": "npm run db:local:setup && prisma migrate deploy && npm run db:import:mac",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",

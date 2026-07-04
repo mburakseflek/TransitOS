@@ -152,7 +152,23 @@ export async function PUT(request: Request) {
     return NextResponse.json({ message: "Eşitleme paketi geçersiz." }, { status: 400 });
   }
 
+  const replaceCloudData = new URL(request.url).searchParams.get("replace") === "local";
+
   await prisma.$transaction(async (tx) => {
+    if (replaceCloudData) {
+      await tx.financialDocumentLine.deleteMany();
+      await tx.financialDocument.deleteMany();
+      await tx.routeStop.deleteMany();
+      await tx.driverDocument.deleteMany();
+      await tx.serviceAssignment.deleteMany();
+      await tx.expense.deleteMany();
+      await tx.serviceRoute.deleteMany();
+      await tx.project.deleteMany();
+      await tx.vehicle.deleteMany();
+      await tx.user.deleteMany();
+      await tx.subcontractor.deleteMany();
+    }
+
     for (const item of snapshot.subcontractors) {
       await tx.subcontractor.upsert({
         where: { id: String(item.id) },

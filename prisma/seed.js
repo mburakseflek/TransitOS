@@ -17,6 +17,11 @@ function sql(query) {
   return output.trim() ? JSON.parse(output) : [];
 }
 
+function firstExistingColumn(tableName, candidates) {
+  const columns = new Set(sql(`PRAGMA table_info(${tableName})`).map((item) => item.name));
+  return candidates.find((candidate) => columns.has(candidate)) || candidates[0];
+}
+
 function dateFromAppleSeconds(value, fallback = new Date()) {
   const seconds = Number(value);
   if (!Number.isFinite(seconds)) return fallback;
@@ -104,7 +109,8 @@ async function main() {
   const assignments = sql(`select hex(ZID) id, hex(ZPROJECTID) projectId, hex(ZROUTEID) routeId, hex(ZVEHICLEID) vehicleId, ZDIRECTIONRAWVALUE direction, ZPLANNEDDAYS plannedDays, ZSERVICESPERDAY serviceCount, ZAVERAGEKILOMETERS kilometers, ZPRICEPERSERVICE pricePerService, ZSERVICETIME serviceTime, ZPLANNEDDATESTEXT plannedDatesText from ZPROJECTVEHICLEASSIGNMENT order by ZCREATEDAT`);
   const expenses = sql(`select hex(ZID) id, hex(ZSUBCONTRACTORID) subcontractorId, hex(ZVEHICLEID) vehicleId, ZCATEGORYRAWVALUE category, ZAMOUNT amount, ZEXPENSEDATE expenseDate, ZMONTHKEY monthKey, ZNOTES notes from ZSUBCONTRACTOREXPENSE order by ZEXPENSEDATE`);
   const routePlans = sql(`select Z_PK pk, hex(ZSERVICEROUTEID) routeId from ZROUTEPLAN`);
-  const waypoints = sql(`select Z6WAYPOINTS routePlanPk, hex(ZID) id, ZORDER stopOrder, ZTITLE title, ZLATITUDE latitude, ZLONGITUDE longitude from ZROUTEWAYPOINT order by Z6WAYPOINTS, ZORDER`);
+  const routePlanRelationColumn = firstExistingColumn("ZROUTEWAYPOINT", ["Z6WAYPOINTS", "Z7WAYPOINTS", "Z8WAYPOINTS"]);
+  const waypoints = sql(`select ${routePlanRelationColumn} routePlanPk, hex(ZID) id, ZORDER stopOrder, ZTITLE title, ZLATITUDE latitude, ZLONGITUDE longitude from ZROUTEWAYPOINT order by ${routePlanRelationColumn}, ZORDER`);
   const subcontractorIds = new Set(subcontractors.map((item) => item.id).filter(Boolean));
   const projectIds = new Set(projects.map((item) => item.id).filter(Boolean));
   const vehicleIds = new Set(vehicles.map((item) => item.id).filter(Boolean));

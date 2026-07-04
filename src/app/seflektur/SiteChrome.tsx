@@ -1,10 +1,23 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { WhatsAppIcon } from "@/app/components/WhatsAppIcon";
 import { SkiperMotionFrame, SkiperTickerRail } from "@/app/components/RegistryInterfaceKit";
 import { readSiteContent, SiteCard } from "@/lib/site-content";
 import { getMarketTickerItems } from "@/lib/market-data";
+
+const siteNavLinks = [
+  { href: "/seflektur", label: "Ana Sayfa" },
+  { href: "/seflektur/hizmetler", label: "Hizmetler" },
+  { href: "/seflektur/filo", label: "Filo" },
+  { href: "/seflektur/vip", label: "VIP" },
+  { href: "/seflektur/ayricaliklar", label: "Ayrıcalıklar" },
+  { href: "/seflektur/standartlar", label: "Belgeler" },
+  { href: "/seflektur/referanslar", label: "Referanslar" },
+  { href: "/seflektur/transitos", label: "TransitOS" },
+  { href: "/seflektur/iletisim", label: "İletişim" },
+  { href: "/seflektur/teklif", label: "Hizmet Talebi", className: "new-nav-cta" }
+] as const;
 
 export function SiteHeader() {
   return (
@@ -12,17 +25,32 @@ export function SiteHeader() {
       <Link className="navy-brand" href="/">
         <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
       </Link>
-      <nav>
-        <Link href="/seflektur">Ana Sayfa</Link>
-        <Link href="/seflektur/hizmetler">Hizmetler</Link>
-        <Link href="/seflektur/filo">Filo</Link>
-        <Link href="/seflektur/vip">VIP</Link>
-        <Link href="/seflektur/ayricaliklar">Ayrıcalıklar</Link>
-        <Link href="/seflektur/standartlar">Belgeler</Link>
-        <Link href="/seflektur/referanslar">Referanslar</Link>
-        <Link href="/seflektur/transitos">TransitOS</Link>
-        <Link href="/seflektur/iletisim">İletişim</Link>
-        <Link className="new-nav-cta" href="/seflektur/teklif">Hizmet Talebi</Link>
+      <nav className="site-desktop-nav" aria-label="Kurumsal site menüsü">
+        {siteNavLinks.map((item) => (
+          <Link key={item.href} className={"className" in item ? item.className : undefined} href={item.href}>
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+      <input className="site-mobile-nav-check" id="site-mobile-navigation" type="checkbox" aria-hidden="true" />
+      <label className="site-mobile-menu-button" htmlFor="site-mobile-navigation" aria-label="Menüyü aç">
+        <Menu size={19} />
+        <span>Menü</span>
+      </label>
+      <label className="site-mobile-nav-backdrop" htmlFor="site-mobile-navigation" aria-label="Menüyü kapat" />
+      <nav className="site-mobile-drawer" aria-label="Mobil kurumsal site menüsü">
+        <div className="site-mobile-drawer-head">
+          <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
+          <label htmlFor="site-mobile-navigation" aria-label="Menüyü kapat">
+            <X size={18} />
+            <span>Kapat</span>
+          </label>
+        </div>
+        {siteNavLinks.map((item) => (
+          <Link key={item.href} className={"className" in item ? item.className : undefined} href={item.href}>
+            {item.label}
+          </Link>
+        ))}
       </nav>
     </header>
   );

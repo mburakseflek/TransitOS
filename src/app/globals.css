@@ -12133,3 +12133,550 @@ textarea {
     padding: 18px !important;
   }
 }
+
+/* Mobile release hardening: real drawers, no hidden overflow, no glass overlays over content */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip !important;
+}
+
+.site-mobile-nav-check,
+.site-mobile-menu-button,
+.site-mobile-nav-backdrop,
+.site-mobile-drawer {
+  display: none;
+}
+
+.new-site-nav .site-desktop-nav {
+  display: flex;
+}
+
+@media (max-width: 860px) {
+  body {
+    overscroll-behavior-x: none;
+  }
+
+  .new-site-page,
+  .form-site-page,
+  .transitos-info-page,
+  .live-edit-page,
+  .site-admin-page {
+    width: 100% !important;
+    overflow-x: clip !important;
+    padding-left: max(14px, env(safe-area-inset-left)) !important;
+    padding-right: max(14px, env(safe-area-inset-right)) !important;
+    padding-bottom: calc(138px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .new-site-page::before,
+  .form-site-page::before,
+  .transitos-info-page::before,
+  .live-edit-page::before,
+  .site-admin-page::before,
+  .new-gateway::before,
+  .transitos-shell .content::before,
+  .new-site-page::after,
+  .form-site-page::after,
+  .transitos-info-page::after,
+  .live-edit-page::after,
+  .site-admin-page::after,
+  .new-gateway::after,
+  .transitos-shell .content::after {
+    content: none !important;
+    display: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .new-site-nav {
+    position: sticky !important;
+    top: max(8px, env(safe-area-inset-top)) !important;
+    z-index: 880 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: calc(100% - 20px) !important;
+    min-height: 68px !important;
+    max-height: 86px !important;
+    margin: max(8px, env(safe-area-inset-top)) auto 12px !important;
+    padding: 9px 10px !important;
+    gap: 10px !important;
+    border-radius: 23px !important;
+    overflow: visible !important;
+    isolation: isolate !important;
+  }
+
+  .new-site-nav::before {
+    content: "" !important;
+    display: block !important;
+    opacity: 0.52 !important;
+  }
+
+  .new-site-nav .navy-brand {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 136px) !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  .new-site-nav .navy-brand img {
+    width: min(164px, 46vw) !important;
+    max-height: 50px !important;
+    object-fit: contain !important;
+    mix-blend-mode: multiply !important;
+    background: transparent !important;
+    border: 0 !important;
+    filter: drop-shadow(0 7px 16px rgba(17, 24, 39, 0.12)) !important;
+  }
+
+  .new-site-nav .site-desktop-nav {
+    display: none !important;
+  }
+
+  .site-mobile-nav-check {
+    position: fixed !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .site-mobile-menu-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    gap: 8px !important;
+    min-width: 92px !important;
+    min-height: 48px !important;
+    border: 1px solid rgba(17, 35, 63, 0.12) !important;
+    border-radius: 999px !important;
+    padding: 0 14px !important;
+    color: #101827 !important;
+    background: rgba(255, 255, 255, 0.86) !important;
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.1) !important;
+    font-weight: 950 !important;
+    cursor: pointer !important;
+  }
+
+  .site-mobile-nav-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 930 !important;
+    display: block !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    background: rgba(10, 17, 32, 0.34) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    transition: opacity 180ms ease !important;
+  }
+
+  .site-mobile-drawer {
+    position: fixed !important;
+    top: max(12px, env(safe-area-inset-top)) !important;
+    bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+    left: max(12px, env(safe-area-inset-left)) !important;
+    z-index: 940 !important;
+    display: grid !important;
+    grid-auto-rows: max-content !important;
+    gap: 9px !important;
+    width: min(338px, calc(100vw - 30px)) !important;
+    max-width: calc(100vw - 30px) !important;
+    padding: 16px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    border: 1px solid rgba(17, 35, 63, 0.13) !important;
+    border-radius: 27px !important;
+    color: #101827 !important;
+    background:
+      radial-gradient(circle at 10% 6%, rgba(88, 210, 255, 0.18), transparent 34%),
+      radial-gradient(circle at 92% 6%, rgba(201, 31, 47, 0.11), transparent 32%),
+      linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(246, 250, 253, 0.93)) !important;
+    box-shadow: 0 34px 94px rgba(15, 23, 42, 0.26) !important;
+    transform: translate3d(-120vw, 0, 0) !important;
+    visibility: hidden !important;
+    transition:
+      transform 220ms cubic-bezier(.2, .82, .2, 1),
+      visibility 0s linear 220ms !important;
+  }
+
+  .site-mobile-nav-check:checked ~ .site-mobile-nav-backdrop {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .site-mobile-nav-check:checked ~ .site-mobile-drawer {
+    transform: translate3d(0, 0, 0) !important;
+    visibility: visible !important;
+    transition:
+      transform 220ms cubic-bezier(.2, .82, .2, 1),
+      visibility 0s linear 0s !important;
+  }
+
+  .site-mobile-drawer-head {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding-bottom: 8px !important;
+  }
+
+  .site-mobile-drawer-head img {
+    width: min(172px, 58vw) !important;
+    height: auto !important;
+    object-fit: contain !important;
+    mix-blend-mode: multiply !important;
+  }
+
+  .site-mobile-drawer-head label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-height: 40px !important;
+    border: 1px solid rgba(17, 35, 63, 0.12) !important;
+    border-radius: 999px !important;
+    padding: 0 11px !important;
+    background: rgba(255, 255, 255, 0.84) !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    cursor: pointer !important;
+  }
+
+  .site-mobile-drawer a {
+    display: flex !important;
+    min-height: 52px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    border: 1px solid rgba(17, 35, 63, 0.1) !important;
+    border-radius: 17px !important;
+    padding: 12px 14px !important;
+    color: #111827 !important;
+    background: rgba(255, 255, 255, 0.74) !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+    font-weight: 930 !important;
+  }
+
+  .site-mobile-drawer a.new-nav-cta {
+    color: #ffffff !important;
+    border-color: transparent !important;
+    background: linear-gradient(135deg, #c91f2f, #17385f) !important;
+  }
+
+  .page-hero,
+  .new-site-hero,
+  .new-section,
+  .page-menu-section,
+  .page-cta-band,
+  .company-preview-card,
+  .mobile-app-promo,
+  .new-transitos-band {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .page-hero,
+  .new-site-hero {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+    padding-top: 18px !important;
+  }
+
+  .new-rate-ticker {
+    position: fixed !important;
+    left: max(10px, env(safe-area-inset-left)) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: 62px !important;
+    padding: 5px !important;
+    border-radius: 22px !important;
+    overflow: hidden !important;
+  }
+
+  .new-rate-ticker .skiper-ticker-rail,
+  .transitos-rate-ticker .skiper-ticker-rail {
+    min-height: 50px !important;
+    overflow: hidden !important;
+  }
+
+  .new-rate-ticker .skiper-ticker-rail span,
+  .transitos-rate-ticker .skiper-ticker-rail span {
+    white-space: nowrap !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+  }
+
+  .whatsapp-float {
+    position: fixed !important;
+    right: max(14px, env(safe-area-inset-right)) !important;
+    bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+    z-index: 970 !important;
+    min-width: 58px !important;
+    width: 58px !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    border-radius: 999px !important;
+    padding: 0 !important;
+  }
+
+  .whatsapp-float span {
+    display: none !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .transitos-shell.shell {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 100dvh !important;
+    overflow-x: clip !important;
+    padding: calc(10px + env(safe-area-inset-top)) 10px calc(146px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] {
+    position: sticky !important;
+    top: calc(8px + env(safe-area-inset-top)) !important;
+    z-index: 820 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 66px !important;
+    height: auto !important;
+    max-height: 82px !important;
+    margin: 0 0 14px !important;
+    padding: 9px 10px !important;
+    overflow: visible !important;
+    border-radius: 23px !important;
+  }
+
+  .transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"]:hover,
+  .transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"]:focus-within {
+    width: 100% !important;
+    max-height: 82px !important;
+    padding: 9px 10px !important;
+  }
+
+  .transitos-shell .sidebar.aceternity-sidebar[data-collapsible="auto"] .brand {
+    display: flex !important;
+    flex: 0 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 132px) !important;
+    align-items: center !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+  }
+
+  .transitos-shell .sidebar.aceternity-sidebar .brand img,
+  .transitos-shell .sidebar.aceternity-sidebar:hover .brand img,
+  .transitos-shell .sidebar.aceternity-sidebar:focus-within .brand img {
+    width: min(116px, 32vw) !important;
+    max-width: 100% !important;
+    max-height: 46px !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    object-fit: contain !important;
+    background: transparent !important;
+    mix-blend-mode: multiply !important;
+  }
+
+  .transitos-shell .sidebar-brand-title,
+  .transitos-shell .sidebar-brand-meta,
+  .transitos-shell .desktop-nav,
+  .transitos-shell .site-return-link:not(.mobile-site-return-link),
+  .transitos-shell .aceternity-sidebar-rail-label {
+    display: none !important;
+  }
+
+  .transitos-shell .mobile-drawer-check {
+    position: fixed !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .transitos-shell .mobile-drawer-open {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    min-width: 98px !important;
+    min-height: 48px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    border-radius: 999px !important;
+    padding: 0 14px !important;
+    color: #101827 !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+    border: 1px solid rgba(17, 35, 63, 0.12) !important;
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.1) !important;
+    font-weight: 950 !important;
+  }
+
+  .transitos-shell .mobile-drawer-backdrop {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 930 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    background: rgba(10, 17, 32, 0.34) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    transition: opacity 180ms ease !important;
+  }
+
+  .transitos-shell .mobile-drawer-panel {
+    display: grid !important;
+    position: fixed !important;
+    top: max(12px, env(safe-area-inset-top)) !important;
+    bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+    left: max(12px, env(safe-area-inset-left)) !important;
+    z-index: 940 !important;
+    width: min(338px, calc(100vw - 30px)) !important;
+    max-width: calc(100vw - 30px) !important;
+    padding: 16px !important;
+    gap: 9px !important;
+    align-content: start !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    border-radius: 27px !important;
+    border: 1px solid rgba(17, 35, 63, 0.13) !important;
+    color: #101827 !important;
+    background:
+      radial-gradient(circle at 10% 6%, rgba(88, 210, 255, 0.18), transparent 34%),
+      radial-gradient(circle at 92% 6%, rgba(201, 31, 47, 0.11), transparent 32%),
+      linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(246, 250, 253, 0.93)) !important;
+    box-shadow: 0 34px 94px rgba(15, 23, 42, 0.26) !important;
+    transform: translate3d(-120vw, 0, 0) !important;
+    visibility: hidden !important;
+    transition:
+      transform 220ms cubic-bezier(.2, .82, .2, 1),
+      visibility 0s linear 220ms !important;
+  }
+
+  .transitos-shell .mobile-drawer-check:checked ~ .mobile-drawer-backdrop {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .transitos-shell .mobile-drawer-check:checked ~ .mobile-drawer-panel {
+    transform: translate3d(0, 0, 0) !important;
+    visibility: visible !important;
+    transition:
+      transform 220ms cubic-bezier(.2, .82, .2, 1),
+      visibility 0s linear 0s !important;
+  }
+
+  .transitos-shell .mobile-drawer-panel .aceternity-sidebar-link,
+  .transitos-shell .mobile-drawer-panel .site-return-link {
+    min-height: 54px !important;
+    color: #111827 !important;
+    background: rgba(255, 255, 255, 0.76) !important;
+  }
+
+  .transitos-shell .content {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 0 calc(142px + env(safe-area-inset-bottom)) !important;
+    overflow-x: clip !important;
+  }
+
+  .transitos-shell .topbar {
+    position: relative !important;
+    display: grid !important;
+    gap: 14px !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 0 14px !important;
+    padding: 18px !important;
+    border-radius: 24px !important;
+  }
+
+  .transitos-shell .title {
+    font-size: clamp(28px, 9vw, 44px) !important;
+    line-height: 1.02 !important;
+  }
+
+  .transitos-shell .topbar-actions,
+  .transitos-shell .expandable-profile-card,
+  .transitos-shell .home-return-button {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .transitos-shell :is(.grid, .dashboard-columns, .project-route-layout, .route-detail-grid, .finance-grid, .cards-grid) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .transitos-shell :is(.card, .skiper-panel, .view-on-map, .traffic-row, .route-card, .summary-card, .expense-card, .document-card) {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .transitos-rate-ticker {
+    position: fixed !important;
+    left: max(10px, env(safe-area-inset-left)) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: 62px !important;
+    z-index: 880 !important;
+    border-radius: 22px !important;
+    overflow: hidden !important;
+    pointer-events: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .new-site-page,
+  .form-site-page,
+  .transitos-info-page,
+  .live-edit-page,
+  .site-admin-page,
+  .transitos-shell.shell {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .new-site-nav .navy-brand img {
+    width: min(146px, 43vw) !important;
+  }
+
+  .site-mobile-menu-button,
+  .transitos-shell .mobile-drawer-open {
+    min-width: 52px !important;
+    padding-inline: 13px !important;
+  }
+
+  .site-mobile-menu-button span,
+  .transitos-shell .mobile-drawer-open span {
+    display: none !important;
+  }
+
+  .company-preview-card,
+  .page-card,
+  .detail-card,
+  .standard-card,
+  .new-fleet-card,
+  .new-service-card,
+  .new-privilege-card,
+  .transitos-shell .card {
+    border-radius: 20px !important;
+  }
+}

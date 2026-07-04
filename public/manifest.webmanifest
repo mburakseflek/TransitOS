@@ -1,0 +1,25 @@
+{
+  "name": "SeflekTur TransitOS",
+  "short_name": "TransitOS",
+  "description": "Şeflek Tur kurumsal web sitesi ve TransitOS operasyon platformu.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#10182f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

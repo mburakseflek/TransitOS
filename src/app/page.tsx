@@ -18,7 +18,7 @@ export default async function HomePage() {
 
       <header className="new-gateway-nav">
         <Link className="navy-brand" href="/">
-          <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
+          <img src="/seflek-logo-white.png" alt="Şeflek Tur" />
         </Link>
         <div className="new-gateway-nav-actions">
           <Link href="/login?next=/site-admin">

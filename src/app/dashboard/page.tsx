@@ -1,9 +1,10 @@
 import { Bus, CalendarDays, Clock3, FolderKanban, MapPinned, Users } from "lucide-react";
 import { AppShell } from "@/app/components/AppShell";
-import { CalendarMiniPanel, OnboardingScreen, RegistryStatusPills, ViewOnMap } from "@/app/components/RegistryInterfaceKit";
+import { CalendarMiniPanel, OnboardingScreen, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
+import { YandexTrafficMap } from "@/app/components/YandexTrafficMap";
 import { prisma } from "@/lib/db";
 import { serviceDirectionTitle } from "@/lib/labels";
-import { getTrafficSnapshot, istanbulTrafficMapEmbedUrl } from "@/lib/traffic";
+import { getTrafficSnapshot, getYandexMapKitApiKey, istanbulTrafficMapEmbedUrl } from "@/lib/traffic";
 import { cookies } from "next/headers";
 import { readSessionToken } from "@/lib/auth";
 import {
@@ -48,6 +49,7 @@ export default async function DashboardPage() {
     getTrafficSnapshot()
   ]);
   const trafficItems = trafficSnapshot.items;
+  const yandexApiKey = getYandexMapKitApiKey();
 
   return (
     <AppShell active="/dashboard" title="Ana Panel" subtitle="SeflekTur TransitOS Cloud v2.0 ortak veri merkezi">
@@ -144,12 +146,12 @@ export default async function DashboardPage() {
               Yandex Trafik
             </a>
           </div>
-          <ViewOnMap
+          <YandexTrafficMap
+            apiKey={yandexApiKey}
             title="İstanbul canlı trafik haritası"
-            subtitle="Yandex/harita trafik katmanı ile yoğunluk renkleri."
-            href="https://yandex.com/maps/11508/istanbul/?l=trf%2Ctrfe&z=10"
-            embedUrl={istanbulTrafficMapEmbedUrl()}
-            actionLabel="Canlı haritada aç"
+            center={[41.0438, 28.7768]}
+            zoom={10}
+            fallbackEmbedUrl={istanbulTrafficMapEmbedUrl()}
           />
           <div className="traffic-source-row">
             <span>{trafficSnapshot.source}</span>

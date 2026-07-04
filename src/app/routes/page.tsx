@@ -4,12 +4,14 @@ import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { PrintReportButton } from "@/app/components/PrintReportButton";
 import { RoutePicker } from "@/app/components/RoutePicker";
 import { InlineDisclosureMenu, ViewOnMap } from "@/app/components/RegistryInterfaceKit";
+import { YandexTrafficMap } from "@/app/components/YandexTrafficMap";
 import { createStop, deleteStop, updateRoute } from "@/app/actions";
 import { readSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { serviceDirectionTitle } from "@/lib/labels";
 import { parsePeriod, periodDateWhere } from "@/lib/period";
 import { assignmentAccessWhere, canEditOperations, routeAccessWhere } from "@/lib/permissions";
+import { getYandexMapKitApiKey, istanbulTrafficMapEmbedUrl } from "@/lib/traffic";
 
 export const dynamic = "force-dynamic";
 
@@ -39,9 +41,10 @@ export default async function RoutesPage({
   });
 
   const selectedRoute = routes.find((route) => route.id === params?.route) ?? routes[0] ?? null;
+  const yandexApiKey = getYandexMapKitApiKey();
 
   return (
-    <AppShell active="/transitos/routes" title="Rotalar" subtitle="Güzergah, durak, Google rota ve araç bağlantıları.">
+    <AppShell active="/transitos/routes" title="Rotalar" subtitle="Güzergah, durak, Yandex trafik katmanlı rota ve araç bağlantıları.">
       <PeriodFilter searchParams={params} hidden={{ route: params?.route }} />
       {routes.length === 0 ? (
         <section className="card muted">Rota için önce projeye güzergah ve araç planı ekleyin.</section>
@@ -63,15 +66,21 @@ export default async function RoutesPage({
             />
           </div>
 
-          {selectedRoute ? <RouteDetail route={selectedRoute} canEdit={canEdit} /> : null}
+          {selectedRoute ? <RouteDetail route={selectedRoute} canEdit={canEdit} yandexApiKey={yandexApiKey} /> : null}
         </section>
       )}
     </AppShell>
   );
 }
 
-function RouteDetail({ route, canEdit }: { route: any; canEdit: boolean }) {
+function RouteDetail({ route, canEdit, yandexApiKey }: { route: any; canEdit: boolean; yandexApiKey: string }) {
   const reportId = `route-report-${route.id}`;
+  const mapPoints = route.stops.map((stop: any) => ({
+    title: stop.title,
+    latitude: Number(stop.latitude),
+    longitude: Number(stop.longitude),
+    order: stop.order
+  }));
   return (
     <section className="section">
       <div className="record-head">
@@ -85,10 +94,10 @@ function RouteDetail({ route, canEdit }: { route: any; canEdit: boolean }) {
         </div>
         <div className="toolbar">
           <PrintReportButton targetId={reportId} label="Rota PDF / Yazdır" />
-          <a className="ghost compact-button" href={googleMapsRouteUrl(route.stops)} target="_blank" rel="noreferrer">
-            Google Rota
+          <a className="ghost compact-button" href={yandexMapsRouteUrl(route.stops)} target="_blank" rel="noreferrer">
+            Yandex Rota
           </a>
-          <a className="ghost compact-button" href={googleMapsTrafficUrl(route.stops)} target="_blank" rel="noreferrer">
+          <a className="ghost compact-button" href={yandexMapsTrafficUrl(route.stops)} target="_blank" rel="noreferrer">
             Canlı Trafik
           </a>
           {canEdit ? (
@@ -110,31 +119,24 @@ function RouteDetail({ route, canEdit }: { route: any; canEdit: boolean }) {
         <div className="stack">
           <ViewOnMap
             title={`${route.name} haritası`}
-            subtitle={`${route.stops.length} durak · Google sürüş rotası`}
-            href={googleMapsRouteUrl(route.stops)}
+            subtitle={`${route.stops.length} durak · Yandex trafik katmanlı sürüş rotası`}
+            href={yandexMapsRouteUrl(route.stops)}
           >
-            <div className="map-box large-map">
-              {route.stops.length === 0 ? (
-                <div className="map-empty">Durak ekleyince harita burada gerçek harita olarak açılır.</div>
-              ) : (
-                <iframe
-                  className="map-frame"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src={googleMapsEmbedUrl(route.stops)}
-                  title={`${route.name} haritası`}
-                />
-              )}
-              {route.stops.map((stop: any, index: number) => (
-                <div
-                  className="pin"
-                  key={stop.id}
-                  style={{ left: `${16 + (index * 59) % 74}%`, top: `${20 + (index * 37) % 58}%` }}
-                >
-                  <span>{stop.order}. {stop.title}</span>
-                </div>
-              ))}
-            </div>
+            {route.stops.length === 0 ? (
+              <div className="map-box large-map">
+                <div className="map-empty">Durak ekleyince Yandex trafik katmanlı rota burada açılır.</div>
+              </div>
+            ) : (
+              <YandexTrafficMap
+                apiKey={yandexApiKey}
+                title={`${route.name} Yandex trafik haritası`}
+                points={mapPoints}
+                showRoute
+                zoom={12}
+                className="large-map"
+                fallbackEmbedUrl={yandexMapsEmbedUrl(route.stops)}
+              />
+            )}
           </ViewOnMap>
 
           <section className="card">
@@ -306,40 +308,32 @@ function directionBadgeClass(value: string) {
   return "badge green";
 }
 
-function googleMapsRouteUrl(stops: { latitude: unknown; longitude: unknown; order: number }[]) {
-  const sortedStops = [...stops].sort((a, b) => a.order - b.order);
-  if (sortedStops.length < 2) {
-    return "https://www.google.com/maps";
-  }
-  const path = sortedStops
-    .map((stop) => `${Number(stop.latitude)},${Number(stop.longitude)}`)
-    .join("/");
-  return `https://www.google.com/maps/dir/${path}/?travelmode=driving`;
-}
-
-function googleMapsEmbedUrl(stops: { latitude: unknown; longitude: unknown; order: number; title?: string }[]) {
+function yandexMapsRouteUrl(stops: { latitude: unknown; longitude: unknown; order: number }[]) {
   const sortedStops = [...stops].sort((a, b) => a.order - b.order);
   const center = sortedStops[0];
-  if (!center) {
-    return "about:blank";
-  }
-  if (sortedStops.length === 1) {
-    const label = encodeURIComponent(center.title ?? "SeflekTur rota");
-    return `https://maps.google.com/maps?q=${Number(center.latitude)},${Number(center.longitude)}(${label})&z=13&output=embed`;
-  }
-  const [start, ...rest] = sortedStops;
-  const destinationPath = rest
+  if (!center) return "https://yandex.com/maps/11508/istanbul/?l=map%2Ctrf%2Ctrfe&z=10";
+  const route = sortedStops
     .map((stop) => `${Number(stop.latitude)},${Number(stop.longitude)}`)
-    .join("+to:");
-  return `https://maps.google.com/maps?saddr=${Number(start.latitude)},${Number(start.longitude)}&daddr=${destinationPath}&dirflg=d&output=embed`;
+    .join("~");
+  return `https://yandex.com/maps/?ll=${Number(center.longitude)}%2C${Number(center.latitude)}&z=12&l=map%2Ctrf%2Ctrfe&rtext=${encodeURIComponent(route)}&rtt=auto`;
 }
 
-function googleMapsTrafficUrl(stops: { latitude: unknown; longitude: unknown; order: number }[]) {
+function yandexMapsTrafficUrl(stops: { latitude: unknown; longitude: unknown; order: number }[]) {
   const sortedStops = [...stops].sort((a, b) => a.order - b.order);
   const center = sortedStops[0];
   const latitude = center ? Number(center.latitude) : 41.0082;
   const longitude = center ? Number(center.longitude) : 28.9784;
-  return `https://www.google.com/maps/@${latitude},${longitude},12z/data=!5m1!1e1`;
+  return `https://yandex.com/maps/?ll=${longitude}%2C${latitude}&z=12&l=map%2Ctrf%2Ctrfe`;
+}
+
+function yandexMapsEmbedUrl(stops: { latitude: unknown; longitude: unknown; order: number }[]) {
+  const sortedStops = [...stops].sort((a, b) => a.order - b.order);
+  const center = sortedStops[0];
+  if (!center) return istanbulTrafficMapEmbedUrl();
+  const route = sortedStops
+    .map((stop) => `${Number(stop.latitude)},${Number(stop.longitude)}`)
+    .join("~");
+  return `https://yandex.com.tr/map-widget/v1/?ll=${Number(center.longitude)}%2C${Number(center.latitude)}&z=12&l=map%2Ctrf%2Ctrfe&rtext=${encodeURIComponent(route)}&rtt=auto`;
 }
 
 function routeReportPoints(stops: { id: string; title: string; latitude: unknown; longitude: unknown; order: number }[]) {

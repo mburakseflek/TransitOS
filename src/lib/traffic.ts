@@ -59,6 +59,10 @@ export async function getTrafficSnapshot(): Promise<{ source: string; items: Tra
   };
 }
 
+export function getYandexMapKitApiKey() {
+  return process.env.YANDEX_MAPKIT_API_KEY ?? process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY ?? "";
+}
+
 export function istanbulTrafficMapEmbedUrl() {
   return "https://yandex.com.tr/map-widget/v1/?ll=28.7768%2C41.0438&z=10&l=trf%2Ctrfe";
 }

@@ -38,7 +38,7 @@ export default async function LoginPage({
         </div>
 
         <div className="field">
-          <FloatingInput name="password" label="Şifre" type="password" required autoComplete="new-password" />
+          <FloatingInput name="password" label="Şifre" type="password" required autoComplete="off" />
         </div>
 
         {params?.error ? <p className="login-error">{params.error}</p> : null}

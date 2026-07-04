@@ -73,10 +73,15 @@ export async function AppShell({
         <span className="aceternity-sidebar-glow" aria-hidden="true" />
         <span className="aceternity-sidebar-rail-label" aria-hidden="true">Menü</span>
         <div className="brand">
-          <img src="/seflek-logo-white.png" alt="Seflek Tur" />
+          <img src="/brand/seflek-logo-navy.png" alt="Seflek Tur" />
           <strong className="sidebar-brand-title">SeflekTur Transit<span>OS</span></strong>
           <small className="sidebar-brand-meta">{currentRoleTitle} · {displayName}</small>
         </div>
+        <input className="mobile-drawer-check" id="transitos-mobile-drawer" type="checkbox" aria-hidden="true" />
+        <label className="mobile-drawer-open" htmlFor="transitos-mobile-drawer">
+          <Menu size={20} />
+          <span>{visibleNavItems.find((item) => item.path === activePath)?.label ?? "Menü"}</span>
+        </label>
         <nav className="nav desktop-nav aceternity-sidebar-nav">
           {visibleNavItems.map((item) => {
             const Icon = item.icon;
@@ -88,24 +93,27 @@ export async function AppShell({
             </Link>
           );})}
         </nav>
-        <details className="mobile-nav-menu">
-          <summary>
-            <Menu size={18} />
-            <span>{visibleNavItems.find((item) => item.path === activePath)?.label ?? "Menü"}</span>
-          </summary>
-          <nav className="nav aceternity-sidebar-nav">
-            {visibleNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activePath === item.path;
-              return (
-                <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}`}>
-                  <Icon size={18} />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </details>
+        <label className="mobile-drawer-backdrop" htmlFor="transitos-mobile-drawer" aria-label="Menüyü kapat" />
+        <nav className="mobile-drawer-panel" aria-label="Mobil TransitOS menüsü">
+          <div className="mobile-drawer-head">
+            <img src="/brand/seflek-logo-navy.png" alt="Seflek Tur" />
+            <label htmlFor="transitos-mobile-drawer">Kapat</label>
+          </div>
+          {visibleNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activePath === item.path;
+            return (
+              <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}`}>
+                <Icon size={19} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+          <Link className="site-return-link mobile-site-return-link" href="/seflektur">
+            <House size={17} />
+            <span>Şeflek Tur sitesine dön</span>
+          </Link>
+        </nav>
         <Link className="site-return-link" href="/seflektur">
           <House size={17} />
           <span>Şeflek Tur sitesine dön</span>

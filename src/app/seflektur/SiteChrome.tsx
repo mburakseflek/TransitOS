@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { WhatsAppIcon } from "@/app/components/WhatsAppIcon";
 import { SkiperMotionFrame, SkiperTickerRail } from "@/app/components/RegistryInterfaceKit";
+import { CorporateMobileNav } from "@/app/seflektur/CorporateMobileNav";
 import { readSiteContent, SiteCard } from "@/lib/site-content";
 import { getMarketTickerItems } from "@/lib/market-data";
 
@@ -21,38 +22,21 @@ const siteNavLinks = [
 
 export function SiteHeader() {
   return (
-    <header className="new-site-nav">
-      <Link className="navy-brand" href="/">
-        <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
-      </Link>
-      <nav className="site-desktop-nav" aria-label="Kurumsal site menüsü">
-        {siteNavLinks.map((item) => (
-          <Link key={item.href} className={"className" in item ? item.className : undefined} href={item.href}>
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      <input className="site-mobile-nav-check" id="site-mobile-navigation" type="checkbox" aria-hidden="true" />
-      <label className="site-mobile-menu-button" htmlFor="site-mobile-navigation" aria-label="Menüyü aç">
-        <Menu size={19} />
-        <span>Menü</span>
-      </label>
-      <label className="site-mobile-nav-backdrop" htmlFor="site-mobile-navigation" aria-label="Menüyü kapat" />
-      <nav className="site-mobile-drawer" aria-label="Mobil kurumsal site menüsü">
-        <div className="site-mobile-drawer-head">
+    <>
+      <CorporateMobileNav links={siteNavLinks} />
+      <header className="new-site-nav">
+        <Link className="navy-brand" href="/">
           <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
-          <label htmlFor="site-mobile-navigation" aria-label="Menüyü kapat">
-            <X size={18} />
-            <span>Kapat</span>
-          </label>
-        </div>
-        {siteNavLinks.map((item) => (
-          <Link key={item.href} className={"className" in item ? item.className : undefined} href={item.href}>
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-    </header>
+        </Link>
+        <nav className="site-desktop-nav" aria-label="Kurumsal site menüsü">
+          {siteNavLinks.map((item) => (
+            <Link key={item.href} className={"className" in item ? item.className : undefined} href={item.href}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </header>
+    </>
   );
 }
 

@@ -179,7 +179,7 @@ export function PeriodFilter({
         </button>
       </div>
       <button className="primary compact-button period-submit-button" type="submit">
-        Raporu göster
+        Dönemi uygula
       </button>
       {mounted && popover ? createPortal(popover, document.body) : null}
     </form>

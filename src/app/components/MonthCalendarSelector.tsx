@@ -8,14 +8,16 @@ const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Tem
 export function MonthCalendarSelector({
   name,
   mode = "multiple",
-  defaultDate
+  defaultDate,
+  defaultMonth
 }: {
   name: string;
   mode?: "single" | "multiple";
   defaultDate?: string;
+  defaultMonth?: string;
 }) {
   const todayValue = localDateValue(new Date());
-  const initialMonth = defaultDate?.slice(0, 7) || todayValue.slice(0, 7);
+  const initialMonth = defaultDate?.slice(0, 7) || defaultMonth || todayValue.slice(0, 7);
   const [month, setMonth] = useState(initialMonth);
   const [selected, setSelected] = useState<string[]>(defaultDate ? [defaultDate] : mode === "single" ? [todayValue] : []);
   const [dragState, setDragState] = useState<{ start: string; active: boolean; pointerType: string } | null>(null);

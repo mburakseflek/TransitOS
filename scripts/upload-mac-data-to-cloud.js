@@ -1,13 +1,38 @@
 const { execFileSync } = require("node:child_process");
-const { existsSync } = require("node:fs");
+const { existsSync, readFileSync } = require("node:fs");
 const { join } = require("node:path");
 const { homedir } = require("node:os");
+
+loadEnvFiles();
 
 const appStorePath = process.env.TRANSITOS_APP_STORE || join(homedir(), "Documents/TransitOS/Veritabani/TransitOSLocalStoreV20.store");
 const cloudURL = (process.env.TRANSITOS_CLOUD_URL || process.env.NEXT_PUBLIC_TRANSITOS_CLOUD_URL || "https://www.seflektur.com").replace(/\/$/, "");
 const loginId = process.env.ADMIN_LOGIN_ID || "admin";
 const password = process.env.ADMIN_PASSWORD || "";
 const appleEpoch = Date.UTC(2001, 0, 1, 0, 0, 0);
+
+function loadEnvFiles() {
+  for (const fileName of [".env.local", ".env"]) {
+    if (!existsSync(fileName)) continue;
+    const lines = readFileSync(fileName, "utf8").split(/\r?\n/);
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const separatorIndex = trimmed.indexOf("=");
+      if (separatorIndex === -1) continue;
+      const key = trimmed.slice(0, separatorIndex).trim();
+      if (!key || process.env[key] !== undefined) continue;
+      let value = trimmed.slice(separatorIndex + 1).trim();
+      if (
+        (value.startsWith("\"") && value.endsWith("\"")) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      process.env[key] = value;
+    }
+  }
+}
 
 function sql(query) {
   if (!existsSync(appStorePath)) {
@@ -225,7 +250,7 @@ async function main() {
     throw new Error("ADMIN_PASSWORD ortam değişkeni gerekli. Vercel'de kullandığınız yönetici şifresini burada verin.");
   }
 
-  const authResponse = await fetch(`${cloudURL}/api/macos/auth`, {
+  const authResponse = await cloudFetch(`${cloudURL}/api/macos/auth`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ role: "MANAGER", loginId, password })
@@ -236,7 +261,7 @@ async function main() {
   }
 
   const { token } = await authResponse.json();
-  const uploadResponse = await fetch(`${cloudURL}/api/macos/snapshot?replace=local`, {
+  const uploadResponse = await cloudFetch(`${cloudURL}/api/macos/snapshot?replace=local`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -250,6 +275,20 @@ async function main() {
   }
 
   console.log(`TransitOS yerel verileri buluta aktarıldı: ${snapshot.subcontractors.length} taşeron, ${snapshot.vehicles.length} araç, ${snapshot.projects.length} proje, ${snapshot.routes.length} güzergah, ${snapshot.assignments.length} servis, ${snapshot.expenses.length} gider.`);
+}
+
+async function cloudFetch(url, options) {
+  try {
+    return await fetch(url, options);
+  } catch (error) {
+    const cause = error && typeof error === "object" ? error.cause : null;
+    const hostMessage = cause && typeof cause === "object" && cause.hostname
+      ? ` (${cause.hostname})`
+      : "";
+    throw new Error(
+      `Web sitesine ulaşılamadı${hostMessage}. Domain yayında değilse TRANSITOS_CLOUD_URL ile Vercel adresini verin; internet bağlantısı kapalıysa bağlantı geldikten sonra tekrar deneyin.`
+    );
+  }
 }
 
 main().catch((error) => {

@@ -19,6 +19,7 @@ import {
   Trash2,
   Upload
 } from "lucide-react";
+import { notifyOperationFinish, notifyOperationStart } from "@/app/components/GlobalOperationOverlay";
 import { saveSiteContent } from "@/app/site-actions";
 import type { CompanyDetail, CustomPage, SiteBlock, SiteCard, SiteContent } from "@/lib/site-content";
 
@@ -181,6 +182,7 @@ function ImagePicker({
   }
 
   function closeCrop() {
+    if (uploading) return;
     if (pendingImage) URL.revokeObjectURL(pendingImage.url);
     if (frameRef.current) {
       window.cancelAnimationFrame(frameRef.current);
@@ -192,24 +194,30 @@ function ImagePicker({
   }
 
   async function upload(file: File | Blob) {
+    if (uploading) return;
     setUploading(true);
+    notifyOperationStart("Görsel yükleniyor");
     const formData = new FormData();
     const extension = file.type === "image/png" ? "png" : "webp";
     formData.append("file", file instanceof File ? file : new File([file], `kirpilmis-gorsel.${extension}`, { type: file.type || "image/webp" }));
-    const response = await fetch("/api/site/upload", { method: "POST", body: formData });
-    const result = await response.json();
-    setUploading(false);
-    if (response.ok && result.url) {
-      onChange(result.url);
-    } else {
-      window.alert(result.message ?? "Görsel yüklenemedi.");
+    try {
+      const response = await fetch("/api/site/upload", { method: "POST", body: formData });
+      const result = await response.json();
+      if (response.ok && result.url) {
+        onChange(result.url);
+      } else {
+        window.alert(result.message ?? "Görsel yüklenemedi.");
+      }
+    } finally {
+      setUploading(false);
+      notifyOperationFinish();
     }
   }
 
   async function cropAndUpload() {
     const image = cropImageRef.current;
     const currentImage = pendingImage;
-    if (!image || !currentImage) return;
+    if (!image || !currentImage || uploading) return;
 
     const preserveTransparency = cropPreset === "logo" && currentImage.file.type === "image/png";
     const canvas = document.createElement("canvas");

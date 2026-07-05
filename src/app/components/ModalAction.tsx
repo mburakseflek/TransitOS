@@ -97,16 +97,31 @@ export function ModalAction({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-busy={submitting}
-        onSubmit={() => setSubmitting(true)}
+        onSubmit={(event) => {
+          if (submitting) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          setSubmitting(true);
+        }}
       >
         <div className="record-head modal-head">
           <h2 id={titleId}>{title}</h2>
-          <button className="ghost icon-button" type="button" aria-label="Pencereyi kapat" onClick={close}>
+          <button className="ghost icon-button" type="button" aria-label="Pencereyi kapat" onClick={close} disabled={submitting}>
             <X size={19} />
           </button>
         </div>
-        {submitting ? <p className="modal-saving" role="status">Kaydediliyor...</p> : null}
         <div className="section modal-body">{children}</div>
+        {submitting ? (
+          <div className="modal-operation-lock" role="status" aria-live="polite">
+            <div className="operation-road compact" aria-hidden="true">
+              <img src="/brand/transitos-service-vehicle.png" alt="" />
+            </div>
+            <strong>Kaydediliyor</strong>
+            <span>Lütfen işlem tamamlanana kadar bekleyin.</span>
+          </div>
+        ) : null}
       </div>
     </div>
   ) : null;

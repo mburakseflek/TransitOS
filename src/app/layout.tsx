@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { InteractionGuards } from "@/app/components/InteractionGuards";
 import { InteractionEffects } from "@/app/components/InteractionEffects";
+import { GlobalOperationOverlay } from "@/app/components/GlobalOperationOverlay";
 import { RouteLoadingOverlay } from "@/app/components/RouteLoadingOverlay";
 import "./globals.css";
 
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="tr">
       <body>
         <RouteLoadingOverlay />
+        <GlobalOperationOverlay />
         <InteractionGuards />
         <InteractionEffects />
         {children}

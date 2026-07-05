@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { notifyOperationFinish, notifyOperationStart } from "@/app/components/GlobalOperationOverlay";
 
 export function DriverDocumentUploadInputs() {
   const [fileUrl, setFileUrl] = useState("");
@@ -9,22 +10,27 @@ export function DriverDocumentUploadInputs() {
   const [uploading, setUploading] = useState(false);
 
   async function upload(file?: File | null) {
-    if (!file) return;
+    if (!file || uploading) return;
     setError("");
     setUploading(true);
+    notifyOperationStart("Evrak yükleniyor");
     const formData = new FormData();
     formData.append("file", file);
-    const response = await fetch("/api/documents/upload", { method: "POST", body: formData });
-    const payload = await response.json().catch(() => ({}));
-    setUploading(false);
+    try {
+      const response = await fetch("/api/documents/upload", { method: "POST", body: formData });
+      const payload = await response.json().catch(() => ({}));
 
-    if (!response.ok || !payload.url) {
-      setError(payload.message ?? "Evrak yüklenemedi.");
-      return;
+      if (!response.ok || !payload.url) {
+        setError(payload.message ?? "Evrak yüklenemedi.");
+        return;
+      }
+
+      setFileUrl(payload.url);
+      setFileName(payload.name ?? file.name);
+    } finally {
+      setUploading(false);
+      notifyOperationFinish();
     }
-
-    setFileUrl(payload.url);
-    setFileName(payload.name ?? file.name);
   }
 
   const isPdf = fileUrl.toLowerCase().endsWith(".pdf");

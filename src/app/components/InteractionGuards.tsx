@@ -22,6 +22,10 @@ const destructiveWords = [
   "reset"
 ];
 
+function cleanLabel(value: string | null | undefined) {
+  return (value ?? "").replace(/\s+/g, " ").trim();
+}
+
 function editableElement(target: EventTarget | null) {
   return target instanceof HTMLElement ? target.closest<HTMLElement>(editableSelector) : null;
 }
@@ -57,6 +61,43 @@ function canRunDestructiveAction() {
   return window.confirm("Bu işlem geri alınamayabilir. Devam etmek istediğinize emin misiniz?");
 }
 
+function submitterOperationLabel(submitter: HTMLElement | null, form: HTMLFormElement) {
+  const explicitLabel = cleanLabel(submitter?.getAttribute("data-loading-label") ?? form.getAttribute("data-loading-label"));
+  if (explicitLabel) return explicitLabel;
+
+  if (submitter instanceof HTMLInputElement) {
+    const inputLabel = cleanLabel(submitter.value);
+    if (inputLabel) return inputLabel;
+  }
+
+  const buttonLabel = cleanLabel(submitter?.textContent);
+  if (buttonLabel) {
+    return /kaydet|oluştur|ekle|güncelle|yükle/i.test(buttonLabel)
+      ? `${buttonLabel} işlemi yapılıyor`
+      : `${buttonLabel} işlemi hazırlanıyor`;
+  }
+
+  const formLabel = cleanLabel(form.getAttribute("aria-label"));
+  return formLabel ? `${formLabel} işlemi yapılıyor` : "İşlem tamamlanıyor";
+}
+
+function disableSubmitControls(form: HTMLFormElement) {
+  window.requestAnimationFrame(() => {
+    form.querySelectorAll<HTMLElement>("button, input[type='submit'], input[type='button']").forEach((control) => {
+      if ("disabled" in control) {
+        (control as HTMLButtonElement | HTMLInputElement).disabled = true;
+      }
+      control.setAttribute("aria-disabled", "true");
+    });
+  });
+}
+
+function startOperationLock(label: string) {
+  document.body.dataset.operationPending = "true";
+  document.body.dataset.operationLabel = label;
+  window.dispatchEvent(new CustomEvent("transitos:operation-start", { detail: { label } }));
+}
+
 export function confirmDirtyFormExit(root: ParentNode = document) {
   return !hasDirtyForms(root) || canLeaveDirtyForm();
 }
@@ -75,14 +116,24 @@ export function InteractionGuards() {
       if (!form) return;
 
       const submitter = (event as SubmitEvent).submitter as HTMLElement | null;
+      if (form.dataset.submitting === "true") {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
       if (isDestructiveSubmitter(submitter, form) && !canRunDestructiveAction()) {
         event.preventDefault();
         event.stopPropagation();
         return;
       }
 
+      const label = submitterOperationLabel(submitter, form);
       form.dataset.submitting = "true";
       form.dataset.dirty = "false";
+      form.setAttribute("aria-busy", "true");
+      startOperationLock(label);
+      disableSubmitControls(form);
     }
 
     function handleDocumentClick(event: MouseEvent) {

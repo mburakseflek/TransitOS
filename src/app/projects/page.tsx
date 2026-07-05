@@ -26,7 +26,6 @@ import {
 import { prisma } from "@/lib/db";
 import { serviceDirectionTitle } from "@/lib/labels";
 import { MonthCalendarSelector } from "@/app/components/MonthCalendarSelector";
-import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { readSessionToken } from "@/lib/auth";
 import { formatTRY } from "@/lib/format";
 import { parsePeriod, periodDateWhere } from "@/lib/period";
@@ -108,8 +107,6 @@ export default async function ProjectsPage({
           </ModalAction>
         </QuickCreateCard> : null}
       </div>
-      <PeriodFilter searchParams={params} hidden={{ project: params?.project, route: params?.route }} />
-
       <div className="project-layout section">
         <aside className="card project-list">
           <h2 style={{ marginTop: 0 }}>Projeler</h2>

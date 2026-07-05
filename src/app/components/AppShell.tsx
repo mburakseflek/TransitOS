@@ -71,7 +71,6 @@ export async function AppShell({
     <main className="shell transitos-shell">
       <aside className="sidebar aceternity-sidebar" aria-label="TransitOS ana menüsü" data-collapsible="auto">
         <span className="aceternity-sidebar-glow" aria-hidden="true" />
-        <span className="aceternity-sidebar-rail-label" aria-hidden="true">Menü</span>
         <div className="brand">
           <img src="/brand/seflek-logo-navy.png" alt="Seflek Tur" />
           <strong className="sidebar-brand-title">SeflekTur Transit<span>OS</span></strong>

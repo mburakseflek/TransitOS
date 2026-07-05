@@ -15,10 +15,11 @@ import {
   createProject,
   createRoute,
   deleteAssignment,
+  deleteAssignmentGroup,
   deleteOneOffJob,
   deleteProject,
   deleteRoute,
-  updateAssignment,
+  updateAssignmentGroup,
   updateProject,
   updateOneOffJob,
   updateRoute
@@ -308,48 +309,56 @@ function ServiceLedger({ assignments, projectId, routeId, returnTo, vehicles, en
     return <section className="service-ledger empty section"><p className="muted">Bu güzergaha henüz servis eklenmemiş.</p></section>;
   }
 
+  const groups = groupServiceAssignments(assignments, endOfToday);
+
   return (
-    <section className="service-ledger section" aria-label="Güzergah servis kayıtları">
-      {assignments.map((assignment: any) => {
-        const isCompleted = assignment.serviceDate <= endOfToday;
-        const carrierTotal = Number(assignment.pricePerService) * assignment.serviceCount;
-        const clientTotal = Number(assignment.clientPricePerService) * assignment.serviceCount;
+    <section className="service-ledger service-summary-list section" aria-label="Güzergah servis özeti">
+      <div className="service-summary-head">
+        <div>
+          <strong>Takvim ve servis özeti</strong>
+          <p className="muted">Aynı araç, saat, servis türü ve ücretler tek satırda gruplanır.</p>
+        </div>
+        <span className="badge gray">{assignments.length} kayıt · {groups.length} özet</span>
+      </div>
+
+      {groups.map((group) => {
+        const title = serviceDirectionTitle(group.direction);
         return (
-          <article className={`service-ledger-card ${directionRowClass(assignment.direction)}`} key={assignment.id}>
-            <div className="service-ledger-main">
-              <span className={directionBadgeClass(assignment.direction)}>{serviceDirectionTitle(assignment.direction)}</span>
-              <strong>{assignment.serviceDate.toLocaleDateString("tr-TR")} · {assignment.serviceTime.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}</strong>
-              <small>{assignment.vehicle.fleetNumber} · {assignment.vehicle.plateNumber}</small>
-            </div>
-            <div className="service-ledger-status">
-              {isCompleted ? <span className="badge green">✓ Taşındı</span> : <span className="badge yellow">◷ Planlandı</span>}
-              <span className="badge gray">{assignment.serviceCount} servis</span>
+          <article className={`service-summary-row ${directionRowClass(group.direction)}`} key={group.key}>
+            <div className="service-summary-main">
+              <div className="service-summary-title">
+                <strong>{group.vehicle.fleetNumber}</strong>
+                <span className={directionBadgeClass(group.direction)}>{title}</span>
+                {group.completedServices > 0 ? <span className="badge green">✓ Taşındı</span> : <span className="badge yellow">◷ Planlandı</span>}
+              </div>
+              <p className="muted">
+                {group.selectedDays} seçili gün · {group.completedDays} tamamlanan gün · {group.pendingDays} bekleyen gün · {formatServiceTime(group.serviceTime)}
+              </p>
+              {showMoney ? (
+                <p className="muted service-summary-line">
+                  {group.completedServices} tamamlanan servis · servis başı {formatTRY(group.carrierUnitPrice)} · hakediş {formatTRY(group.carrierCompleted)} / kalan {formatTRY(group.carrierPending)} / toplam {formatTRY(group.carrierTotal)}
+                </p>
+              ) : (
+                <p className="muted service-summary-line">
+                  {group.totalServices} toplam servis · {group.completedServices} taşındı · {group.pendingServices} planlandı
+                </p>
+              )}
             </div>
             {showMoney ? (
-              <div className="service-ledger-money">
-                <span><small>Taşıyıcı</small><strong>{formatTRY(carrierTotal)}</strong><em>{formatTRY(Number(assignment.pricePerService))} / servis</em></span>
-                <span><small>Proje</small><strong>{formatTRY(clientTotal)}</strong><em>{formatTRY(Number(assignment.clientPricePerService))} / servis</em></span>
+              <div className="service-summary-money">
+                <span className="money-completed"><small>Taşınan</small><strong>{formatTRY(group.carrierCompleted)}</strong></span>
+                <span className="money-pending"><small>Kalan</small><strong>{formatTRY(group.carrierPending)}</strong></span>
+                <span className="money-total"><small>Toplam</small><strong>{formatTRY(group.carrierTotal)}</strong></span>
               </div>
             ) : null}
             {canEdit ? (
-              <div className="service-ledger-actions">
-                <ModalAction label="Düzenle" title="Servisi Düzenle">
-                  <form className="stack service-form" action={updateAssignment}>
-                    <input type="hidden" name="id" value={assignment.id} />
-                    <input type="hidden" name="projectId" value={projectId} />
-                    <input type="hidden" name="routeId" value={routeId} />
-                    <input type="hidden" name="_returnTo" value={returnTo} />
-                    <AssignmentEditFields assignment={assignment} vehicles={vehicles} />
-                    <div className="actions"><SubmitButton>✓ Güncelle</SubmitButton></div>
-                  </form>
-                </ModalAction>
-                <ModalAction label="Sil" title="Servis Sil" tone="danger">
-                  <form className="stack" action={deleteAssignment} data-confirm-danger="true">
-                    <input type="hidden" name="id" value={assignment.id} />
-                    <input type="hidden" name="_returnTo" value={returnTo} />
-                    <p>Bu servis kaydı silinecek. Emin misiniz?</p>
-                    <div className="actions"><DeleteButton>Sil</DeleteButton></div>
-                  </form>
+              <div className="service-summary-actions">
+                <ModalAction
+                  label={<><span aria-hidden="true">...</span><span className="sr-only">Servisleri düzenle</span></>}
+                  title={`${group.vehicle.fleetNumber} ${title} Servisleri`}
+                  buttonClassName="ghost icon-button service-summary-menu"
+                >
+                  <ServiceGroupDetails group={group} projectId={projectId} routeId={routeId} returnTo={returnTo} vehicles={vehicles} endOfToday={endOfToday} showMoney={showMoney} />
                 </ModalAction>
               </div>
             ) : null}
@@ -357,6 +366,106 @@ function ServiceLedger({ assignments, projectId, routeId, returnTo, vehicles, en
         );
       })}
     </section>
+  );
+}
+
+function ServiceGroupDetails({
+  group,
+  projectId,
+  routeId,
+  returnTo,
+  vehicles,
+  endOfToday,
+  showMoney
+}: {
+  group: ServiceAssignmentGroup;
+  projectId: string;
+  routeId: string;
+  returnTo: string;
+  vehicles: { id: string; fleetNumber: string; plateNumber: string }[];
+  endOfToday: Date;
+  showMoney: boolean;
+}) {
+  const selectedDates = Array.from(new Set(group.assignments.map((assignment) => dateInputValue(assignment.serviceDate)).filter(Boolean) as string[])).sort();
+  const firstAssignment = group.assignments[0];
+
+  return (
+    <div className="service-summary-detail">
+      <div className="service-summary-detail-overview">
+        <div>
+          <span className={directionBadgeClass(group.direction)}>{serviceDirectionTitle(group.direction)}</span>
+          <strong>{group.vehicle.fleetNumber} · {group.vehicle.plateNumber}</strong>
+          <p className="muted">{group.selectedDays} gün · {group.completedDays} tamamlanan gün · {group.pendingDays} bekleyen gün · {formatServiceTime(group.serviceTime)}</p>
+        </div>
+        {showMoney ? (
+          <div className="service-summary-detail-totals">
+            <span className="money-completed"><small>Tamamlanan</small><strong>{formatTRY(group.carrierCompleted)}</strong></span>
+            <span className="money-pending"><small>Kalan</small><strong>{formatTRY(group.carrierPending)}</strong></span>
+            <span className="money-total"><small>Toplam</small><strong>{formatTRY(group.carrierTotal)}</strong></span>
+          </div>
+        ) : null}
+      </div>
+
+      <form className="stack service-form service-group-edit-form" action={updateAssignmentGroup} data-dirty-guard="true">
+        {group.assignments.map((assignment) => <input key={assignment.id} type="hidden" name="assignmentIds" value={assignment.id} />)}
+        <input type="hidden" name="projectId" value={projectId} />
+        <input type="hidden" name="routeId" value={routeId} />
+        <input type="hidden" name="_returnTo" value={returnTo} />
+        <div className="service-group-edit-head">
+          <div>
+            <strong>Toplu servis düzenleme</strong>
+            <p className="muted">Bu gruptaki gün, saat, araç, servis türü ve ücretleri birlikte güncellenir.</p>
+          </div>
+          <span className="badge blue">{selectedDates.length} gün</span>
+        </div>
+        <BulkGroupEditFields group={group} vehicles={vehicles} selectedDates={selectedDates} />
+        <div className="actions service-group-edit-actions">
+          <SubmitButton>✓ Toplu Güncelle</SubmitButton>
+        </div>
+      </form>
+
+      <form className="actions service-group-danger" action={deleteAssignmentGroup} data-confirm-danger="true">
+        {group.assignments.map((assignment) => <input key={assignment.id} type="hidden" name="assignmentIds" value={assignment.id} />)}
+        <input type="hidden" name="_returnTo" value={returnTo} />
+        <DeleteButton>Bu Grubu Sil</DeleteButton>
+      </form>
+
+      <div className="service-summary-detail-list">
+        <div className="service-summary-detail-list-head">
+          <strong>Tekil günler</strong>
+          <span className="muted">Gerekirse yalnızca belirli bir günü silebilirsiniz.</span>
+        </div>
+        {group.assignments.map((assignment) => {
+          const completed = assignment.serviceDate <= endOfToday;
+          const carrierTotal = Number(assignment.pricePerService) * assignment.serviceCount;
+          const clientTotal = Number(assignment.clientPricePerService) * assignment.serviceCount;
+          return (
+            <details className="service-summary-detail-card" key={assignment.id}>
+              <summary>
+                <span>
+                  <strong>{assignment.serviceDate.toLocaleDateString("tr-TR")} · {formatServiceTime(assignment.serviceTime)}</strong>
+                  <small>{assignment.serviceCount} servis · {assignment.vehicle.fleetNumber}</small>
+                </span>
+                <span className={completed ? "badge green" : "badge yellow"}>{completed ? "✓ Taşındı" : "◷ Planlandı"}</span>
+                {showMoney ? <b>{formatTRY(carrierTotal)}</b> : null}
+              </summary>
+              {showMoney ? (
+                <div className="service-summary-detail-money">
+                  <span>Taşıyıcı: {formatTRY(carrierTotal)} · {formatTRY(Number(assignment.pricePerService))} / servis</span>
+                  <span>Proje: {formatTRY(clientTotal)} · {formatTRY(Number(assignment.clientPricePerService))} / servis</span>
+                </div>
+              ) : null}
+              <form className="actions service-summary-delete" action={deleteAssignment} data-confirm-danger="true">
+                <input type="hidden" name="id" value={assignment.id} />
+                <input type="hidden" name="_returnTo" value={returnTo} />
+                <DeleteButton>Bu Servisi Sil</DeleteButton>
+              </form>
+            </details>
+          );
+        })}
+        {!firstAssignment ? <p className="muted">Bu grupta servis kaydı bulunmuyor.</p> : null}
+      </div>
+    </div>
   );
 }
 
@@ -412,24 +521,6 @@ function AssignmentFields({ vehicles, defaultDate }: { vehicles: { id: string; f
   );
 }
 
-function AssignmentEditFields({ assignment, vehicles }: { assignment: any; vehicles: { id: string; fleetNumber: string; plateNumber: string }[] }) {
-  return (
-    <>
-      <Field label="Gün" hint="Servisin yapılacağı tarih."><MonthCalendarSelector name="serviceDate" mode="single" defaultDate={dateInputValue(assignment.serviceDate)} /></Field>
-      <Field label="Saat" hint="Timeline’da görünecek saat."><input name="serviceTime" type="time" defaultValue={timeInputValue(assignment.serviceTime) ?? "07:30"} required /></Field>
-      <Field label="Araç" hint="Bu servise gidecek araç.">
-        <select name="vehicleId" defaultValue={assignment.vehicleId} required>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.fleetNumber} · {vehicle.plateNumber}</option>)}</select>
-      </Field>
-      <Field label="İş türü" hint="Sabah, akşam, gece veya mesai.">
-        <ServiceDirectionSelector defaultValue={assignment.direction} />
-      </Field>
-      <Field label="Servis adedi" hint="O gün yapılacak servis sayısı."><AdaptiveSlider name="serviceCount" label="Servis sayısı" min={1} max={20} defaultValue={assignment.serviceCount ?? 1} helper="Gerekirse rakamı kayıt sonrası düzenleyebilirsiniz." /></Field>
-      <Field label="Taşıyıcı hakedişi" hint="Bu servisin taşeron servis başı TL tutarı."><FloatingInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue={Number(assignment.pricePerService ?? 0)} inputMode="decimal" /></Field>
-      <Field label="Proje fatura tutarı" hint="Bu servisin proje sahibine servis başı TL tutarı."><FloatingInput name="clientPricePerService" label="₺ Proje servis başı" defaultValue={Number(assignment.clientPricePerService ?? 0)} inputMode="decimal" /></Field>
-    </>
-  );
-}
-
 function AssignmentOptions({ vehicles }: { vehicles: { id: string; fleetNumber: string; plateNumber: string }[] }) {
   return (
     <>
@@ -459,6 +550,51 @@ function BulkAssignmentFields({ vehicles, defaultMonth }: { vehicles: { id: stri
       </Field>
       <Field label="Saat" hint="Oluşturulacak servislerin saati."><input name="serviceTime" type="time" defaultValue="07:30" required /></Field>
       <AssignmentOptions vehicles={vehicles} />
+    </>
+  );
+}
+
+function BulkGroupEditFields({
+  group,
+  vehicles,
+  selectedDates
+}: {
+  group: ServiceAssignmentGroup;
+  vehicles: { id: string; fleetNumber: string; plateNumber: string }[];
+  selectedDates: string[];
+}) {
+  return (
+    <>
+      <Field label="Çalışma takvimi" hint="Seçili günler bu servis grubuna ait kabul edilir. Çıkardığınız günler kayıttan silinir; eklediğiniz günler gruba eklenir.">
+        <MonthCalendarSelector
+          name="serviceDates"
+          mode="multiple"
+          defaultMonth={dateInputValue(group.firstDate)?.slice(0, 7)}
+          defaultDates={selectedDates}
+        />
+      </Field>
+      <div className="service-group-edit-grid">
+        <Field label="Servis saati" hint="Seçili tüm günlerde kullanılacak saat.">
+          <input name="serviceTime" type="time" defaultValue={timeInputValue(group.serviceTime) ?? "07:30"} required />
+        </Field>
+        <Field label="Araç" hint="Bu gruptaki servislerin tamamına atanacak araç.">
+          <select name="vehicleId" defaultValue={group.vehicle?.id} required>
+            {vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.fleetNumber} · {vehicle.plateNumber}</option>)}
+          </select>
+        </Field>
+        <Field label="İş türü" hint="Sabah, akşam, gece veya mesai ayrımı.">
+          <ServiceDirectionSelector defaultValue={group.direction} />
+        </Field>
+        <Field label="Servis adedi" hint="Seçili her gün için yapılacak servis sayısı.">
+          <AdaptiveSlider name="serviceCount" label="Servis sayısı" min={1} max={20} defaultValue={group.serviceCount} helper="Bu değer seçili günlerin tamamına uygulanır." />
+        </Field>
+        <Field label="Taşıyıcı hakedişi" hint="Taşerona servis başına yazılacak TL tutarı.">
+          <FloatingInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue={group.carrierUnitPrice} inputMode="decimal" />
+        </Field>
+        <Field label="Proje fatura tutarı" hint="Proje sahibine servis başına yazılacak TL tutarı.">
+          <FloatingInput name="clientPricePerService" label="₺ Proje servis başı" defaultValue={group.clientUnitPrice} inputMode="decimal" />
+        </Field>
+      </div>
     </>
   );
 }
@@ -582,6 +718,120 @@ function ServiceDirectionSelector({ defaultValue = "MORNING" }: { defaultValue?:
 function timeInputValue(date?: Date) {
   if (!date) return undefined;
   return date.toISOString().slice(11, 16);
+}
+
+type ServiceAssignmentGroup = {
+  key: string;
+  direction: string;
+  serviceTime: Date;
+  vehicle: any;
+  assignments: any[];
+  serviceCount: number;
+  selectedDays: number;
+  completedDays: number;
+  pendingDays: number;
+  completedServices: number;
+  pendingServices: number;
+  totalServices: number;
+  carrierUnitPrice: number;
+  clientUnitPrice: number;
+  carrierCompleted: number;
+  carrierPending: number;
+  carrierTotal: number;
+  clientCompleted: number;
+  clientPending: number;
+  clientTotal: number;
+  firstDate: Date;
+};
+
+function groupServiceAssignments(assignments: any[], endOfToday: Date): ServiceAssignmentGroup[] {
+  const groups = new Map<string, ServiceAssignmentGroup>();
+  const sortedAssignments = [...assignments].sort((first, second) => {
+    const dateDiff = first.serviceDate.getTime() - second.serviceDate.getTime();
+    if (dateDiff !== 0) return dateDiff;
+    return first.serviceTime.getTime() - second.serviceTime.getTime();
+  });
+
+  sortedAssignments.forEach((assignment) => {
+    const carrierUnitPrice = Number(assignment.pricePerService ?? 0);
+    const clientUnitPrice = Number(assignment.clientPricePerService ?? 0);
+    const serviceCount = Number(assignment.serviceCount ?? 1);
+    const key = [
+      assignment.vehicleId,
+      assignment.direction,
+      timeInputValue(assignment.serviceTime) ?? "",
+      serviceCount,
+      carrierUnitPrice,
+      clientUnitPrice
+    ].join("|");
+    const completed = assignment.serviceDate <= endOfToday;
+    const carrierValue = carrierUnitPrice * serviceCount;
+    const clientValue = clientUnitPrice * serviceCount;
+    const existing = groups.get(key);
+
+    if (!existing) {
+      groups.set(key, {
+        key,
+        direction: assignment.direction,
+        serviceTime: assignment.serviceTime,
+        vehicle: assignment.vehicle,
+        assignments: [assignment],
+        serviceCount,
+        selectedDays: 0,
+        completedDays: 0,
+        pendingDays: 0,
+        completedServices: completed ? serviceCount : 0,
+        pendingServices: completed ? 0 : serviceCount,
+        totalServices: serviceCount,
+        carrierUnitPrice,
+        clientUnitPrice,
+        carrierCompleted: completed ? carrierValue : 0,
+        carrierPending: completed ? 0 : carrierValue,
+        carrierTotal: carrierValue,
+        clientCompleted: completed ? clientValue : 0,
+        clientPending: completed ? 0 : clientValue,
+        clientTotal: clientValue,
+        firstDate: assignment.serviceDate
+      });
+      return;
+    }
+
+    existing.assignments.push(assignment);
+    existing.completedServices += completed ? serviceCount : 0;
+    existing.pendingServices += completed ? 0 : serviceCount;
+    existing.totalServices += serviceCount;
+    existing.carrierCompleted += completed ? carrierValue : 0;
+    existing.carrierPending += completed ? 0 : carrierValue;
+    existing.carrierTotal += carrierValue;
+    existing.clientCompleted += completed ? clientValue : 0;
+    existing.clientPending += completed ? 0 : clientValue;
+    existing.clientTotal += clientValue;
+  });
+
+  return Array.from(groups.values())
+    .map((group) => {
+      const selectedDates = new Set(group.assignments.map((assignment) => dateInputValue(assignment.serviceDate)));
+      const completedDates = new Set(group.assignments.filter((assignment) => assignment.serviceDate <= endOfToday).map((assignment) => dateInputValue(assignment.serviceDate)));
+      const pendingDates = new Set(group.assignments.filter((assignment) => assignment.serviceDate > endOfToday).map((assignment) => dateInputValue(assignment.serviceDate)));
+      return {
+        ...group,
+        selectedDays: selectedDates.size,
+        completedDays: completedDates.size,
+        pendingDays: pendingDates.size
+      };
+    })
+    .sort((first, second) => {
+      const dateDiff = first.firstDate.getTime() - second.firstDate.getTime();
+      if (dateDiff !== 0) return dateDiff;
+      const timeDiff = first.serviceTime.getTime() - second.serviceTime.getTime();
+      if (timeDiff !== 0) return timeDiff;
+      return `${first.vehicle.fleetNumber}`.localeCompare(`${second.vehicle.fleetNumber}`, "tr");
+    });
+}
+
+function formatServiceTime(date?: Date) {
+  if (!date) return "--:--";
+  return date.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 }
 
 function Metric({ title, value }: { title: string; value: string | number }) {

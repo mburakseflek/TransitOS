@@ -47,6 +47,14 @@ function dateValue(formData: FormData, key: string) {
   return value ? new Date(`${value}T12:00:00`) : new Date();
 }
 
+function dateKey(date: Date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0")
+  ].join("-");
+}
+
 function periodFromMonthKey(value: string) {
   const safeValue = /^\d{4}-\d{2}$/.test(value) ? value : monthKey();
   const [year, month] = safeValue.split("-").map(Number);
@@ -528,6 +536,106 @@ export async function createBulkAssignments(formData: FormData) {
   revalidatePath("/transitos/earnings");
   revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, `/transitos/projects?project=${text(formData, "projectId")}&route=${text(formData, "routeId")}`));
+}
+
+export async function updateAssignmentGroup(formData: FormData) {
+  const assignmentIds = ids(formData, "assignmentIds");
+  const routeId = text(formData, "routeId");
+  const fallbackUrl = `/transitos/projects?project=${optionalId(formData, "projectId") ?? ""}&route=${routeId}`;
+
+  if (!assignmentIds.length || !routeId) {
+    redirect(returnTo(formData, fallbackUrl));
+  }
+
+  const route = await prisma.serviceRoute.findUnique({
+    where: { id: routeId },
+    select: { projectId: true }
+  });
+  const existingAssignments = await prisma.serviceAssignment.findMany({
+    where: {
+      id: { in: assignmentIds },
+      routeId
+    },
+    orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
+  });
+
+  if (!existingAssignments.length) {
+    redirect(returnTo(formData, fallbackUrl));
+  }
+
+  const selectedDates = Array.from(new Set(formData.getAll("serviceDates").map(String).filter(Boolean))).sort();
+  const fallbackDates = Array.from(new Set(existingAssignments.map((assignment) => dateKey(assignment.serviceDate)))).sort();
+  const dateValues = selectedDates.length ? selectedDates : fallbackDates;
+  const targetDateSet = new Set(dateValues);
+  const existingByDate = new Map<string, typeof existingAssignments[number]>();
+  const duplicateIds = new Set<string>();
+
+  for (const assignment of existingAssignments) {
+    const key = dateKey(assignment.serviceDate);
+    if (existingByDate.has(key)) {
+      duplicateIds.add(assignment.id);
+    } else {
+      existingByDate.set(key, assignment);
+    }
+  }
+
+  await prisma.$transaction(async (tx) => {
+    for (const assignment of existingAssignments) {
+      const key = dateKey(assignment.serviceDate);
+      if (!targetDateSet.has(key) || duplicateIds.has(assignment.id)) {
+        await tx.serviceAssignment.delete({ where: { id: assignment.id } });
+      }
+    }
+
+    for (const value of dateValues) {
+      const serviceDate = new Date(`${value}T12:00:00`);
+      const current = existingByDate.get(value);
+      const data = {
+        projectId: optionalId(formData, "projectId") ?? route?.projectId ?? null,
+        routeId,
+        vehicleId: text(formData, "vehicleId"),
+        serviceDate,
+        serviceTime: timeValue(serviceDate, text(formData, "serviceTime") || "07:30"),
+        direction: serviceDirection(formData),
+        serviceCount: numberValue(formData, "serviceCount") || 1,
+        kilometers: 0,
+        pricePerService: numberValue(formData, "pricePerService"),
+        clientPricePerService: numberValue(formData, "clientPricePerService"),
+        monthKey: monthKey(serviceDate)
+      };
+
+      if (current && targetDateSet.has(value) && !duplicateIds.has(current.id)) {
+        await tx.serviceAssignment.update({
+          where: { id: current.id },
+          data
+        });
+      } else {
+        await tx.serviceAssignment.create({ data });
+      }
+    }
+  });
+
+  revalidatePath("/transitos/projects");
+  revalidatePath("/transitos/calendar");
+  revalidatePath("/transitos/earnings");
+  revalidatePath("/transitos/dashboard");
+  redirect(returnTo(formData, fallbackUrl));
+}
+
+export async function deleteAssignmentGroup(formData: FormData) {
+  const assignmentIds = ids(formData, "assignmentIds");
+
+  if (assignmentIds.length) {
+    await prisma.serviceAssignment.deleteMany({
+      where: { id: { in: assignmentIds } }
+    });
+  }
+
+  revalidatePath("/transitos/projects");
+  revalidatePath("/transitos/calendar");
+  revalidatePath("/transitos/earnings");
+  revalidatePath("/transitos/dashboard");
+  redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function createOneOffJob(formData: FormData) {

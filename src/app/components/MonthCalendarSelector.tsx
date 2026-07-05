@@ -9,17 +9,20 @@ export function MonthCalendarSelector({
   name,
   mode = "multiple",
   defaultDate,
-  defaultMonth
+  defaultMonth,
+  defaultDates
 }: {
   name: string;
   mode?: "single" | "multiple";
   defaultDate?: string;
   defaultMonth?: string;
+  defaultDates?: string[];
 }) {
   const todayValue = localDateValue(new Date());
-  const initialMonth = defaultDate?.slice(0, 7) || defaultMonth || todayValue.slice(0, 7);
+  const initialDates = defaultDates?.filter(Boolean) ?? [];
+  const initialMonth = defaultDate?.slice(0, 7) || initialDates[0]?.slice(0, 7) || defaultMonth || todayValue.slice(0, 7);
   const [month, setMonth] = useState(initialMonth);
-  const [selected, setSelected] = useState<string[]>(defaultDate ? [defaultDate] : mode === "single" ? [todayValue] : []);
+  const [selected, setSelected] = useState<string[]>(defaultDate ? [defaultDate] : mode === "single" ? [todayValue] : Array.from(new Set(initialDates)).sort());
   const [dragState, setDragState] = useState<{ start: string; active: boolean; pointerType: string } | null>(null);
   const holdTimerRef = useRef<number | null>(null);
 
@@ -64,7 +67,7 @@ export function MonthCalendarSelector({
     const next = new Date(year, monthIndex - 1 + offset, 1);
     const nextMonth = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}`;
     setMonth(nextMonth);
-    setSelected(mode === "single" ? [] : []);
+    setSelected((current) => mode === "single" ? [] : current);
     setDragState(null);
   }
 

@@ -66,9 +66,41 @@ export async function AppShell({
   const visibleNavItems = navItems
     .filter((item) => isNavVisible(item.label, user?.role))
     .map((item) => user?.role === "PROJECT_OWNER" && item.label === "Hakedişler" ? { ...item, label: "Faturalar" } : item);
+  const activeNavLabel = visibleNavItems.find((item) => item.path === activePath)?.label ?? "Menü";
 
   return (
     <main className="shell transitos-shell">
+      <input className="mobile-drawer-check" id="transitos-mobile-drawer" type="checkbox" aria-hidden="true" />
+      <div className="transitos-mobile-chrome" aria-label="TransitOS mobil hızlı menü">
+        <Link className="transitos-mobile-logo" href="/transitos/dashboard" aria-label="TransitOS ana panele dön">
+          <img src="/brand/seflek-logo-navy.png" alt="Seflek Tur" />
+        </Link>
+        <label className="mobile-drawer-open" htmlFor="transitos-mobile-drawer" aria-label="TransitOS menüsünü aç">
+          <Menu size={22} />
+          <span>{activeNavLabel}</span>
+        </label>
+      </div>
+      <label className="mobile-drawer-backdrop" htmlFor="transitos-mobile-drawer" aria-label="Menüyü kapat" />
+      <nav className="mobile-drawer-panel" aria-label="Mobil TransitOS menüsü">
+        <div className="mobile-drawer-head">
+          <img src="/brand/seflek-logo-navy.png" alt="Seflek Tur" />
+          <label htmlFor="transitos-mobile-drawer">Kapat</label>
+        </div>
+        {visibleNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activePath === item.path;
+          return (
+            <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}`}>
+              <Icon size={19} />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+        <Link className="site-return-link mobile-site-return-link" href="/seflektur">
+          <House size={17} />
+          <span>Siteye dön</span>
+        </Link>
+      </nav>
       <aside className="sidebar aceternity-sidebar" aria-label="TransitOS ana menüsü" data-collapsible="auto">
         <span className="aceternity-sidebar-glow" aria-hidden="true" />
         <div className="brand">
@@ -76,11 +108,6 @@ export async function AppShell({
           <strong className="sidebar-brand-title">SeflekTur Transit<span>OS</span></strong>
           <small className="sidebar-brand-meta">{currentRoleTitle} · {displayName}</small>
         </div>
-        <input className="mobile-drawer-check" id="transitos-mobile-drawer" type="checkbox" aria-hidden="true" />
-        <label className="mobile-drawer-open" htmlFor="transitos-mobile-drawer">
-          <Menu size={20} />
-          <span>{visibleNavItems.find((item) => item.path === activePath)?.label ?? "Menü"}</span>
-        </label>
         <nav className="nav desktop-nav aceternity-sidebar-nav">
           {visibleNavItems.map((item) => {
             const Icon = item.icon;
@@ -91,27 +118,6 @@ export async function AppShell({
               <span>{item.label}</span>
             </Link>
           );})}
-        </nav>
-        <label className="mobile-drawer-backdrop" htmlFor="transitos-mobile-drawer" aria-label="Menüyü kapat" />
-        <nav className="mobile-drawer-panel" aria-label="Mobil TransitOS menüsü">
-          <div className="mobile-drawer-head">
-            <img src="/brand/seflek-logo-navy.png" alt="Seflek Tur" />
-            <label htmlFor="transitos-mobile-drawer">Kapat</label>
-          </div>
-          {visibleNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activePath === item.path;
-            return (
-              <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}`}>
-                <Icon size={19} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-          <Link className="site-return-link mobile-site-return-link" href="/seflektur">
-            <House size={17} />
-            <span>Siteye dön</span>
-          </Link>
         </nav>
         <Link className="site-return-link" href="/seflektur" title="Şeflek Tur sitesine dön">
           <House size={17} />

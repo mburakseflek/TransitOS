@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
-import { ProjectJumpLink } from "@/app/components/ProjectJumpLink";
+import { ProjectJumpLink, ProjectPanel, ProjectSelectionProvider } from "@/app/components/ProjectJumpLink";
 import {
   AdaptiveSlider,
   FloatingInput,
@@ -84,7 +84,10 @@ export default async function ProjectsPage({
       orderBy: { displayName: "asc" }
     })
   ]);
-  const initialProjectId = params?.project ?? projects[0]?.id ?? null;
+  const requestedProjectId = params?.project ?? null;
+  const initialProjectId = projects.some((project) => project.id === requestedProjectId)
+    ? requestedProjectId
+    : projects[0]?.id ?? null;
   const initialRouteId = params?.route ?? null;
 
   return (
@@ -110,48 +113,35 @@ export default async function ProjectsPage({
           </ModalAction>
         </QuickCreateCard> : null}
       </div>
-      <div className="project-layout project-accordion-layout section">
-        <aside className="card project-list">
-          <h2 style={{ marginTop: 0 }}>Projeler</h2>
-          <div className="stack">
-            {projects.map((project) => (
-              <ProjectJumpLink className={`route-card selectable-card project-jump-card ${initialProjectId === project.id ? "selected" : ""}`} targetId={`project-${project.id}`} key={project.id}>
-                <div className="record-head">
-                  <strong>{project.name}</strong>
-                  <span className={statusClass(project.status)}>{statusTitle(project.status)}</span>
-                </div>
-                <p className="muted">{project.clientCompany}</p>
-                <p className="muted">{project.personnelCount} personel · {project.routes.length} güzergah</p>
-              </ProjectJumpLink>
-            ))}
-            {projects.length === 0 ? <p className="muted">Henüz proje yok.</p> : null}
-          </div>
-        </aside>
-
-        <section className="stack project-accordion-stack">
-          {projects.map((project, index) => {
-            const isInitialProject = initialProjectId ? project.id === initialProjectId : index === 0;
-            return (
-              <details className={`project-accordion ${isInitialProject ? "selected" : ""}`} id={`project-${project.id}`} open={isInitialProject} key={project.id}>
-                <summary className="project-accordion-summary">
-                  <div>
+      <ProjectSelectionProvider initialProjectId={initialProjectId}>
+        <div className="project-layout project-selection-layout section">
+          <aside className="card project-list">
+            <h2 style={{ marginTop: 0 }}>Projeler</h2>
+            <div className="stack">
+              {projects.map((project) => (
+                <ProjectJumpLink className="route-card selectable-card project-jump-card" projectId={project.id} key={project.id}>
+                  <div className="record-head">
+                    <strong>{project.name}</strong>
                     <span className={statusClass(project.status)}>{statusTitle(project.status)}</span>
-                    <h2>{project.name}</h2>
-                    <p className="muted">{project.clientCompany}</p>
                   </div>
-                  <div className="chip-row project-accordion-metrics">
-                    <span className="badge blue">{project.personnelCount} personel</span>
-                    <span className="badge gray">{project.routes.length} güzergah</span>
-                    <span className="badge yellow">Aç/Kapat</span>
-                  </div>
-                </summary>
-                <ProjectCard project={project} initialRouteId={isInitialProject ? initialRouteId : null} vehicles={vehicles} projectOwners={projectOwners} endOfToday={endOfToday} canEdit={canEdit} showMoney={canEdit} periodMonth={period.month} defaultServiceDate={defaultServiceDate} periodQuery={`month=${period.month}&range=${period.range}`} />
-              </details>
-            );
-          })}
-          {projects.length === 0 ? <section className="card muted">Başlamak için Proje Ekle penceresini kullanın.</section> : null}
-        </section>
-      </div>
+                  <p className="muted">{project.clientCompany}</p>
+                  <p className="muted">{project.personnelCount} personel · {project.routes.length} güzergah</p>
+                </ProjectJumpLink>
+              ))}
+              {projects.length === 0 ? <p className="muted">Henüz proje yok.</p> : null}
+            </div>
+          </aside>
+
+          <section className="stack project-detail-stack">
+            {projects.map((project) => (
+              <ProjectPanel projectId={project.id} key={project.id}>
+                <ProjectCard project={project} initialRouteId={initialProjectId === project.id ? initialRouteId : null} vehicles={vehicles} projectOwners={projectOwners} endOfToday={endOfToday} canEdit={canEdit} showMoney={canEdit} periodMonth={period.month} defaultServiceDate={defaultServiceDate} periodQuery={`month=${period.month}&range=${period.range}`} />
+              </ProjectPanel>
+            ))}
+            {projects.length === 0 ? <section className="card muted">Başlamak için Proje Ekle penceresini kullanın.</section> : null}
+          </section>
+        </div>
+      </ProjectSelectionProvider>
 
       <OneOffJobsPanel routes={oneOffRoutes} vehicles={vehicles} canEdit={canEdit} />
     </AppShell>

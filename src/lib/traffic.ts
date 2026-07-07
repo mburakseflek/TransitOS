@@ -9,6 +9,7 @@ const publicTrafficEndpoints = [
   "https://api.ibb.gov.tr/tkmservices/api/TrafficData/v1/TrafficDensity",
   "https://api.ibb.gov.tr/tkmservices/api/TrafficData/v1/TrafficDensityMap"
 ];
+const trafficFetchTimeoutMs = 1800;
 
 const monitoredRegions = [
   "Beylikdüzü",
@@ -29,27 +30,11 @@ export async function getTrafficSnapshot(): Promise<{ source: string; items: Tra
     process.env.YANDEX_TRAFFIC_API_URL
   ].filter(Boolean) as string[];
   const urls = [...configuredUrls, ...publicTrafficEndpoints];
+  const results = await Promise.all(urls.map((liveUrl) => fetchTrafficEndpoint(liveUrl)));
+  const liveResult = results.find(Boolean);
 
-  for (const liveUrl of urls) {
-    try {
-      const response = await fetch(liveUrl, {
-        next: { revalidate: 60 * 5 },
-        headers: { "User-Agent": "SeflekTur TransitOS" }
-      });
-      if (response.ok) {
-        const payload = await response.json();
-        const parsed = parseTrafficPayload(payload);
-        if (parsed.length) {
-          return {
-            source: liveUrl.includes("ibb") ? "İBB canlı veri" : "Yandex canlı veri",
-            items: prioritizeTrafficItems(parsed),
-            updatedAt: new Date()
-          };
-        }
-      }
-    } catch {
-      // Bir kaynak kapalıysa sıradaki anahtarsız canlı kaynağı deneriz.
-    }
+  if (liveResult) {
+    return liveResult;
   }
 
   return {
@@ -57,6 +42,34 @@ export async function getTrafficSnapshot(): Promise<{ source: string; items: Tra
     items: [],
     updatedAt: new Date()
   };
+}
+
+async function fetchTrafficEndpoint(liveUrl: string) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), trafficFetchTimeoutMs);
+
+  try {
+    const response = await fetch(liveUrl, {
+      signal: controller.signal,
+      next: { revalidate: 60 * 5 },
+      headers: { "User-Agent": "SeflekTur TransitOS" }
+    });
+    if (!response.ok) return null;
+
+    const payload = await response.json();
+    const parsed = parseTrafficPayload(payload);
+    if (!parsed.length) return null;
+
+    return {
+      source: liveUrl.includes("ibb") ? "İBB canlı veri" : "Yandex canlı veri",
+      items: prioritizeTrafficItems(parsed),
+      updatedAt: new Date()
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export function getYandexMapKitApiKey() {

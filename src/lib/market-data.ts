@@ -6,6 +6,13 @@ type MarketItem = {
 
 const tcmbTodayUrl = "https://www.tcmb.gov.tr/kurlar/today.xml";
 const petrolOfisiUrl = "https://www.petrolofisi.com.tr/akaryakit-fiyatlari";
+const marketFetchTimeoutMs = 1200;
+
+type NextFetchInit = RequestInit & {
+  next?: {
+    revalidate?: number;
+  };
+};
 
 function shouldSkipLiveFetchDuringBuild() {
   return process.env.npm_lifecycle_event === "build" && process.env.TRANSITOS_FETCH_MARKET_DURING_BUILD !== "1";
@@ -23,8 +30,19 @@ function getXmlValue(xml: string, code: string, tag: string) {
   return block?.match(new RegExp(`<${tag}>(.*?)</${tag}>`))?.[1]?.trim();
 }
 
+async function fetchWithTimeout(url: string, init: NextFetchInit = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), marketFetchTimeoutMs);
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function fetchExchangeItems(): Promise<MarketItem[]> {
-  const response = await fetch(tcmbTodayUrl, {
+  const response = await fetchWithTimeout(tcmbTodayUrl, {
     next: { revalidate: 60 * 60 },
     headers: { "User-Agent": "SeflekTur TransitOS" }
   });
@@ -52,7 +70,7 @@ function extractFuelPrice(html: string, fuel: "benzin" | "mazot" | "LPG") {
 }
 
 async function fetchFuelItems(): Promise<MarketItem[]> {
-  const response = await fetch(petrolOfisiUrl, {
+  const response = await fetchWithTimeout(petrolOfisiUrl, {
     next: { revalidate: 60 * 60 },
     headers: { "User-Agent": "SeflekTur TransitOS" }
   });

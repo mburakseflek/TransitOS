@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
+import { ProjectJumpLink } from "@/app/components/ProjectJumpLink";
 import {
   AdaptiveSlider,
   FloatingInput,
@@ -83,8 +84,8 @@ export default async function ProjectsPage({
       orderBy: { displayName: "asc" }
     })
   ]);
-  const selectedProject = projects.find((project) => project.id === params?.project) ?? null;
-  const selectedRoute = selectedProject?.routes.find((route) => route.id === params?.route) ?? null;
+  const initialProjectId = params?.project ?? projects[0]?.id ?? null;
+  const initialRouteId = params?.route ?? null;
 
   return (
     <AppShell active="/transitos/projects" title="Projeler" subtitle="Proje şirketi, güzergahlar, araç planları ve bağımsız tek seferlik işler.">
@@ -109,30 +110,45 @@ export default async function ProjectsPage({
           </ModalAction>
         </QuickCreateCard> : null}
       </div>
-      <div className="project-layout section">
+      <div className="project-layout project-accordion-layout section">
         <aside className="card project-list">
           <h2 style={{ marginTop: 0 }}>Projeler</h2>
           <div className="stack">
             {projects.map((project) => (
-              <a className={`route-card selectable-card ${selectedProject?.id === project.id ? "selected" : ""}`} href={`/transitos/projects?project=${project.id}&month=${period.month}&range=${period.range}`} key={project.id}>
+              <ProjectJumpLink className={`route-card selectable-card project-jump-card ${initialProjectId === project.id ? "selected" : ""}`} targetId={`project-${project.id}`} key={project.id}>
                 <div className="record-head">
                   <strong>{project.name}</strong>
                   <span className={statusClass(project.status)}>{statusTitle(project.status)}</span>
                 </div>
                 <p className="muted">{project.clientCompany}</p>
                 <p className="muted">{project.personnelCount} personel · {project.routes.length} güzergah</p>
-              </a>
+              </ProjectJumpLink>
             ))}
             {projects.length === 0 ? <p className="muted">Henüz proje yok.</p> : null}
           </div>
         </aside>
 
-        <section className="stack">
-          {selectedProject ? (
-            <ProjectCard project={selectedProject} selectedRoute={selectedRoute} vehicles={vehicles} projectOwners={projectOwners} endOfToday={endOfToday} canEdit={canEdit} showMoney={canEdit} periodMonth={period.month} defaultServiceDate={defaultServiceDate} periodQuery={`month=${period.month}&range=${period.range}`} />
-          ) : (
-            <section className="card muted">Detayları görmek için soldan bir proje seçin.</section>
-          )}
+        <section className="stack project-accordion-stack">
+          {projects.map((project, index) => {
+            const isInitialProject = initialProjectId ? project.id === initialProjectId : index === 0;
+            return (
+              <details className={`project-accordion ${isInitialProject ? "selected" : ""}`} id={`project-${project.id}`} open={isInitialProject} key={project.id}>
+                <summary className="project-accordion-summary">
+                  <div>
+                    <span className={statusClass(project.status)}>{statusTitle(project.status)}</span>
+                    <h2>{project.name}</h2>
+                    <p className="muted">{project.clientCompany}</p>
+                  </div>
+                  <div className="chip-row project-accordion-metrics">
+                    <span className="badge blue">{project.personnelCount} personel</span>
+                    <span className="badge gray">{project.routes.length} güzergah</span>
+                    <span className="badge yellow">Aç/Kapat</span>
+                  </div>
+                </summary>
+                <ProjectCard project={project} initialRouteId={isInitialProject ? initialRouteId : null} vehicles={vehicles} projectOwners={projectOwners} endOfToday={endOfToday} canEdit={canEdit} showMoney={canEdit} periodMonth={period.month} defaultServiceDate={defaultServiceDate} periodQuery={`month=${period.month}&range=${period.range}`} />
+              </details>
+            );
+          })}
           {projects.length === 0 ? <section className="card muted">Başlamak için Proje Ekle penceresini kullanın.</section> : null}
         </section>
       </div>
@@ -142,14 +158,14 @@ export default async function ProjectsPage({
   );
 }
 
-function ProjectCard({ project, selectedRoute, vehicles, projectOwners, endOfToday, canEdit, showMoney, periodMonth, defaultServiceDate, periodQuery }: { project: any; selectedRoute: any | null; vehicles: any[]; projectOwners: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; defaultServiceDate: string; periodQuery: string }) {
+function ProjectCard({ project, initialRouteId, vehicles, projectOwners, endOfToday, canEdit, showMoney, periodMonth, defaultServiceDate, periodQuery }: { project: any; initialRouteId: string | null; vehicles: any[]; projectOwners: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; defaultServiceDate: string; periodQuery: string }) {
   const allAssignments = project.routes.flatMap((route: any) => route.assignments);
   const completedAssignments = allAssignments.filter((item: any) => item.serviceDate <= endOfToday);
   const totalServices = completedAssignments.reduce((sum: number, item: any) => sum + item.serviceCount, 0);
   const activeVehicles = new Set(project.routes.flatMap((route: any) => route.assignments.map((item: any) => item.vehicle.fleetNumber)));
 
   return (
-    <section className="card" id={`project-${project.id}`}>
+    <section className="project-detail-panel" id={`project-detail-${project.id}`}>
       <div className="record-head">
         <div>
           <h2 style={{ margin: 0 }}>{project.name}</h2>
@@ -210,26 +226,26 @@ function ProjectCard({ project, selectedRoute, vehicles, projectOwners, endOfTod
 
       <div className="stack section">
         {project.routes.map((route: any) => (
-          <RouteCard route={route} project={project} selected={selectedRoute?.id === route.id} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} periodMonth={periodMonth} defaultServiceDate={defaultServiceDate} periodQuery={periodQuery} key={route.id} />
+          <RouteCard route={route} project={project} defaultOpen={initialRouteId === route.id} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} periodMonth={periodMonth} defaultServiceDate={defaultServiceDate} periodQuery={periodQuery} key={route.id} />
         ))}
         {project.routes.length === 0 ? <p className="muted">Bu projeye henüz güzergah eklenmemiş.</p> : null}
       </div>
 
-      {!selectedRoute && project.routes.length > 0 ? (
-        <p className="muted section">Mesai ve planları görmek için bir güzergah seçin.</p>
+      {!initialRouteId && project.routes.length > 0 ? (
+        <p className="muted section">Mesai ve planları görmek için güzergah kartını açın. Sayfa yenilenmeden detaylar burada genişler.</p>
       ) : null}
     </section>
   );
 }
 
-function RouteCard({ route, project, selected, vehicles, endOfToday, canEdit, showMoney, periodMonth, defaultServiceDate, periodQuery }: { route: any; project: any; selected: boolean; vehicles: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; defaultServiceDate: string; periodQuery: string }) {
+function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit, showMoney, periodMonth, defaultServiceDate, periodQuery }: { route: any; project: any; defaultOpen: boolean; vehicles: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; defaultServiceDate: string; periodQuery: string }) {
   const vehiclesText = Array.from(new Set(route.assignments.map((assignment: any) => assignment.vehicle.fleetNumber))).join(", ");
   const completedCount = route.assignments.filter((assignment: any) => assignment.serviceDate <= endOfToday).length;
   const returnTo = `/transitos/projects?project=${project.id}&route=${route.id}&${periodQuery}`;
   return (
-    <article className={`route-card selectable-card ${selected ? "selected" : ""}`}>
-      <div className="record-head">
-        <a className="route-card-link" href={`/transitos/projects?project=${project.id}&route=${route.id}&${periodQuery}`}>
+    <details className="route-card route-accordion selectable-card" open={defaultOpen}>
+      <summary className="route-card-link route-summary">
+        <div>
           <h3 style={{ margin: 0 }}>{route.name}</h3>
           <p className="muted">{route.startPoint} → {route.endPoint}</p>
           <div className="chip-row">
@@ -237,7 +253,11 @@ function RouteCard({ route, project, selected, vehicles, endOfToday, canEdit, sh
             <span className="badge yellow">◷ {route.assignments.length - completedCount} plan</span>
           </div>
           {vehiclesText ? <p className="muted">Bağlı araçlar: {vehiclesText}</p> : <p className="muted">Henüz araç bağlı değil.</p>}
-        </a>
+        </div>
+        <span className="route-summary-cue" aria-hidden="true">⌄</span>
+      </summary>
+      <div className="record-head route-card-toolbar">
+        <span className="badge gray">Servis planı</span>
         <div className="toolbar">
           {canEdit ? (
             <InlineDisclosureMenu label="..." tone="blue">
@@ -261,46 +281,44 @@ function RouteCard({ route, project, selected, vehicles, endOfToday, canEdit, sh
         </div>
       </div>
 
-      {selected ? (
-        <>
-          <section className="service-planner section">
-            <div>
-              <span className="badge blue">Seçili güzergah</span>
-              <h3>Servis planı ve ücretlendirme</h3>
-              <p className="muted">Her servis kendi gününü, aracını, servis türünü ve iki ayrı ücretini saklar. Böylece proje faturası ve taşıyıcı hakedişi karışmadan hesaplanır.</p>
+      <div className="route-expand-body">
+        <section className="service-planner section">
+          <div>
+            <span className="badge blue">Seçili güzergah</span>
+            <h3>Servis planı ve ücretlendirme</h3>
+            <p className="muted">Her servis kendi gününü, aracını, servis türünü ve iki ayrı ücretini saklar. Böylece proje faturası ve taşıyıcı hakedişi karışmadan hesaplanır.</p>
+          </div>
+          {canEdit ? (
+            <div className="service-action-grid">
+              <QuickCreateCard title="Tek gün servis" body="Seçili güne tek servis veya aynı gün tekrar ekleyin.">
+                <ModalAction label="Servis Ekle" title="Servis Ekle">
+                  <form className="stack service-form" action={createAssignment}>
+                    <input type="hidden" name="projectId" value={project.id} />
+                    <input type="hidden" name="routeId" value={route.id} />
+                    <input type="hidden" name="_returnTo" value={returnTo} />
+                    <AssignmentFields vehicles={vehicles} defaultDate={defaultServiceDate} />
+                    <div className="actions"><SubmitButton>✓ Servis Ekle</SubmitButton></div>
+                  </form>
+                </ModalAction>
+              </QuickCreateCard>
+              <QuickCreateCard title="Çoklu gün planı" body="Ay tablosundan birden fazla günü seçerek plan oluşturun.">
+                <ModalAction label="Toplu Planla" title="Çoklu Servis Planla">
+                  <form className="stack service-form" action={createBulkAssignments}>
+                    <input type="hidden" name="projectId" value={project.id} />
+                    <input type="hidden" name="routeId" value={route.id} />
+                    <input type="hidden" name="_returnTo" value={returnTo} />
+                    <BulkAssignmentFields vehicles={vehicles} defaultMonth={periodMonth} />
+                    <div className="actions"><SubmitButton>✓ Servisleri Planla</SubmitButton></div>
+                  </form>
+                </ModalAction>
+              </QuickCreateCard>
             </div>
-            {canEdit ? (
-              <div className="service-action-grid">
-                <QuickCreateCard title="Tek gün servis" body="Seçili güne tek servis veya aynı gün tekrar ekleyin.">
-                  <ModalAction label="Servis Ekle" title="Servis Ekle">
-                    <form className="stack service-form" action={createAssignment}>
-                      <input type="hidden" name="projectId" value={project.id} />
-                      <input type="hidden" name="routeId" value={route.id} />
-                      <input type="hidden" name="_returnTo" value={returnTo} />
-                      <AssignmentFields vehicles={vehicles} defaultDate={defaultServiceDate} />
-                      <div className="actions"><SubmitButton>✓ Servis Ekle</SubmitButton></div>
-                    </form>
-                  </ModalAction>
-                </QuickCreateCard>
-                <QuickCreateCard title="Çoklu gün planı" body="Ay tablosundan birden fazla günü seçerek plan oluşturun.">
-                  <ModalAction label="Toplu Planla" title="Çoklu Servis Planla">
-                    <form className="stack service-form" action={createBulkAssignments}>
-                      <input type="hidden" name="projectId" value={project.id} />
-                      <input type="hidden" name="routeId" value={route.id} />
-                      <input type="hidden" name="_returnTo" value={returnTo} />
-                      <BulkAssignmentFields vehicles={vehicles} defaultMonth={periodMonth} />
-                      <div className="actions"><SubmitButton>✓ Servisleri Planla</SubmitButton></div>
-                    </form>
-                  </ModalAction>
-                </QuickCreateCard>
-              </div>
-            ) : null}
-          </section>
+          ) : null}
+        </section>
 
-          <ServiceLedger assignments={route.assignments} projectId={project.id} routeId={route.id} returnTo={returnTo} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} />
-        </>
-      ) : null}
-    </article>
+        <ServiceLedger assignments={route.assignments} projectId={project.id} routeId={route.id} returnTo={returnTo} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} />
+      </div>
+    </details>
   );
 }
 
@@ -419,12 +437,12 @@ function ServiceGroupDetails({
           <span className="badge blue">{selectedDates.length} gün</span>
         </div>
         <BulkGroupEditFields group={group} vehicles={vehicles} selectedDates={selectedDates} />
-        <div className="actions service-group-edit-actions">
+        <div className="service-group-edit-actions">
           <SubmitButton>✓ Toplu Güncelle</SubmitButton>
         </div>
       </form>
 
-      <form className="actions service-group-danger" action={deleteAssignmentGroup} data-confirm-danger="true">
+      <form className="service-group-danger" action={deleteAssignmentGroup} data-confirm-danger="true">
         {group.assignments.map((assignment) => <input key={assignment.id} type="hidden" name="assignmentIds" value={assignment.id} />)}
         <input type="hidden" name="_returnTo" value={returnTo} />
         <DeleteButton>Bu Grubu Sil</DeleteButton>
@@ -455,7 +473,7 @@ function ServiceGroupDetails({
                   <span>Proje: {formatTRY(clientTotal)} · {formatTRY(Number(assignment.clientPricePerService))} / servis</span>
                 </div>
               ) : null}
-              <form className="actions service-summary-delete" action={deleteAssignment} data-confirm-danger="true">
+              <form className="service-summary-delete" action={deleteAssignment} data-confirm-danger="true">
                 <input type="hidden" name="id" value={assignment.id} />
                 <input type="hidden" name="_returnTo" value={returnTo} />
                 <DeleteButton>Bu Servisi Sil</DeleteButton>

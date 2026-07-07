@@ -43,6 +43,14 @@ function hasDirtyForms(root: ParentNode = document) {
   return Boolean(root.querySelector(dirtyFormSelector));
 }
 
+function hasPendingInteraction() {
+  return document.body.dataset.operationPending === "true" || document.body.dataset.navigationPending === "true";
+}
+
+function isLockSurface(target: EventTarget | null) {
+  return target instanceof HTMLElement && Boolean(target.closest(".global-operation-overlay, .modal-operation-lock, .route-loader"));
+}
+
 function isDestructiveSubmitter(submitter: HTMLElement | null, form: HTMLFormElement) {
   const label = `${submitter?.textContent ?? ""} ${submitter?.getAttribute("aria-label") ?? ""} ${form.textContent ?? ""}`.toLocaleLowerCase("tr-TR");
   return (
@@ -116,6 +124,12 @@ export function InteractionGuards() {
       if (!form) return;
 
       const submitter = (event as SubmitEvent).submitter as HTMLElement | null;
+      if (hasPendingInteraction() && form.dataset.submitting !== "true") {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
       if (form.dataset.submitting === "true") {
         event.preventDefault();
         event.stopPropagation();
@@ -137,6 +151,12 @@ export function InteractionGuards() {
     }
 
     function handleDocumentClick(event: MouseEvent) {
+      if (hasPendingInteraction() && !isLockSurface(event.target)) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
       const link = event.target instanceof HTMLElement ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
       if (!link || link.dataset.ignoreDirtyGuard === "true") return;
       if (link.target === "_blank" || link.hasAttribute("download")) return;
@@ -156,11 +176,17 @@ export function InteractionGuards() {
       event.returnValue = "";
     }
 
+    function resetInteractionLock() {
+      document.body.dataset.operationPending = "false";
+      document.body.dataset.navigationPending = "false";
+    }
+
     document.addEventListener("input", markDirty, true);
     document.addEventListener("change", markDirty, true);
     document.addEventListener("submit", handleSubmit, true);
     document.addEventListener("click", handleDocumentClick, true);
     window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("pageshow", resetInteractionLock);
 
     return () => {
       document.removeEventListener("input", markDirty, true);
@@ -168,6 +194,7 @@ export function InteractionGuards() {
       document.removeEventListener("submit", handleSubmit, true);
       document.removeEventListener("click", handleDocumentClick, true);
       window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("pageshow", resetInteractionLock);
     };
   }, []);
 

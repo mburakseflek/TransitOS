@@ -412,7 +412,7 @@ export async function updateRoute(formData: FormData) {
   revalidatePath("/transitos/routes");
   revalidatePath("/transitos/calendar");
   revalidatePath("/transitos/earnings");
-  redirect(returnTo(formData, `/transitos/routes?route=${routeId}`));
+  redirect(returnTo(formData, `/transitos/projects?route=${routeId}`));
 }
 
 export async function deleteRoute(formData: FormData) {
@@ -1045,11 +1045,11 @@ export async function createStop(formData: FormData) {
     }
   });
   revalidatePath("/transitos/routes");
-  redirect(returnTo(formData, `/transitos/routes?route=${text(formData, "routeId")}`));
+  redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function deleteStop(formData: FormData) {
   await prisma.routeStop.delete({ where: { id: text(formData, "id") } });
   revalidatePath("/transitos/routes");
-  redirect(returnTo(formData, "/transitos/routes"));
+  redirect(returnTo(formData, "/transitos/projects"));
 }

@@ -19,6 +19,7 @@ export function RouteLoadingOverlay() {
 
   function beginLoading() {
     clearTimers();
+    document.body.dataset.navigationPending = "true";
     setProgress(0);
     delayTimer.current = window.setTimeout(() => {
       setVisible(true);
@@ -32,6 +33,7 @@ export function RouteLoadingOverlay() {
   function finishLoading() {
     window.clearTimeout(delayTimer.current);
     window.clearInterval(progressTimer.current);
+    document.body.dataset.navigationPending = "false";
     setProgress(100);
     hideTimer.current = window.setTimeout(() => {
       setVisible(false);
@@ -56,6 +58,7 @@ export function RouteLoadingOverlay() {
 
     document.addEventListener("click", handleClick);
     return () => {
+      document.body.dataset.navigationPending = "false";
       clearTimers();
       document.removeEventListener("click", handleClick);
     };

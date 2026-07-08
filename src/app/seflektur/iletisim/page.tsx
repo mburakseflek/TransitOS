@@ -3,6 +3,14 @@ import { ArrowRight, Send } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
 import { ContactActions } from "@/app/seflektur/iletisim/ContactActions";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
+
+export const metadata = createCorporateMetadata({
+  title: "Şeflek Tur İletişim | İstanbul Servis ve VIP Transfer",
+  description:
+    "İstanbul personel servisi, okul servisi, VIP transfer ve kurumsal taşımacılık talepleriniz için Şeflek Tur iletişim bilgilerine ulaşın.",
+  path: "/seflektur/iletisim"
+});
 
 export default async function ContactPage() {
   const content = await readSiteContent();

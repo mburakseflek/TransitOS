@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { Pencil, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { createSubcontractor, deleteSubcontractor, updateSubcontractor } from "@/app/actions";
 import { readSessionToken } from "@/lib/auth";
@@ -50,7 +51,12 @@ export default async function SubcontractorsPage() {
                     <span className="badge yellow">◷ {planned} plan</span>
                   </div>
                 </div>
-                <ModalAction label="Düzenle" title={`${subcontractor.companyName} İşlemleri`}>
+                <ModalAction
+                  label={<Pencil size={17} aria-hidden="true" />}
+                  ariaLabel={`${subcontractor.companyName} taşeronunu düzenle`}
+                  buttonClassName="ghost icon-button"
+                  title={`${subcontractor.companyName} İşlemleri`}
+                >
                   <div className="stack">
                     <form className="stack" action={updateSubcontractor}>
                       <input type="hidden" name="id" value={subcontractor.id} />
@@ -60,7 +66,11 @@ export default async function SubcontractorsPage() {
                     <form className="stack" action={deleteSubcontractor}>
                       <input type="hidden" name="id" value={subcontractor.id} />
                       <p>Bu taşeron, kullanıcı girişi, araçları ve bağlı kayıtları silinecek.</p>
-                      <div className="actions"><DeleteButton>Taşeron Sil</DeleteButton></div>
+                      <div className="actions">
+                        <DeleteButton ariaLabel={`${subcontractor.companyName} taşeronunu sil`}>
+                          <Trash2 size={17} aria-hidden="true" />
+                        </DeleteButton>
+                      </div>
                     </form>
                   </div>
                 </ModalAction>

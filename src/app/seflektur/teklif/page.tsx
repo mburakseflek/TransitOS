@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { submitServiceRequest } from "@/app/site-actions";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
+
+export const metadata = createCorporateMetadata({
+  title: "Şeflek Tur Hizmet Talebi | Personel Servisi, Okul Servisi ve VIP Transfer",
+  description:
+    "İstanbul personel servisi, okul servisi, turizm, günlük yolculuk ve VIP transfer ihtiyacınız için Şeflek Tur hizmet talep formunu doldurun.",
+  path: "/seflektur/teklif"
+});
 
 export default async function ServiceRequestPage({ searchParams }: { searchParams?: Promise<{ sent?: string }> }) {
   const params = await searchParams;

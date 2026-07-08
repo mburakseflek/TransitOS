@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { createDriverDocument, deleteDriverDocument, updateVehicle } from "@/app/actions";
 import { DriverDocumentUploadInputs } from "@/app/components/DriverDocumentUploadInputs";
@@ -43,7 +44,12 @@ export default async function DriversPage() {
                 </div>
               </div>
               {canEdit ? (
-                <ModalAction label="Düzenle" title={`${vehicle.fleetNumber} Şoför Bilgileri`}>
+                <ModalAction
+                  label={<Pencil size={17} aria-hidden="true" />}
+                  ariaLabel={`${vehicle.fleetNumber} şoför bilgilerini düzenle`}
+                  buttonClassName="ghost icon-button"
+                  title={`${vehicle.fleetNumber} Şoför Bilgileri`}
+                >
                   <form className="stack" action={updateVehicle}>
                     <input type="hidden" name="id" value={vehicle.id} />
                     <input type="hidden" name="_returnTo" value="/transitos/drivers" />
@@ -96,12 +102,16 @@ export default async function DriversPage() {
                         <small>{document.createdAt.toLocaleDateString("tr-TR")}</small>
                       </div>
                       <div className="actions">
-                        <a className="ghost compact-button" href={document.fileUrl} target="_blank" rel="noreferrer">Önizle</a>
+                        <a className="ghost compact-button icon-button" href={document.fileUrl} target="_blank" rel="noreferrer" aria-label={`${document.title} evrak önizle`}>
+                          <Eye size={17} aria-hidden="true" />
+                        </a>
                         {canEdit ? (
                           <form action={deleteDriverDocument}>
                             <input type="hidden" name="id" value={document.id} />
                             <input type="hidden" name="_returnTo" value="/transitos/drivers" />
-                            <DeleteButton>Sil</DeleteButton>
+                            <DeleteButton ariaLabel={`${document.title} evrak sil`}>
+                              <Trash2 size={17} aria-hidden="true" />
+                            </DeleteButton>
                           </form>
                         ) : null}
                       </div>

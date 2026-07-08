@@ -1,4 +1,6 @@
 import { cookies } from "next/headers";
+import { Trash2 } from "lucide-react";
+import { deleteVehicleSurveyResponse } from "@/app/actions";
 import { AppShell } from "@/app/components/AppShell";
 import { PrintButton } from "@/app/components/PrintButton";
 import { readSessionToken } from "@/lib/auth";
@@ -90,7 +92,16 @@ export default async function SurveysPage() {
                         <strong>Yolcu Memnuniyet Anketi</strong>
                         <span>TransitOS tarafından hazırlanmıştır</span>
                       </div>
-                      <PrintButton label="PDF / Yazdır" />
+                      <div className="survey-report-actions">
+                        <PrintButton label="PDF / Yazdır" />
+                        <form action={deleteVehicleSurveyResponse} data-confirm-danger="true">
+                          <input type="hidden" name="id" value={response.id} />
+                          <input type="hidden" name="_returnTo" value="/transitos/surveys" />
+                          <button className="danger icon-button" type="submit" aria-label="Anketi sil">
+                            <Trash2 size={17} aria-hidden="true" />
+                          </button>
+                        </form>
+                      </div>
                     </div>
 
                     <div className="survey-answer-grid">

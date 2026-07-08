@@ -2,8 +2,16 @@ import Link from "next/link";
 import { ArrowRight, Bus, Clock3, MapPinned, Route, Sparkles, UsersRound } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
 
 const serviceIcons = [UsersRound, Route, MapPinned, Clock3, Sparkles];
+
+export const metadata = createCorporateMetadata({
+  title: "İstanbul Personel Servisi ve Okul Servisi | Şeflek Tur",
+  description:
+    "Şeflek Tur; İstanbul'da personel taşımacılığı, okul servisi, turizm, günlük yolculuk ve VIP transfer hizmetleri için güvenli ve planlı ulaşım çözümleri sunar.",
+  path: "/seflektur/hizmetler"
+});
 
 export default async function ServicesPage() {
   const content = await readSiteContent();

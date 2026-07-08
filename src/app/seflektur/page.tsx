@@ -4,9 +4,14 @@ import { readSiteContent } from "@/lib/site-content";
 import { OnboardingScreen, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { CompanyInfoList } from "@/app/seflektur/CompanyInfoList";
 import { MobileAppPromo, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
 
 const heroFleetImage =
   "/site-media/hero-home.png";
+
+export const metadata = createCorporateMetadata({
+  path: "/seflektur"
+});
 
 const pageCards = [
   {

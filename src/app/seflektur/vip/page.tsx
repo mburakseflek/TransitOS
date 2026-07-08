@@ -2,6 +2,14 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { FleetCard, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
+
+export const metadata = createCorporateMetadata({
+  title: "VIP Transfer İstanbul | Şeflek Tur",
+  description:
+    "Şeflek Tur, İstanbul'da Mercedes-Benz Vito, Volkswagen Transporter, Mercedes-Benz Sprinter ve Mercedes-Benz E200 ile VIP transfer ve özel yolculuk hizmetleri sunar.",
+  path: "/seflektur/vip"
+});
 
 export default async function VipPage() {
   const content = await readSiteContent();

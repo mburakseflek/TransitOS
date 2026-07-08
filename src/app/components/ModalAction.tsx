@@ -19,13 +19,15 @@ export function ModalAction({
   title,
   children,
   tone = "default",
-  buttonClassName
+  buttonClassName,
+  ariaLabel
 }: {
   label: React.ReactNode;
   title: string;
   children: React.ReactNode;
   tone?: "default" | "danger";
   buttonClassName?: string;
+  ariaLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -133,6 +135,7 @@ export function ModalAction({
         className={buttonClassName ?? (tone === "danger" ? "danger" : "ghost")}
         type="button"
         aria-haspopup="dialog"
+        aria-label={ariaLabel}
         onClick={() => setOpen(true)}
       >
         {label}

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
 
 const standards = [
   {
@@ -60,6 +61,13 @@ const standards = [
     icon: Leaf
   }
 ] as const;
+
+export const metadata = createCorporateMetadata({
+  title: "Şeflek Tur Belgeler ve Standartlar | SRC, D2, TÜRSAB ve İBB Güzergah",
+  description:
+    "Şeflek Tur; SRC, psikoteknik, D2, TÜRSAB, İBB güzergah belgeleri, trafik sigortası, koltuk sigortası ve araç evrak kontrolleriyle profesyonel taşımacılık standardı sunar.",
+  path: "/seflektur/standartlar"
+});
 
 export default async function StandardsPage() {
   const content = await readSiteContent();

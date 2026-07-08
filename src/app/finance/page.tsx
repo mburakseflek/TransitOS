@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { FinancialDocumentType } from "@prisma/client";
+import { PencilLine } from "lucide-react";
 import { AppShell, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { AddCashDisclosure } from "@/app/components/RegistryInterfaceKit";
 import {
@@ -148,7 +149,13 @@ export default async function FinancePage({
                     {document ? (
                       <div className="finance-document-actions">
                         <PrintReportButton targetId={`project-document-${document.id}`} label="PDF / Yazdır" />
-                        <ModalAction label="İptal / Düzenle" title={`${project.name} faturası iptal edilsin mi?`} tone="danger">
+                        <ModalAction
+                          label={<PencilLine size={17} aria-hidden="true" />}
+                          ariaLabel={`${project.name} faturasını iptal et ve düzenle`}
+                          buttonClassName="danger icon-button"
+                          title={`${project.name} faturası iptal edilsin mi?`}
+                          tone="danger"
+                        >
                           <form className="stack" action={cancelProjectInvoiceDocument}>
                             <input type="hidden" name="documentId" value={document.id} />
                             <input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />
@@ -226,7 +233,13 @@ export default async function FinancePage({
                     <div className="finance-document-actions">
                       <PrintReportButton targetId={`subcontractor-document-${document.id}`} label="PDF / Yazdır" />
                       {canIssueSubcontractor ? (
-                        <ModalAction label="İptal / Düzenle" title={`${subcontractor.companyName} hakedişi iptal edilsin mi?`} tone="danger">
+                        <ModalAction
+                          label={<PencilLine size={17} aria-hidden="true" />}
+                          ariaLabel={`${subcontractor.companyName} hakedişini iptal et ve düzenle`}
+                          buttonClassName="danger icon-button"
+                          title={`${subcontractor.companyName} hakedişi iptal edilsin mi?`}
+                          tone="danger"
+                        >
                           <form className="stack" action={cancelSubcontractorEarningDocument}>
                             <input type="hidden" name="documentId" value={document.id} />
                             <input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />

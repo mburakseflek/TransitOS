@@ -1140,6 +1140,21 @@ export async function submitVehicleSurvey(formData: FormData) {
   redirectSurvey(vehicleId, "thanks");
 }
 
+export async function deleteVehicleSurveyResponse(formData: FormData) {
+  const user = await currentSessionUser();
+  if (!isManager(user) && !isServiceSupervisor(user)) {
+    redirect("/transitos/surveys" as never);
+  }
+
+  await prisma.vehicleSurveyResponse.delete({
+    where: { id: text(formData, "id") }
+  });
+
+  revalidatePath("/transitos/surveys");
+  revalidatePath("/surveys");
+  redirect(returnTo(formData, "/transitos/surveys"));
+}
+
 export async function createStop(formData: FormData) {
   await prisma.routeStop.create({
     data: {

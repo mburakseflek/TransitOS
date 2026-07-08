@@ -2,10 +2,15 @@ import Link from "next/link";
 import { ArrowRight, Building2, LockKeyhole, MonitorCog, PhoneCall } from "lucide-react";
 import { WhatsAppIcon } from "@/app/components/WhatsAppIcon";
 import { SkiperMotionFrame } from "@/app/components/RegistryInterfaceKit";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
 import { readSiteContent } from "@/lib/site-content";
 
 const heroFleetImage =
   "/site-media/hero-gateway.png";
+
+export const metadata = createCorporateMetadata({
+  path: "/"
+});
 
 export default async function HomePage() {
   const content = await readSiteContent();

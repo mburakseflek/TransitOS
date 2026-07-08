@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, FileCheck2, Headphones, ShieldCheck } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
 
 const privileges = [
   ["7/24 Ulaşılabilirlik", "Operasyon sırasında hızlı iletişim, yönlendirme ve çözüm odaklı takip.", Headphones],
@@ -9,6 +10,13 @@ const privileges = [
   ["TransitOS destekli raporlama", "Planlanan ve tamamlanan servislerin dijital olarak takip edilebilirliği.", BadgeCheck],
   ["Güvenli hizmet standardı", "Okul, personel, turizm ve VIP taşımada kontrollü operasyon süreci.", ShieldCheck]
 ] as const;
+
+export const metadata = createCorporateMetadata({
+  title: "Şeflek Tur Ayrıcalıkları | 7/24 Kurumsal Taşımacılık",
+  description:
+    "Şeflek Tur; 7/24 ulaşılabilirlik, evrak takibi, filo disiplini, güvenli hizmet standardı ve TransitOS destekli raporlama ile kurumsal taşımacılık hizmeti sunar.",
+  path: "/seflektur/ayricaliklar"
+});
 
 export default async function PrivilegesPage() {
   const content = await readSiteContent();

@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { ProjectJumpLink, ProjectPanel, ProjectSelectionProvider } from "@/app/components/ProjectJumpLink";
 import {
@@ -163,7 +164,12 @@ function ProjectCard({ project, initialRouteId, vehicles, projectOwners, endOfTo
         </div>
         <div className="toolbar">
           <span className={statusClass(project.status)}>{statusTitle(project.status)}</span>
-          {canEdit ? <ModalAction label="Düzenle" title={`${project.name} İşlemleri`}>
+          {canEdit ? <ModalAction
+            label={<Pencil size={17} aria-hidden="true" />}
+            ariaLabel={`${project.name} projesini düzenle`}
+            buttonClassName="ghost icon-button"
+            title={`${project.name} İşlemleri`}
+          >
             <div className="stack">
               <form className="stack" action={updateProject}>
                 <input type="hidden" name="id" value={project.id} />
@@ -174,7 +180,9 @@ function ProjectCard({ project, initialRouteId, vehicles, projectOwners, endOfTo
               <form className="actions" action={deleteProject}>
                 <input type="hidden" name="id" value={project.id} />
                 <input type="hidden" name="_returnTo" value="/transitos/projects" />
-                <DeleteButton>Projeyi Sil</DeleteButton>
+                <DeleteButton ariaLabel={`${project.name} projesini sil`}>
+                  <Trash2 size={17} aria-hidden="true" />
+                </DeleteButton>
               </form>
             </div>
           </ModalAction> : null}
@@ -250,8 +258,13 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
         <span className="badge gray">Servis planı</span>
         <div className="toolbar">
           {canEdit ? (
-            <InlineDisclosureMenu label="..." tone="blue">
-              <ModalAction label="Düzenle" title={`${route.name} İşlemleri`}>
+            <InlineDisclosureMenu label={<MoreHorizontal size={17} aria-hidden="true" />} tone="blue">
+              <ModalAction
+                label={<Pencil size={17} aria-hidden="true" />}
+                ariaLabel={`${route.name} güzergahını düzenle`}
+                buttonClassName="ghost icon-button"
+                title={`${route.name} İşlemleri`}
+              >
                 <div className="stack">
                   <form className="stack" action={updateRoute}>
                     <input type="hidden" name="id" value={route.id} />
@@ -262,7 +275,9 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
                   <form className="actions" action={deleteRoute}>
                     <input type="hidden" name="id" value={route.id} />
                     <input type="hidden" name="_returnTo" value={`/transitos/projects?project=${project.id}`} />
-                    <DeleteButton>Güzergahı Sil</DeleteButton>
+                    <DeleteButton ariaLabel={`${route.name} güzergahını sil`}>
+                      <Trash2 size={17} aria-hidden="true" />
+                    </DeleteButton>
                   </form>
                 </div>
               </ModalAction>
@@ -362,7 +377,8 @@ function ServiceLedger({ assignments, projectId, routeId, returnTo, vehicles, en
             {canEdit ? (
               <div className="service-summary-actions">
                 <ModalAction
-                  label={<><span aria-hidden="true">...</span><span className="sr-only">Servisleri düzenle</span></>}
+                  label={<MoreHorizontal size={17} aria-hidden="true" />}
+                  ariaLabel={`${group.vehicle.fleetNumber} ${title} servislerini düzenle`}
                   title={`${group.vehicle.fleetNumber} ${title} Servisleri`}
                   buttonClassName="ghost icon-button service-summary-menu"
                 >
@@ -435,7 +451,9 @@ function ServiceGroupDetails({
       <form className="service-group-danger" action={deleteAssignmentGroup} data-confirm-danger="true">
         {group.assignments.map((assignment) => <input key={assignment.id} type="hidden" name="assignmentIds" value={assignment.id} />)}
         <input type="hidden" name="_returnTo" value={returnTo} />
-        <DeleteButton>Bu Grubu Sil</DeleteButton>
+        <DeleteButton ariaLabel="Bu servis grubunu sil">
+          <Trash2 size={17} aria-hidden="true" />
+        </DeleteButton>
       </form>
 
       <div className="service-summary-detail-list">
@@ -466,7 +484,9 @@ function ServiceGroupDetails({
               <form className="service-summary-delete" action={deleteAssignment} data-confirm-danger="true">
                 <input type="hidden" name="id" value={assignment.id} />
                 <input type="hidden" name="_returnTo" value={returnTo} />
-                <DeleteButton>Bu Servisi Sil</DeleteButton>
+                <DeleteButton ariaLabel="Bu servisi sil">
+                  <Trash2 size={17} aria-hidden="true" />
+                </DeleteButton>
               </form>
             </details>
           );
@@ -661,7 +681,12 @@ function OneOffJobsPanel({ routes, vehicles, canEdit }: { routes: any[]; vehicle
                     <h3 style={{ margin: 0 }}>{route.name}</h3>
                     <p className="muted">{route.startPoint} → {route.endPoint}</p>
                   </div>
-                  {canEdit ? <ModalAction label="..." title={`${route.name} İşlemleri`}>
+                  {canEdit ? <ModalAction
+                    label={<MoreHorizontal size={17} aria-hidden="true" />}
+                    ariaLabel={`${route.name} tek seferlik iş işlemleri`}
+                    buttonClassName="ghost icon-button"
+                    title={`${route.name} İşlemleri`}
+                  >
                     <div className="stack">
                       <form className="stack" action={updateOneOffJob}>
                         <input type="hidden" name="routeId" value={route.id} />
@@ -674,7 +699,11 @@ function OneOffJobsPanel({ routes, vehicles, canEdit }: { routes: any[]; vehicle
                         <input type="hidden" name="routeId" value={route.id} />
                         <input type="hidden" name="_returnTo" value="/transitos/projects" />
                         <p>Bu tek seferlik iş silinecek.</p>
-                        <div className="actions"><DeleteButton>Sil</DeleteButton></div>
+                        <div className="actions">
+                          <DeleteButton ariaLabel={`${route.name} tek seferlik işi sil`}>
+                            <Trash2 size={17} aria-hidden="true" />
+                          </DeleteButton>
+                        </div>
                       </form>
                     </div>
                   </ModalAction> : null}

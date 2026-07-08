@@ -1,12 +1,12 @@
 {
-  "name": "SeflekTur TransitOS",
-  "short_name": "TransitOS",
-  "description": "Şeflek Tur kurumsal web sitesi ve TransitOS operasyon platformu.",
+  "name": "Şeflek Tur",
+  "short_name": "Şeflek Tur",
+  "description": "İstanbul personel servisi, okul servisi, VIP transfer ve kurumsal taşımacılık hizmetleri.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#10182f",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0F172A",
   "orientation": "portrait-primary",
   "icons": [
     {

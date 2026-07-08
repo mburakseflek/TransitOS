@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { ExpenseReport } from "@/app/components/FinancialDocumentView";
 import { ExpenseVehiclePicker } from "@/app/components/ExpenseVehiclePicker";
@@ -109,7 +110,11 @@ export default async function ExpensesPage({
                       <form className="stack" action={deleteExpense}>
                         <input type="hidden" name="id" value={expense.id} />
                         <p>Bu gider kaydı hakedişten kaldırılacak.</p>
-                        <div className="actions"><DeleteButton>Sil</DeleteButton></div>
+                        <div className="actions">
+                          <DeleteButton ariaLabel="Gider kaydını sil">
+                            <Trash2 size={17} aria-hidden="true" />
+                          </DeleteButton>
+                        </div>
                       </form>
                     </div>
                   </ModalAction>

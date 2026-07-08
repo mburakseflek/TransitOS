@@ -1,7 +1,29 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FileText, Image as ImageIcon, LayoutPanelTop } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const content = await readSiteContent();
+  const page = content.customPages.find((item) => item.slug === slug);
+
+  if (!page) {
+    return createCorporateMetadata({
+      title: "Şeflek Tur",
+      path: "/seflektur"
+    });
+  }
+
+  return createCorporateMetadata({
+    title: `${page.title} | Şeflek Tur`,
+    description: page.summary,
+    path: `/seflektur/sayfa/${page.slug}`,
+    image: page.heroImageUrl || "/og-image.jpg"
+  });
+}
 
 export default async function CustomContentPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

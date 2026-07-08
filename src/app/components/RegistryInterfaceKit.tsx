@@ -207,7 +207,7 @@ export function InlineDisclosureMenu({
   children,
   tone = "gray"
 }: {
-  label?: string;
+  label?: ReactNode;
   children: ReactNode;
   tone?: Tone;
 }) {

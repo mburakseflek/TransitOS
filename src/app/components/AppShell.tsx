@@ -192,9 +192,9 @@ export function SubmitButton({ children = "Kaydet" }: { children?: React.ReactNo
   );
 }
 
-export function DeleteButton({ children = "Sil" }: { children?: React.ReactNode }) {
+export function DeleteButton({ children = "Sil", ariaLabel }: { children?: React.ReactNode; ariaLabel?: string }) {
   return (
-    <button className="danger" type="submit">
+    <button className="danger" type="submit" aria-label={ariaLabel}>
       {children}
     </button>
   );

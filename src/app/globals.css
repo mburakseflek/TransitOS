@@ -16722,3 +16722,100 @@ body .modal-window > .section {
     transform: translateX(-50%) !important;
   }
 }
+
+/* Final interaction polish: QR, survey actions, and disclosure menus */
+.modal-backdrop {
+  z-index: 2147483000 !important;
+}
+
+.modal-window {
+  z-index: 2147483001 !important;
+}
+
+.inline-disclosure-menu[open] {
+  z-index: 260;
+}
+
+.inline-disclosure-menu > div {
+  z-index: 261 !important;
+}
+
+.inline-disclosure-menu summary > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.inline-disclosure-menu summary > svg:last-child {
+  transition: transform 180ms ease;
+}
+
+.inline-disclosure-menu[open] summary > svg:not(:last-child) {
+  transform: none !important;
+}
+
+.inline-disclosure-menu[open] summary > span svg {
+  transform: none !important;
+}
+
+.inline-disclosure-menu[open] summary > svg:last-child {
+  transform: rotate(180deg) !important;
+}
+
+.inline-disclosure-menu .icon-button,
+.record-head .icon-button,
+.survey-report-actions .icon-button {
+  display: inline-grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  padding: 0;
+  border-radius: 14px;
+}
+
+.vehicle-survey-qr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.vehicle-survey-qr-actions :is(a, button) {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.vehicle-survey-qr-preview img {
+  background: #ffffff;
+}
+
+.survey-report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.survey-report-actions form {
+  margin: 0;
+}
+
+.survey-report-actions .danger.icon-button {
+  color: #dc2626;
+  background: rgba(254, 226, 226, 0.94);
+  border-color: rgba(220, 38, 38, 0.24);
+}
+
+@media (max-width: 760px) {
+  .survey-report-actions {
+    justify-content: flex-start;
+  }
+
+  .inline-disclosure-menu > div {
+    min-width: min(260px, calc(100vw - 36px));
+  }
+}

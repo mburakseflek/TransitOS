@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BarChart3, FileText, Map, MonitorCog, ShieldCheck, UsersRound } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { MobileAppPromo, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
 
 const features = [
   ["Taşeron ve araç yönetimi", "Firma, araç, sürücü ve evrak süreçleri tek merkezde düzenlenir.", UsersRound],
@@ -11,6 +12,13 @@ const features = [
   ["Kurumsal güvenlik", "Yönetici ve taşeron girişleri farklı rol ve yetkilerle ayrılır.", ShieldCheck],
   ["Şeflek Tur’a özel altyapı", "TransitOS, Şeflek Tur işleyişine göre tasarlanmış özel operasyon katmanıdır.", MonitorCog]
 ] as const;
+
+export const metadata = createCorporateMetadata({
+  title: "TransitOS | Şeflek Tur Operasyon Takip Altyapısı",
+  description:
+    "TransitOS, Şeflek Tur'un taşeron, araç, sürücü, güzergah, servis planı, hakediş ve rapor süreçlerini takip etmek için kullandığı operasyon yönetim altyapısıdır.",
+  path: "/seflektur/transitos"
+});
 
 export default async function TransitOSInfoPage() {
   const content = await readSiteContent();

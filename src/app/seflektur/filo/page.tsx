@@ -2,6 +2,14 @@ import Link from "next/link";
 import { ArrowRight, Bus } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { FleetCard, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
+
+export const metadata = createCorporateMetadata({
+  title: "Şeflek Tur Filo | İstanbul Servis ve Turizm Araçları",
+  description:
+    "Şeflek Tur filosunda Mercedes-Benz Sprinter, Travego, Tourismo, Renault Master, Fiat Ducato, Volkswagen Crafter Volt ve Ford Transit araç tipleriyle servis ve turizm taşımacılığı planlanır.",
+  path: "/seflektur/filo"
+});
 
 export default async function FleetPage() {
   const content = await readSiteContent();

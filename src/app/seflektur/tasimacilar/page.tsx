@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { submitCarrierApplication } from "@/app/site-actions";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
+
+export const metadata = createCorporateMetadata({
+  title: "Şeflek Tur Taşımacı Başvurusu | İstanbul Servis İş Ortaklığı",
+  description:
+    "Şeflek Tur ile çalışmak isteyen taşımacılar için İstanbul servis, turizm ve yolcu taşımacılığı iş ortaklığı başvuru formu.",
+  path: "/seflektur/tasimacilar"
+});
 
 export default async function CarrierApplicationPage({ searchParams }: { searchParams?: Promise<{ sent?: string }> }) {
   const params = await searchParams;

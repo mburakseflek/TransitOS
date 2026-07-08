@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, ModalAction } from "@/app/components/AppShell";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { deleteAssignment } from "@/app/actions";
@@ -76,7 +77,9 @@ export default async function CalendarPage({
                           <form action={deleteAssignment}>
                             <input type="hidden" name="id" value={assignment.id} />
                             <input type="hidden" name="_returnTo" value={`/transitos/calendar?month=${period.month}`} />
-                            <DeleteButton>Sil</DeleteButton>
+                            <DeleteButton ariaLabel="Takvim servis kaydını sil">
+                              <Trash2 size={17} aria-hidden="true" />
+                            </DeleteButton>
                           </form>
                         ) : null}
                       </div>

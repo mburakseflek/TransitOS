@@ -3,6 +3,14 @@ import { ArrowRight, Building2, Handshake } from "lucide-react";
 import { readSiteContent, type SiteCard } from "@/lib/site-content";
 import { SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
 import { SkiperLogoShowcase } from "@/app/components/RegistryInterfaceKit";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
+
+export const metadata = createCorporateMetadata({
+  title: "Şeflek Tur Referanslar ve İş Ortakları",
+  description:
+    "Şeflek Tur referansları ve iş ortakları; kurumsal personel taşımacılığı, servis operasyonları, turizm ve özel ulaşım hizmetlerinde izlenebilir çalışma yaklaşımını gösterir.",
+  path: "/seflektur/referanslar"
+});
 
 export default async function ReferencesPage() {
   const content = await readSiteContent();

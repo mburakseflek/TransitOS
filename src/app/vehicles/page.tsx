@@ -1,4 +1,5 @@
 import { cookies, headers } from "next/headers";
+import { ExternalLink, Pencil, QrCode, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { ExpandableProfileCard, InlineDisclosureMenu, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
@@ -95,7 +96,12 @@ export default async function VehiclesPage({
               </div>
               {canEdit ? (
                 <InlineDisclosureMenu label="..." tone="blue">
-                  <ModalAction label="Düzenle" title={`${vehicle.fleetNumber} İşlemleri`}>
+                  <ModalAction
+                    label={<Pencil size={17} aria-hidden="true" />}
+                    ariaLabel={`${vehicle.fleetNumber} aracını düzenle`}
+                    buttonClassName="ghost icon-button"
+                    title={`${vehicle.fleetNumber} İşlemleri`}
+                  >
                     <div className="stack">
                       <form className="stack" action={updateVehicle}>
                         <input type="hidden" name="id" value={vehicle.id} />
@@ -105,11 +111,21 @@ export default async function VehiclesPage({
                       <form className="stack" action={deleteVehicle}>
                         <input type="hidden" name="id" value={vehicle.id} />
                         <p>Bu araç ve bağlı plan kayıtları silinecek.</p>
-                        <div className="actions"><DeleteButton>Araç Sil</DeleteButton></div>
+                        <div className="actions">
+                          <DeleteButton>
+                            <Trash2 size={17} aria-hidden="true" />
+                            Araç Sil
+                          </DeleteButton>
+                        </div>
                       </form>
                     </div>
                   </ModalAction>
-                  <ModalAction label="Anket QR" title={`${vehicle.fleetNumber} Anket QR`}>
+                  <ModalAction
+                    label={<QrCode size={17} aria-hidden="true" />}
+                    ariaLabel={`${vehicle.fleetNumber} anket QR kodunu göster`}
+                    buttonClassName="ghost icon-button"
+                    title={`${vehicle.fleetNumber} Anket QR`}
+                  >
                     <VehicleSurveyQr vehicle={vehicle} surveyUrl={surveyUrl} />
                   </ModalAction>
                 </InlineDisclosureMenu>
@@ -163,7 +179,8 @@ export default async function VehiclesPage({
 }
 
 function VehicleSurveyQr({ vehicle, surveyUrl }: { vehicle: any; surveyUrl: string }) {
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=12&data=${encodeURIComponent(surveyUrl)}`;
+  const qrUrl = `/api/vehicles/${encodeURIComponent(vehicle.id)}/survey-qr`;
+  const qrDownloadUrl = `${qrUrl}?download=1`;
 
   return (
     <div className="vehicle-survey-qr">
@@ -176,9 +193,16 @@ function VehicleSurveyQr({ vehicle, surveyUrl }: { vehicle: any; surveyUrl: stri
         <p className="muted">
           Bu QR araca özeldir. Yolcu telefondan açtığında araç ve şoför bilgisi otomatik gelir.
         </p>
-        <a className="primary compact" href={surveyUrl} target="_blank" rel="noreferrer">
-          Anketi Aç
-        </a>
+        <div className="vehicle-survey-qr-actions">
+          <a className="primary compact" href={surveyUrl} target="_blank" rel="noreferrer">
+            <ExternalLink size={16} aria-hidden="true" />
+            Anketi Aç
+          </a>
+          <a className="ghost compact" href={qrDownloadUrl} download>
+            <QrCode size={16} aria-hidden="true" />
+            PNG indir
+          </a>
+        </div>
         <code>{surveyUrl}</code>
       </div>
     </div>

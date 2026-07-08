@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { ExpandableProfileCard, InlineDisclosureMenu, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
@@ -31,6 +31,10 @@ export default async function VehiclesPage({
   const canEdit = canEditOperations(user);
   const showMoney = canSeeSubcontractorMoney(user);
   const compactAssetView = isSubcontractor(user) || isProjectOwner(user);
+  const requestHeaders = await headers();
+  const requestHost = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
+  const requestProtocol = requestHeaders.get("x-forwarded-proto") ?? (requestHost.includes("localhost") ? "http" : "https");
+  const surveyOrigin = process.env.NEXT_PUBLIC_SITE_URL ?? `${requestProtocol}://${requestHost}`;
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
   const [vehicles, subcontractors] = await Promise.all([
@@ -74,6 +78,7 @@ export default async function VehiclesPage({
             .reduce((sum, item) => sum + Number(item.pricePerService) * item.serviceCount, 0);
           const groupedAssignments = groupVehicleAssignments(vehicle.assignments);
           const visibleGroups = compactAssetView ? groupedAssignments.slice(0, 2) : groupedAssignments.slice(0, 4);
+          const surveyUrl = `${surveyOrigin}/anket/arac/${vehicle.id}`;
           return (
           <section className={`card status-card ${compactAssetView ? "compact-asset-card" : ""}`} key={vehicle.id}>
             <div className="record-head">
@@ -103,6 +108,9 @@ export default async function VehiclesPage({
                         <div className="actions"><DeleteButton>Araç Sil</DeleteButton></div>
                       </form>
                     </div>
+                  </ModalAction>
+                  <ModalAction label="Anket QR" title={`${vehicle.fleetNumber} Anket QR`}>
+                    <VehicleSurveyQr vehicle={vehicle} surveyUrl={surveyUrl} />
                   </ModalAction>
                 </InlineDisclosureMenu>
               ) : null}
@@ -151,6 +159,29 @@ export default async function VehiclesPage({
         {vehicles.length === 0 ? <section className="card muted">Henüz araç kaydı yok.</section> : null}
       </section>
     </AppShell>
+  );
+}
+
+function VehicleSurveyQr({ vehicle, surveyUrl }: { vehicle: any; surveyUrl: string }) {
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=12&data=${encodeURIComponent(surveyUrl)}`;
+
+  return (
+    <div className="vehicle-survey-qr">
+      <div className="vehicle-survey-qr-preview">
+        <img src={qrUrl} alt={`${vehicle.fleetNumber} anket QR kodu`} />
+      </div>
+      <div className="vehicle-survey-qr-copy">
+        <span>Araç anket bağlantısı</span>
+        <strong>{vehicle.fleetNumber} · {vehicle.plateNumber}</strong>
+        <p className="muted">
+          Bu QR araca özeldir. Yolcu telefondan açtığında araç ve şoför bilgisi otomatik gelir.
+        </p>
+        <a className="primary compact" href={surveyUrl} target="_blank" rel="noreferrer">
+          Anketi Aç
+        </a>
+        <code>{surveyUrl}</code>
+      </div>
+    </div>
   );
 }
 

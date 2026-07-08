@@ -6,6 +6,7 @@ import {
   Bus,
   CalendarDays,
   ChartNoAxesCombined,
+  ClipboardCheck,
   FolderKanban,
   Gauge,
   House,
@@ -26,6 +27,7 @@ const navItems = [
   { label: "Panel", path: "/dashboard", icon: Gauge },
   { label: "Taşeronlar", path: "/subcontractors", icon: UsersRound },
   { label: "Araçlar", path: "/vehicles", icon: Bus },
+  { label: "Anketler", path: "/surveys", icon: ClipboardCheck },
   { label: "Sürücüler", path: "/drivers", icon: UserRound },
   { label: "Projeler", path: "/projects", icon: FolderKanban },
   { label: "Giderler", path: "/expenses", icon: MinusCircle },
@@ -88,7 +90,7 @@ export async function AppShell({
           const Icon = item.icon;
           const isActive = activePath === item.path;
           return (
-            <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}`}>
+            <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}` as never}>
               <Icon size={19} />
               <span>{item.label}</span>
             </Link>
@@ -111,7 +113,7 @@ export async function AppShell({
             const Icon = item.icon;
             const isActive = activePath === item.path;
             return (
-            <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}`}>
+            <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}` as never}>
               <Icon size={18} />
               <span>{item.label}</span>
             </Link>
@@ -162,10 +164,10 @@ function isNavVisible(label: string, role?: string) {
     return !["Giderler", "Hakedişler", "Ayarlar"].includes(label);
   }
   if (role === "SUBCONTRACTOR") {
-    return !["Taşeronlar", "Sürücüler", "Giderler", "Finans", "Takvim"].includes(label);
+    return !["Taşeronlar", "Anketler", "Sürücüler", "Giderler", "Finans", "Takvim"].includes(label);
   }
   if (role === "PROJECT_OWNER") {
-    return !["Taşeronlar", "Giderler", "Finans", "Ayarlar"].includes(label);
+    return !["Taşeronlar", "Anketler", "Giderler", "Finans", "Ayarlar"].includes(label);
   }
   return true;
 }

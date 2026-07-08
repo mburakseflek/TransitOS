@@ -47,7 +47,7 @@ export function GlobalOperationOverlay() {
       safetyTimer = window.setTimeout(() => {
         document.body.dataset.operationPending = "false";
         setVisible(false);
-      }, 18000);
+      }, 60000);
     }
 
     function hide() {

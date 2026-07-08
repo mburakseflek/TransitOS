@@ -105,6 +105,7 @@ model Vehicle {
   documents       DriverDocument[]
   assignments     ServiceAssignment[]
   expenses        Expense[]
+  surveyResponses VehicleSurveyResponse[]
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 }
@@ -128,6 +129,7 @@ model Project {
   ownerUsers     User[]             @relation("ProjectOwnerProjects")
   routes         ServiceRoute[]
   assignments    ServiceAssignment[]
+  surveyResponses VehicleSurveyResponse[]
   financialDocuments FinancialDocument[]
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
@@ -148,6 +150,7 @@ model ServiceRoute {
   routePolyline      String?
   stops              RouteStop[]
   assignments        ServiceAssignment[]
+  surveyResponses    VehicleSurveyResponse[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 }
@@ -181,6 +184,46 @@ model ServiceAssignment {
   financialLines  FinancialDocumentLine[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+}
+
+model VehicleSurveyResponse {
+  id                   String       @id @default(cuid())
+  vehicleId            String
+  vehicle              Vehicle      @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  routeId              String?
+  route                ServiceRoute? @relation(fields: [routeId], references: [id], onDelete: SetNull)
+  projectId            String?
+  project              Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  vehicleFleetNumber   String
+  vehiclePlateNumber   String
+  driverName           String?
+  driverPhone          String?
+  passengerName        String
+  passengerPhone       String
+  passengerEmail       String?
+  serviceLineLabel     String
+  journeyDate          DateTime
+  deviceKey            String
+  courtesyRating       Int
+  safetyRating         Int
+  cleanlinessRating    Int
+  comfortRating        Int
+  punctualityRating    Int
+  trustRating          Int
+  satisfactionRating   Int
+  recommendationRating Int
+  favoriteTopics       Json         @default("[]")
+  comments             String?
+  lowScoreExplanation  String?
+  averageRating        Decimal      @default(0)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  @@unique([vehicleId, journeyDate, deviceKey])
+  @@index([vehicleId, journeyDate])
+  @@index([routeId])
+  @@index([projectId])
+  @@index([averageRating])
 }
 
 model Expense {

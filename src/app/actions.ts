@@ -19,6 +19,11 @@ function numberValue(formData: FormData, key: string) {
   return Number(String(formData.get(key) ?? "0").replace(",", ".")) || 0;
 }
 
+function ratingValue(formData: FormData, key: string) {
+  const value = Math.round(numberValue(formData, key));
+  return Number.isFinite(value) ? Math.min(5, Math.max(1, value)) : 0;
+}
+
 function hasValue(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim().length > 0;
 }
@@ -53,6 +58,14 @@ function dateKey(date: Date) {
     String(date.getMonth() + 1).padStart(2, "0"),
     String(date.getDate()).padStart(2, "0")
   ].join("-");
+}
+
+function surveyReturnPath(vehicleId: string, status: string) {
+  return `/anket/arac/${encodeURIComponent(vehicleId)}?sent=${encodeURIComponent(status)}`;
+}
+
+function redirectSurvey(vehicleId: string, status: string): never {
+  redirect(surveyReturnPath(vehicleId, status) as never);
 }
 
 function periodFromMonthKey(value: string) {
@@ -1032,6 +1045,99 @@ export async function deleteDriverDocument(formData: FormData) {
   revalidatePath("/transitos/drivers");
   revalidatePath("/transitos/vehicles");
   redirect(returnTo(formData, "/transitos/drivers"));
+}
+
+export async function submitVehicleSurvey(formData: FormData) {
+  const vehicleId = text(formData, "vehicleId");
+  const routeId = optionalId(formData, "routeId");
+  const deviceKey = text(formData, "deviceKey") || "unknown-device";
+  const journeyDate = dateValue(formData, "journeyDate");
+  const passengerName = text(formData, "passengerName");
+  const passengerPhone = formatPhoneTR(text(formData, "passengerPhone"));
+  const passengerEmail = optional(formData, "passengerEmail");
+  const favoriteTopics = formData.getAll("favoriteTopics").map(String).filter(Boolean);
+  const ratings = {
+    courtesyRating: ratingValue(formData, "courtesyRating"),
+    safetyRating: ratingValue(formData, "safetyRating"),
+    cleanlinessRating: ratingValue(formData, "cleanlinessRating"),
+    comfortRating: ratingValue(formData, "comfortRating"),
+    punctualityRating: ratingValue(formData, "punctualityRating"),
+    trustRating: ratingValue(formData, "trustRating"),
+    satisfactionRating: ratingValue(formData, "satisfactionRating"),
+    recommendationRating: ratingValue(formData, "recommendationRating")
+  };
+
+  const ratingValues = Object.values(ratings);
+  if (!vehicleId || !passengerName || !passengerPhone || ratingValues.some((value) => value < 1 || value > 5)) {
+    redirectSurvey(vehicleId || "eksik", "missing");
+  }
+
+  const lowScoreExplanation = optional(formData, "lowScoreExplanation");
+  if (ratingValues.some((value) => value <= 2) && !lowScoreExplanation) {
+    redirectSurvey(vehicleId, "low-score");
+  }
+
+  const [vehicle, route] = await Promise.all([
+    prisma.vehicle.findUnique({
+      where: { id: vehicleId },
+      select: {
+        id: true,
+        fleetNumber: true,
+        plateNumber: true,
+        driverName: true,
+        driverPhone: true
+      }
+    }),
+    routeId
+      ? prisma.serviceRoute.findUnique({
+          where: { id: routeId },
+          include: { project: true }
+        })
+      : Promise.resolve(null)
+  ]);
+
+  if (!vehicle) {
+    redirectSurvey(vehicleId, "not-found");
+  }
+
+  const averageRating = ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length;
+  const serviceLineLabel = route
+    ? `${route.project?.name ?? route.project?.clientCompany ?? "Tek seferlik iş"} - ${route.name}`
+    : text(formData, "serviceLineLabel") || "Servis hattı seçilmedi";
+
+  try {
+    await prisma.vehicleSurveyResponse.create({
+      data: {
+        vehicleId,
+        routeId: route?.id ?? null,
+        projectId: route?.projectId ?? null,
+        vehicleFleetNumber: vehicle.fleetNumber,
+        vehiclePlateNumber: vehicle.plateNumber,
+        driverName: vehicle.driverName,
+        driverPhone: vehicle.driverPhone,
+        passengerName,
+        passengerPhone,
+        passengerEmail,
+        serviceLineLabel,
+        journeyDate,
+        deviceKey,
+        ...ratings,
+        favoriteTopics,
+        comments: optional(formData, "comments"),
+        lowScoreExplanation,
+        averageRating
+      }
+    });
+  } catch (error) {
+    if (typeof error === "object" && error && "code" in error && (error as { code?: string }).code === "P2002") {
+      redirectSurvey(vehicleId, "already");
+    }
+    throw error;
+  }
+
+  revalidatePath("/transitos/surveys");
+  revalidatePath("/transitos/vehicles");
+  redirectSurvey(vehicleId, "thanks");
 }
 
 export async function createStop(formData: FormData) {

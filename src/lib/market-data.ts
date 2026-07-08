@@ -7,6 +7,10 @@ type MarketItem = {
 const tcmbTodayUrl = "https://www.tcmb.gov.tr/kurlar/today.xml";
 const petrolOfisiUrl = "https://www.petrolofisi.com.tr/akaryakit-fiyatlari";
 const marketFetchTimeoutMs = 1200;
+const marketCacheMs = 10 * 60 * 1000;
+
+let tickerCache: { items: string[]; expiresAt: number } | null = null;
+let pendingTickerRequest: Promise<string[]> | null = null;
 
 type NextFetchInit = RequestInit & {
   next?: {
@@ -91,7 +95,7 @@ async function fetchFuelItems(): Promise<MarketItem[]> {
   ].filter(Boolean) as MarketItem[];
 }
 
-export async function getMarketTickerItems(fallbackItems: string[]) {
+async function loadMarketTickerItems(fallbackItems: string[]) {
   if (shouldSkipLiveFetchDuringBuild()) {
     return fallbackItems;
   }
@@ -111,4 +115,26 @@ export async function getMarketTickerItems(fallbackItems: string[]) {
   }
 
   return items.map((item) => `${item.label}: ${item.value} (${item.source})`);
+}
+
+export async function getMarketTickerItems(fallbackItems: string[]) {
+  const now = Date.now();
+  if (tickerCache && tickerCache.expiresAt > now) {
+    return tickerCache.items;
+  }
+
+  if (pendingTickerRequest) {
+    return pendingTickerRequest.catch(() => tickerCache?.items ?? fallbackItems);
+  }
+
+  pendingTickerRequest = loadMarketTickerItems(fallbackItems);
+  try {
+    const items = await pendingTickerRequest;
+    tickerCache = { items, expiresAt: now + marketCacheMs };
+    return items;
+  } catch {
+    return tickerCache?.items ?? fallbackItems;
+  } finally {
+    pendingTickerRequest = null;
+  }
 }

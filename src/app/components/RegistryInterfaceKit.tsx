@@ -51,10 +51,14 @@ export function SkiperTickerRail({
   items: string[];
   tone?: Tone;
 }) {
+  const cleanItems = items.map((item) => item.trim()).filter(Boolean);
+  const safeItems = cleanItems.length ? cleanItems : ["Canlı piyasa verisi hazırlanıyor"];
+  const railItems = Array.from({ length: 4 }, () => safeItems).flat();
+
   return (
     <div className={`skiper-ticker-rail skiper-panel-${tone}`} aria-label="Canlı bilgi akışı">
       <div>
-        {[...items, ...items].map((item, index) => (
+        {railItems.map((item, index) => (
           <span key={`${item}-${index}`}>{item}</span>
         ))}
       </div>

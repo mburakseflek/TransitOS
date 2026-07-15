@@ -23,6 +23,7 @@ export function notifyOperationStart(label = defaultLabel) {
 export function notifyOperationFinish() {
   if (typeof window === "undefined") return;
   document.body.dataset.operationPending = "false";
+  delete document.body.dataset.operationLabel;
   window.dispatchEvent(new Event("transitos:operation-finish"));
 }
 
@@ -46,8 +47,9 @@ export function GlobalOperationOverlay() {
       setVisible(true);
       safetyTimer = window.setTimeout(() => {
         document.body.dataset.operationPending = "false";
+        delete document.body.dataset.operationLabel;
         setVisible(false);
-      }, 60000);
+      }, 22000);
     }
 
     function hide() {
@@ -55,6 +57,7 @@ export function GlobalOperationOverlay() {
       if (document.body.dataset.operationPending !== "false") {
         document.body.dataset.operationPending = "false";
       }
+      delete document.body.dataset.operationLabel;
       setVisible(false);
     }
 

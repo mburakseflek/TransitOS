@@ -17086,3 +17086,528 @@ body {
       linear-gradient(135deg, #f8fbff 0%, #eef6fb 52%, #fff7f8 100%) !important;
   }
 }
+
+/* TransitOS final readability and interaction recovery layer. */
+:root,
+html,
+body {
+  color-scheme: light !important;
+  --bg: #f6f9fc;
+  --panel: rgba(255, 255, 255, 0.9);
+  --panel-strong: rgba(255, 255, 255, 0.98);
+  --stroke: rgba(23, 56, 95, 0.14);
+  --highlight: rgba(255, 255, 255, 0.82);
+  --text: #101827;
+  --muted: #526173;
+  --brand-navy: #15172b;
+  --surface-clean: rgba(255, 255, 255, 0.94);
+  --surface-clean-text: #101827;
+}
+
+html.dark,
+body.dark,
+body[data-theme="dark"] {
+  color-scheme: light !important;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(86, 214, 255, 0.18), transparent 30rem),
+    radial-gradient(circle at 90% 8%, rgba(213, 31, 47, 0.1), transparent 28rem),
+    linear-gradient(135deg, #f8fbff 0%, #eef6fb 52%, #fff7f8 100%) !important;
+}
+
+body {
+  color: #101827 !important;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(86, 214, 255, 0.18), transparent 30rem),
+    radial-gradient(circle at 90% 8%, rgba(213, 31, 47, 0.1), transparent 28rem),
+    linear-gradient(135deg, #f8fbff 0%, #eef6fb 52%, #fff7f8 100%) !important;
+}
+
+.new-site-page::before,
+.new-site-page::after,
+.form-site-page::before,
+.form-site-page::after,
+.transitos-info-page::before,
+.transitos-info-page::after,
+.site-admin-page::before,
+.site-admin-page::after,
+.live-edit-page::before,
+.live-edit-page::after,
+.new-gateway::before,
+.new-gateway::after,
+.transitos-shell::before,
+.transitos-shell::after,
+.survey-page::before,
+.survey-page::after,
+.skiper-panel::after,
+.skiper-motion-frame::after,
+.onboarding-screen::after,
+.service-summary-detail-overview::after,
+.service-summary-detail-card::after,
+.service-group-edit-form::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:is(
+  .new-site-page,
+  .form-site-page,
+  .transitos-info-page,
+  .site-admin-page,
+  .live-edit-page,
+  .new-gateway,
+  .transitos-shell,
+  .survey-page,
+  .modal-window
+) {
+  color: #101827 !important;
+  text-shadow: none !important;
+}
+
+:is(
+  .new-site-page,
+  .form-site-page,
+  .transitos-info-page,
+  .site-admin-page,
+  .live-edit-page,
+  .new-gateway,
+  .transitos-shell,
+  .survey-page,
+  .modal-window
+) :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b,
+  label,
+  legend,
+  dt,
+  th,
+  .sidebar-brand-title,
+  .profile-main strong,
+  .record-head h2,
+  .new-section-title,
+  .new-card-title,
+  .hero-title,
+  .auth-title
+) {
+  color: #101827 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+:is(
+  .new-site-page,
+  .form-site-page,
+  .transitos-info-page,
+  .site-admin-page,
+  .live-edit-page,
+  .new-gateway,
+  .transitos-shell,
+  .survey-page,
+  .modal-window
+) :is(
+  p,
+  li,
+  dd,
+  small,
+  em,
+  td,
+  caption,
+  .muted,
+  .sidebar-brand-meta,
+  .profile-main small,
+  .profile-main em,
+  .new-card-body,
+  .section-copy,
+  .hero-copy,
+  .auth-copy
+) {
+  color: #526173 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+:is(
+  .new-site-page,
+  .form-site-page,
+  .transitos-info-page,
+  .site-admin-page,
+  .live-edit-page,
+  .new-gateway,
+  .transitos-shell,
+  .survey-page
+) :is(
+  .card,
+  .section,
+  .topbar,
+  .summary-card,
+  .period-filter,
+  .status-card,
+  .record-head,
+  .service-summary-row,
+  .service-summary-list,
+  .service-summary-detail-overview,
+  .service-summary-detail-card,
+  .service-group-edit-form,
+  .traffic-row,
+  .expense-card,
+  .document-card,
+  .project-route-layout,
+  .expandable-profile-card,
+  .add-cash-disclosure,
+  .view-on-map,
+  .skiper-panel,
+  .skiper-motion-frame,
+  .onboarding-screen,
+  .auth01-panel,
+  .mobile-drawer-panel,
+  .transitos-mobile-chrome,
+  .new-entry-card,
+  .new-service-card,
+  .new-fleet-card,
+  .new-privilege-card,
+  .company-preview-card,
+  .page-cta-band,
+  .page-card,
+  .detail-card,
+  .standard-card,
+  .references-intro,
+  .partner-logo-card,
+  .mobile-app-promo,
+  .survey-hero,
+  .survey-form-card,
+  .survey-section,
+  .survey-report-card,
+  .survey-report-sheet,
+  .survey-report-summary,
+  .survey-metric-card
+),
+.modal-window,
+.modal-window :is(
+  .card,
+  .section,
+  .service-summary-detail-overview,
+  .service-summary-detail-card,
+  .service-group-edit-form,
+  .skiper-panel,
+  .skiper-motion-frame,
+  .expandable-profile-card,
+  .add-cash-disclosure,
+  .view-on-map
+) {
+  color: #101827 !important;
+  opacity: 1 !important;
+  border-color: rgba(23, 56, 95, 0.14) !important;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(86, 214, 255, 0.08), transparent 34%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 255, 0.92)) !important;
+  box-shadow: 0 18px 44px rgba(21, 23, 43, 0.1) !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+:is(.new-site-page, .form-site-page, .new-gateway) :is(.hero-title, .hero-copy, .new-gateway-title, .new-gateway-copy p),
+:is(.new-site-page, .form-site-page, .new-gateway) :is(.section-card, .page-card, .new-entry-card, .new-service-card, .new-fleet-card, .new-privilege-card) :is(h1, h2, h3, strong, p, small, span) {
+  color: #101827 !important;
+  opacity: 1 !important;
+}
+
+.new-gateway .new-gateway-bg + .new-gateway-shade ~ * :is(h1, h2, h3, p, strong, span, a) {
+  text-shadow: 0 2px 16px rgba(255, 255, 255, 0.46) !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-shell, .survey-page, .modal-window) :is(input, select, textarea) {
+  color: #101827 !important;
+  caret-color: #101827 !important;
+  border-color: rgba(23, 56, 95, 0.18) !important;
+  background: rgba(255, 255, 255, 0.99) !important;
+  box-shadow: inset 0 0 0 1px rgba(23, 56, 95, 0.02) !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-shell, .survey-page, .modal-window) :is(input, textarea)::placeholder {
+  color: #7a8699 !important;
+  opacity: 1 !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-shell, .survey-page, .modal-window) option {
+  color: #101827 !important;
+  background: #ffffff !important;
+}
+
+:is(.primary, .new-primary, .registry-action, .survey-submit, .login-submit-button, .danger.action-primary, .service-submit, .site-admin-submit),
+:is(.new-site-page, .form-site-page, .transitos-shell, .survey-page, .modal-window) :is(.primary, .new-primary, .registry-action, .survey-submit, .login-submit-button, .site-admin-submit) :is(span, strong, small) {
+  color: #ffffff !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-shell, .survey-page, .modal-window) :is(.ghost, .compact-button, .nav-link, .site-return-link, .icon-button, summary) {
+  color: #101827 !important;
+  border-color: rgba(23, 56, 95, 0.16) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-shell, .survey-page, .modal-window) :is(.danger, .danger *, .service-summary-delete, .service-summary-delete *) {
+  color: #dc2626 !important;
+}
+
+.badge.green,
+.status-success,
+.survey-score-good {
+  color: #047857 !important;
+  background: rgba(209, 250, 229, 0.9) !important;
+}
+
+.badge.yellow,
+.status-warning,
+.survey-score-mid {
+  color: #a16207 !important;
+  background: rgba(254, 243, 199, 0.9) !important;
+}
+
+.badge.gray,
+.status-muted {
+  color: #475569 !important;
+  background: rgba(226, 232, 240, 0.88) !important;
+}
+
+.badge.blue,
+.status-info {
+  color: #075985 !important;
+  background: rgba(224, 242, 254, 0.92) !important;
+}
+
+.badge.red,
+.status-danger,
+.survey-score-bad {
+  color: #b91c1c !important;
+  background: rgba(254, 226, 226, 0.92) !important;
+}
+
+body[data-operation-pending="true"] :is(a, button, input, select, textarea, summary, [role="button"]):not(.global-operation-overlay *):not(.global-operation-overlay) {
+  pointer-events: none !important;
+  cursor: progress !important;
+}
+
+body[data-operation-pending="true"] {
+  cursor: progress !important;
+}
+
+.global-operation-overlay {
+  background: rgba(15, 23, 42, 0.28) !important;
+  backdrop-filter: blur(10px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(120%) !important;
+}
+
+.global-operation-card {
+  color: #101827 !important;
+  border-color: rgba(23, 56, 95, 0.16) !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 26px 80px rgba(21, 23, 43, 0.22) !important;
+}
+
+.global-operation-card strong {
+  color: #101827 !important;
+}
+
+.global-operation-card span {
+  color: #526173 !important;
+}
+
+.operation-road img {
+  right: -132px !important;
+  left: auto !important;
+  animation: operation-bus-drive-rtl 1.55s cubic-bezier(0.3, 0.72, 0.16, 1) infinite !important;
+}
+
+@keyframes operation-bus-drive-rtl {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(-100vw - 260px), 0, 0);
+  }
+}
+
+.new-rate-ticker,
+.transitos-rate-ticker {
+  position: fixed !important;
+  left: max(16px, env(safe-area-inset-left)) !important;
+  right: max(16px, env(safe-area-inset-right)) !important;
+  bottom: max(12px, env(safe-area-inset-bottom)) !important;
+  width: auto !important;
+  max-width: none !important;
+  min-height: 50px !important;
+  overflow: hidden !important;
+  z-index: 2147481000 !important;
+  color: #101827 !important;
+  border: 1px solid rgba(23, 56, 95, 0.14) !important;
+  border-radius: 22px !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 18px 50px rgba(21, 23, 43, 0.16) !important;
+  backdrop-filter: blur(18px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+}
+
+.new-rate-ticker .ticker-visibility-shell,
+.new-rate-ticker .skiper-ticker-rail,
+.transitos-rate-ticker .skiper-ticker-rail {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: none !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.new-rate-ticker .skiper-ticker-rail > div,
+.transitos-rate-ticker .skiper-ticker-rail > div {
+  display: flex !important;
+  align-items: center !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  gap: 14px !important;
+  transform: translate3d(0, 0, 0) !important;
+  animation: transitos-ticker-stable 44s linear infinite !important;
+  will-change: transform;
+}
+
+.new-rate-ticker .skiper-ticker-rail span,
+.transitos-rate-ticker .skiper-ticker-rail span {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  color: #101827 !important;
+  opacity: 1 !important;
+  border: 1px solid rgba(23, 56, 95, 0.12) !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 8px 24px rgba(21, 23, 43, 0.08) !important;
+}
+
+@keyframes transitos-ticker-stable {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.new-site-page,
+.form-site-page,
+.transitos-info-page,
+.site-admin-page,
+.live-edit-page,
+.new-gateway,
+.survey-page,
+.transitos-shell .content {
+  padding-bottom: max(112px, calc(env(safe-area-inset-bottom) + 92px)) !important;
+}
+
+body .modal-backdrop {
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: auto !important;
+  padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(92px, calc(env(safe-area-inset-bottom) + 72px)) max(14px, env(safe-area-inset-left)) !important;
+}
+
+body .modal-window {
+  color: #101827 !important;
+  max-height: calc(100dvh - 28px) !important;
+  overflow: hidden !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(23, 56, 95, 0.16) !important;
+}
+
+body .modal-window > .modal-body,
+body .modal-window > .section {
+  min-height: 0 !important;
+  overflow: auto !important;
+  padding-bottom: 104px !important;
+}
+
+body .modal-window :is(.actions, .form-actions, .modal-actions, .modal-footer, .service-group-edit-actions, .service-group-danger, .service-summary-delete) {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 50 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  min-height: auto !important;
+  margin-top: 12px !important;
+  padding: 12px !important;
+  border-top: 1px solid rgba(23, 56, 95, 0.12) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.98)) !important;
+  box-shadow: 0 -18px 32px rgba(21, 23, 43, 0.08) !important;
+}
+
+body .modal-window :is(.actions, .form-actions, .modal-actions, .modal-footer, .service-group-edit-actions, .service-group-danger, .service-summary-delete):empty {
+  display: none !important;
+}
+
+.brand img,
+.sidebar-brand img,
+.new-site-logo img,
+.new-gateway-logo img,
+.vehicle-survey-qr-preview img {
+  background: transparent !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  html,
+  body {
+    color-scheme: light !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .new-rate-ticker,
+  .transitos-rate-ticker {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    min-height: 46px !important;
+    border-radius: 20px !important;
+  }
+
+  .new-rate-ticker .skiper-ticker-rail span,
+  .transitos-rate-ticker .skiper-ticker-rail span {
+    font-size: 0.78rem !important;
+    padding: 0.58rem 0.75rem !important;
+  }
+
+  .new-site-page,
+  .form-site-page,
+  .transitos-info-page,
+  .site-admin-page,
+  .live-edit-page,
+  .new-gateway,
+  .survey-page,
+  .transitos-shell .content {
+    padding-bottom: max(116px, calc(env(safe-area-inset-bottom) + 96px)) !important;
+  }
+
+  body .modal-window {
+    width: min(100%, calc(100vw - 20px)) !important;
+    max-height: calc(100dvh - 20px) !important;
+    border-radius: 22px !important;
+  }
+
+  body .modal-window > .modal-body,
+  body .modal-window > .section {
+    padding-bottom: 118px !important;
+  }
+}

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AlertCircle, CheckCircle2, Star } from "lucide-react";
 import { submitVehicleSurvey } from "@/app/actions";
 import { notifyOperationStart } from "@/app/components/GlobalOperationOverlay";
+import { formatPhoneTR } from "@/lib/format";
 
 type SurveyLine = {
   id: string;
@@ -66,15 +67,7 @@ function formatDisplayDate(value: string) {
 }
 
 function formatPhoneInput(value: string) {
-  const digits = value.replace(/\D/g, "").replace(/^90/, "").slice(0, 10);
-  const parts = [
-    digits.slice(0, 3),
-    digits.slice(3, 6),
-    digits.slice(6, 8),
-    digits.slice(8, 10)
-  ];
-  if (!parts[0]) return "";
-  return `+90 (${parts[0]}${parts[0].length === 3 ? ")" : ""}${parts[1] ? ` ${parts[1]}` : ""}${parts[2] ? ` ${parts[2]}` : ""}${parts[3] ? ` ${parts[3]}` : ""}`;
+  return formatPhoneTR(value) || "";
 }
 
 function sentStatusMessage(status?: string) {
@@ -258,7 +251,7 @@ export function VehicleSurveyForm({
             <div className="survey-readonly survey-full">
               <span>Şoför</span>
               <strong>{driverName || "Tanımlı şoför yok"}</strong>
-              {driverPhone ? <small>{driverPhone}</small> : null}
+              {driverPhone ? <small>{formatPhoneTR(driverPhone)}</small> : null}
             </div>
           </div>
 
@@ -304,8 +297,8 @@ export function VehicleSurveyForm({
               ))}
             </div>
             <label>
-              <strong>Öneri ve Şikâyetleriniz</strong>
-              <textarea name="comments" rows={4} placeholder="İsteğe bağlı notunuzu yazabilirsiniz." />
+              <strong>Şikayet, İstek ve Talepleriniz</strong>
+              <textarea name="comments" rows={4} placeholder="Varsa şikayet, istek veya talebinizi yazabilirsiniz." />
             </label>
             {hasLowScore ? (
               <label className="survey-low-score">

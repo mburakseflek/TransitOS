@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ExpenseCategory, FinancialDocumentLineKind, FinancialDocumentType, RecordStatus, ServiceDirection, UserRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { formatPhoneTR, monthKey } from "@/lib/format";
+import { formatPhoneTR, monthKey, normalizePhoneDigitsTR } from "@/lib/format";
 import { readSessionToken } from "@/lib/auth";
 import { expenseCategoryTitle, serviceDirectionTitle } from "@/lib/labels";
 import { isManager, isServiceSupervisor } from "@/lib/permissions";
@@ -1053,7 +1053,9 @@ export async function submitVehicleSurvey(formData: FormData) {
   const deviceKey = text(formData, "deviceKey") || "unknown-device";
   const journeyDate = dateValue(formData, "journeyDate");
   const passengerName = text(formData, "passengerName");
-  const passengerPhone = formatPhoneTR(text(formData, "passengerPhone"));
+  const passengerPhoneRaw = text(formData, "passengerPhone");
+  const passengerPhone = formatPhoneTR(passengerPhoneRaw);
+  const passengerPhoneDigits = normalizePhoneDigitsTR(passengerPhoneRaw);
   const passengerEmail = optional(formData, "passengerEmail");
   const favoriteTopics = formData.getAll("favoriteTopics").map(String).filter(Boolean);
   const ratings = {
@@ -1068,7 +1070,7 @@ export async function submitVehicleSurvey(formData: FormData) {
   };
 
   const ratingValues = Object.values(ratings);
-  if (!vehicleId || !passengerName || !passengerPhone || ratingValues.some((value) => value < 1 || value > 5)) {
+  if (!vehicleId || !passengerName || passengerPhoneDigits.length !== 10 || ratingValues.some((value) => value < 1 || value > 5)) {
     redirectSurvey(vehicleId || "eksik", "missing");
   }
 

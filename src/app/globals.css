@@ -7468,6 +7468,483 @@ svg {
   }
 }
 
+/* TransitOS final contrast recovery layer - 2026-07-15
+   Keeps the product in one readable light system while preserving white text
+   only where it sits on real dark imagery. */
+html,
+body {
+  color-scheme: light !important;
+}
+
+body {
+  background: #f5f9fc !important;
+  color: #101827 !important;
+}
+
+body::before,
+body::after,
+.new-site-page::before,
+.new-site-page::after,
+.form-site-page::before,
+.form-site-page::after,
+.transitos-shell::before,
+.transitos-shell::after,
+.transitos-shell .content::before,
+.transitos-shell .content::after,
+.site-admin-page::before,
+.site-admin-page::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Gateway: dark photographic first screen needs white copy. */
+.new-gateway {
+  background: #07111d !important;
+  color: #fff !important;
+  isolation: isolate !important;
+}
+
+.new-gateway .new-gateway-shade {
+  background:
+    linear-gradient(90deg, rgba(3, 8, 18, 0.84) 0%, rgba(5, 13, 25, 0.66) 46%, rgba(5, 13, 25, 0.48) 100%),
+    linear-gradient(180deg, rgba(5, 13, 25, 0.12) 0%, rgba(5, 13, 25, 0.76) 100%) !important;
+}
+
+.new-gateway :is(.new-gateway-title, .new-gateway-copy h1) {
+  color: #fff !important;
+  opacity: 1 !important;
+  text-shadow: 0 5px 28px rgba(0, 0, 0, 0.72) !important;
+}
+
+.new-gateway .new-gateway-copy :is(p, strong) {
+  color: rgba(255, 255, 255, 0.93) !important;
+  opacity: 1 !important;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.58) !important;
+}
+
+.new-gateway .new-gateway-copy > span,
+.new-gateway .new-gateway-copy .eyebrow {
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #101827 !important;
+  text-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.52) !important;
+}
+
+.new-gateway .new-gateway-nav :is(a, button) {
+  min-height: 44px !important;
+  color: #fff !important;
+  background: rgba(15, 23, 42, 0.42) !important;
+  border: 1px solid rgba(255, 255, 255, 0.34) !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+}
+
+.new-gateway .new-gateway-logo,
+.new-gateway .new-gateway-logo img {
+  background: transparent !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.new-gateway .new-entry-panel {
+  background: rgba(15, 23, 42, 0.62) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32) !important;
+}
+
+.new-gateway .new-entry-panel > span {
+  color: #101827 !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+}
+
+.new-gateway .new-entry-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  color: #101827 !important;
+  box-shadow: 0 18px 40px rgba(3, 8, 18, 0.18) !important;
+}
+
+.new-gateway .new-entry-card :is(h2, h3, p, strong, span) {
+  color: #101827 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.new-gateway .new-entry-card :is(svg, em, b) {
+  color: #dc2536 !important;
+}
+
+/* Corporate site: light pages need dark text and non-transparent cards. */
+.new-site-page,
+.form-site-page,
+.transitos-info-page,
+.site-admin-page,
+.live-edit-page,
+.survey-page {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(91, 213, 242, 0.12), transparent 34%),
+    radial-gradient(circle at 88% 8%, rgba(220, 37, 54, 0.08), transparent 28%),
+    #f6f9fc !important;
+  color: #101827 !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-info-page, .site-admin-page, .live-edit-page, .survey-page)
+  :is(h1, h2, h3, h4, h5, h6, strong, b, label, legend, .title, .section-title, .card-title) {
+  color: #101827 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-info-page, .site-admin-page, .live-edit-page, .survey-page)
+  :is(p, li, dd, dt, small, .muted, .helper-text, .section-copy) {
+  color: #475569 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-info-page, .site-admin-page, .live-edit-page, .survey-page)
+  :is(.card, .glass-card, .new-card, .site-card, .info-card, .feature-card, .form-card, .content-card, .editor-panel) {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(23, 56, 95, 0.12) !important;
+  color: #101827 !important;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.09) !important;
+}
+
+/* TransitOS app shell: force readable light operational UI. */
+.transitos-shell,
+.transitos-shell .content,
+.transitos-page,
+.transitos-main,
+.transitos-workspace {
+  background:
+    radial-gradient(circle at 9% 0%, rgba(91, 213, 242, 0.14), transparent 32%),
+    radial-gradient(circle at 94% 12%, rgba(220, 37, 54, 0.08), transparent 30%),
+    #f4f8fb !important;
+  color: #101827 !important;
+}
+
+.transitos-shell :is(.sidebar, .transitos-sidebar, .side-nav, .sidebar-card, .nav-shell) {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(23, 56, 95, 0.12) !important;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.11) !important;
+}
+
+.transitos-shell :is(.brand, .sidebar-brand, .sidebar-logo, .app-logo, .transitos-logo) {
+  color: #101827 !important;
+  opacity: 1 !important;
+}
+
+.transitos-shell :is(.brand img, .sidebar-brand img, .sidebar-logo img, .app-logo img, .transitos-logo img) {
+  opacity: 1 !important;
+  filter: none !important;
+  background: transparent !important;
+}
+
+.transitos-shell :is(.nav a, .nav button, .sidebar a, .sidebar button, .site-return-link, .mobile-nav-trigger, .mobile-transitos-menu button) {
+  min-height: 44px !important;
+  color: #17385f !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid rgba(23, 56, 95, 0.12) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.transitos-shell :is(.nav a.active, .nav button.active, .sidebar a.active, .sidebar button.active, [aria-current="page"]) {
+  color: #101827 !important;
+  background:
+    linear-gradient(90deg, rgba(225, 247, 255, 0.98), rgba(255, 255, 255, 0.98)) !important;
+  border-color: rgba(91, 213, 242, 0.42) !important;
+  box-shadow: inset 4px 0 0 #4cc9f0, 0 10px 28px rgba(76, 201, 240, 0.14) !important;
+}
+
+.transitos-shell :is(.page-hero, .hero-card, .summary-hero, .metric-card, .dashboard-card, .record-card, .vehicle-card, .subcontractor-card, .project-card, .route-card, .driver-card, .expense-card, .survey-card, .period-filter, .content-panel, .workspace-card, .calendar-card, .service-card, .service-summary-row, .service-group-card) {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(23, 56, 95, 0.12) !important;
+  color: #101827 !important;
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.09) !important;
+}
+
+.transitos-shell :is(h1, h2, h3, h4, h5, h6, strong, b, label, legend, th, .page-title, .card-title, .record-title, .route-title, .vehicle-title, .project-title) {
+  color: #101827 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.transitos-shell :is(p, li, td, small, .muted, .helper-text, .description, .card-copy, .route-subtitle, .vehicle-meta, .record-meta) {
+  color: #475569 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.transitos-shell :is(input, textarea, select) {
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #101827 !important;
+  border: 1px solid rgba(23, 56, 95, 0.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+}
+
+.transitos-shell :is(input::placeholder, textarea::placeholder) {
+  color: #7b8798 !important;
+  opacity: 1 !important;
+}
+
+.transitos-shell :is(button, .button, .btn, [role="button"]) {
+  text-shadow: none !important;
+}
+
+.transitos-shell :is(.primary, .btn-primary, .button-primary, .login-submit-button, .save-button, .submit-button) {
+  color: #fff !important;
+  background: linear-gradient(90deg, #dc2536, #17385f) !important;
+  border-color: transparent !important;
+}
+
+.transitos-shell :is(.badge, .pill, .status-pill) {
+  opacity: 1 !important;
+  text-shadow: none !important;
+  font-weight: 800 !important;
+}
+
+.transitos-shell :is(.badge-success, .status-active, .success-pill) {
+  color: #047857 !important;
+  background: #d7f8e4 !important;
+}
+
+.transitos-shell :is(.badge-warning, .status-pending, .warning-pill) {
+  color: #9a5a00 !important;
+  background: #fff1c7 !important;
+}
+
+.transitos-shell :is(.badge-danger, .status-danger, .danger-pill) {
+  color: #b91c1c !important;
+  background: #ffe1e1 !important;
+}
+
+/* Modals and menus must sit above cards and remain readable. */
+body :is(.modal-window, .dialog, .popover, .sheet, .dropdown-panel, .inline-menu-panel, .menu-panel, [role="dialog"], [role="menu"]) {
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #101827 !important;
+  border: 1px solid rgba(23, 56, 95, 0.14) !important;
+  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.24) !important;
+}
+
+body :is(.modal-window, .dialog, .popover, .sheet, .dropdown-panel, .inline-menu-panel, .menu-panel, [role="dialog"], [role="menu"])
+  :is(h1, h2, h3, h4, strong, b, label, button, a) {
+  color: #101827 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+body :is(.modal-window, .dialog, .popover, .sheet, .dropdown-panel, .inline-menu-panel, .menu-panel, [role="dialog"], [role="menu"])
+  :is(p, small, span:not(.badge):not(.pill), li) {
+  color: #475569 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+body :is(.inline-disclosure-menu, .action-menu, .more-menu, .dropdown, details[open]) {
+  position: relative !important;
+  z-index: 2147483000 !important;
+  overflow: visible !important;
+}
+
+body :is(.inline-disclosure-menu, .action-menu, .more-menu, .dropdown, details[open]) > * {
+  overflow: visible !important;
+}
+
+body :is(.inline-disclosure-menu, .action-menu, .more-menu, .dropdown, details[open]) :is([role="menu"], .menu-panel, .dropdown-panel, ul) {
+  z-index: 2147483200 !important;
+}
+
+body .modal-window :is(.actions, .form-actions, .modal-actions, .modal-footer, .service-group-edit-actions, .service-group-danger, .service-summary-delete) {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-top: 1px solid rgba(23, 56, 95, 0.12) !important;
+}
+
+/* TransitOS login: readable white text on secure dark panel, fields stay white. */
+.transitos-login-page {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(76, 201, 240, 0.22), transparent 34%),
+    radial-gradient(circle at 86% 16%, rgba(220, 37, 54, 0.16), transparent 30%),
+    linear-gradient(135deg, #07111d 0%, #12243a 100%) !important;
+  color: #fff !important;
+}
+
+.transitos-login-page :is(.login-card, .transitos-login-card, .auth01-card, .auth01-panel) {
+  background: rgba(15, 23, 42, 0.76) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.34) !important;
+}
+
+.transitos-login-page :is(h1, h2, h3, .login-title, .auth-title, label, strong, b) {
+  color: #fff !important;
+  opacity: 1 !important;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.42) !important;
+}
+
+.transitos-login-page :is(p, small, .muted, .auth-copy, .helper-text) {
+  color: rgba(255, 255, 255, 0.82) !important;
+  opacity: 1 !important;
+}
+
+.transitos-login-page :is(input, textarea, select) {
+  min-height: 48px !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #101827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+}
+
+.transitos-login-page :is(input::placeholder, textarea::placeholder) {
+  color: #64748b !important;
+}
+
+.transitos-login-page :is(.login-home-link, .secondary-link) {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+.transitos-login-page :is(.login-submit-button, .submit-button) {
+  color: #fff !important;
+  background: linear-gradient(90deg, #dc2536, #17385f) !important;
+}
+
+/* Site admin login stays light but all copy remains visible. */
+.site-admin-login-page {
+  background:
+    radial-gradient(circle at 14% 10%, rgba(220, 37, 54, 0.08), transparent 28%),
+    radial-gradient(circle at 88% 8%, rgba(23, 56, 95, 0.1), transparent 32%),
+    #f6f9fc !important;
+  color: #101827 !important;
+}
+
+.site-admin-login-page :is(.login-card, .site-admin-login-card) {
+  background: rgba(255, 255, 255, 0.97) !important;
+  color: #101827 !important;
+}
+
+.site-admin-login-page :is(h1, h2, h3, p, small, label, strong, b, .login-title) {
+  color: #101827 !important;
+  opacity: 1 !important;
+}
+
+/* Stable readable bottom ticker. */
+.new-rate-ticker,
+.transitos-rate-ticker {
+  position: fixed !important;
+  z-index: 2147482000 !important;
+  left: clamp(16px, 5vw, 96px) !important;
+  right: clamp(16px, 5vw, 96px) !important;
+  bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  min-height: 52px !important;
+  padding: 8px 10px !important;
+  overflow: hidden !important;
+  color: #101827 !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid rgba(23, 56, 95, 0.14) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 18px 55px rgba(15, 23, 42, 0.17) !important;
+  backdrop-filter: blur(18px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+}
+
+.new-rate-ticker .skiper-ticker-rail,
+.transitos-rate-ticker .skiper-ticker-rail {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  color: #101827 !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+.new-rate-ticker .skiper-ticker-rail > div,
+.transitos-rate-ticker .skiper-ticker-rail > div {
+  min-width: max-content !important;
+  animation: ticker-marquee-readable 72s linear infinite !important;
+  will-change: transform !important;
+}
+
+.new-rate-ticker .skiper-ticker-rail span,
+.transitos-rate-ticker .skiper-ticker-rail span {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 34px !important;
+  margin-right: 12px !important;
+  padding: 0.55rem 0.9rem !important;
+  color: #101827 !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(23, 56, 95, 0.12) !important;
+  border-radius: 999px !important;
+  opacity: 1 !important;
+  font-weight: 850 !important;
+  white-space: nowrap !important;
+  text-shadow: none !important;
+}
+
+@keyframes ticker-marquee-readable {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-25%, 0, 0);
+  }
+}
+
+/* Async operation lock: foreground readable, clicks blocked once action starts. */
+body[data-operation-pending="true"] .global-operation-overlay {
+  pointer-events: all !important;
+}
+
+body[data-operation-pending="true"] :is(button, a, input, select, textarea) {
+  touch-action: none !important;
+}
+
+body[data-operation-pending="true"] .global-operation-overlay :is(h1, h2, h3, p, strong, b, span) {
+  color: #101827 !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 760px) {
+  .new-gateway .new-gateway-shade {
+    background:
+      linear-gradient(180deg, rgba(3, 8, 18, 0.64) 0%, rgba(3, 8, 18, 0.46) 36%, rgba(3, 8, 18, 0.82) 100%),
+      linear-gradient(90deg, rgba(3, 8, 18, 0.72), rgba(3, 8, 18, 0.34)) !important;
+  }
+
+  .new-gateway .new-gateway-copy :is(h1, .new-gateway-title) {
+    color: #fff !important;
+    font-size: clamp(2.7rem, 14vw, 4.6rem) !important;
+    line-height: 0.98 !important;
+  }
+
+  .transitos-shell :is(.sidebar, .transitos-sidebar, .side-nav, .sidebar-card, .nav-shell) {
+    background: rgba(255, 255, 255, 0.97) !important;
+  }
+
+  .transitos-shell :is(.nav a, .nav button, .sidebar a, .sidebar button, .site-return-link, .mobile-nav-trigger, .mobile-transitos-menu button) {
+    min-height: 52px !important;
+    font-size: 1rem !important;
+  }
+
+  .new-rate-ticker,
+  .transitos-rate-ticker {
+    left: 10px !important;
+    right: 10px !important;
+    min-height: 48px !important;
+    border-radius: 20px !important;
+  }
+
+  .new-rate-ticker .skiper-ticker-rail span,
+  .transitos-rate-ticker .skiper-ticker-rail span {
+    font-size: 0.82rem !important;
+    min-height: 32px !important;
+    padding: 0.48rem 0.75rem !important;
+  }
+}
+
 /* Dark theme repair pass */
 .whatsapp-float {
   gap: 9px;
@@ -17609,5 +18086,1014 @@ body .modal-window :is(.actions, .form-actions, .modal-actions, .modal-footer, .
   body .modal-window > .modal-body,
   body .modal-window > .section {
     padding-bottom: 118px !important;
+  }
+}
+
+/* TransitOS final readable-light lock. Keep this at EOF so older theme layers cannot override contrast. */
+:root {
+  color-scheme: light !important;
+  --readable-ink: #0f172a;
+  --readable-strong: #020617;
+  --readable-muted: #475569;
+  --readable-soft: #64748b;
+  --readable-line: rgba(15, 23, 42, 0.14);
+  --readable-surface: rgba(255, 255, 255, 0.97);
+  --readable-surface-solid: #ffffff;
+  --readable-app-bg: #eef6fb;
+}
+
+html,
+body {
+  color-scheme: light !important;
+  background: var(--readable-app-bg) !important;
+  color: var(--readable-ink) !important;
+}
+
+.new-site-page::before,
+.new-site-page::after,
+.form-site-page::before,
+.form-site-page::after,
+.transitos-info-page::before,
+.transitos-info-page::after,
+.site-admin-page::before,
+.site-admin-page::after,
+.live-edit-page::before,
+.live-edit-page::after,
+.survey-page::before,
+.survey-page::after,
+.transitos-shell::before,
+.transitos-shell::after,
+.transitos-shell .content::before,
+.transitos-shell .content::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.new-gateway {
+  color: #ffffff !important;
+  background: #07111f !important;
+}
+
+.new-gateway::before,
+.new-gateway::after {
+  content: none !important;
+  display: none !important;
+}
+
+.new-gateway .new-gateway-bg {
+  opacity: 1 !important;
+  filter: brightness(0.46) saturate(1.08) contrast(1.08) !important;
+}
+
+.new-gateway .new-gateway-shade {
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.94) 0%, rgba(2, 6, 23, 0.7) 48%, rgba(2, 6, 23, 0.38) 100%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.12), rgba(2, 6, 23, 0.72)) !important;
+}
+
+.new-gateway :is(.new-gateway-copy, .new-gateway-copy *, .new-gateway-title, .hero-title, .hero-copy, .new-eyebrow) {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.86) !important;
+}
+
+.new-gateway .new-gateway-copy p {
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+.new-gateway .new-entry-panel {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+}
+
+.new-gateway .new-entry-card {
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: var(--readable-ink) !important;
+  border-color: rgba(255, 255, 255, 0.82) !important;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.24) !important;
+}
+
+.new-gateway .new-entry-card :is(h1, h2, h3, h4, p, strong, span, small, a, svg) {
+  color: var(--readable-ink) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.new-gateway .new-gateway-nav :is(a, button) {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.34) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+
+.new-site-page,
+.form-site-page,
+.transitos-info-page,
+.site-admin-page,
+.live-edit-page,
+.survey-page {
+  color: var(--readable-ink) !important;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(214, 246, 255, 0.8), transparent 30%),
+    radial-gradient(circle at 90% 8%, rgba(255, 232, 239, 0.68), transparent 30%),
+    linear-gradient(135deg, #f8fcff 0%, #eef6fb 100%) !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-info-page, .site-admin-page, .live-edit-page, .survey-page)
+  :is(h1, h2, h3, h4, h5, h6, strong, b, label, legend, th, .section-title, .card-title, .hero-title) {
+  color: var(--readable-strong) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-info-page, .site-admin-page, .live-edit-page, .survey-page)
+  :is(p, li, td, small, span, .muted, .helper-text, .description, .hero-copy) {
+  color: var(--readable-muted) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-info-page, .site-admin-page, .live-edit-page, .survey-page)
+  :is(.section-card, .page-card, .new-service-card, .new-fleet-card, .new-privilege-card, .form-card, .site-card, .contact-card, .reference-card, .survey-form-card, .survey-report-card) {
+  background: var(--readable-surface) !important;
+  color: var(--readable-ink) !important;
+  border-color: var(--readable-line) !important;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.1) !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-info-page, .site-admin-page, .live-edit-page, .survey-page)
+  :is(input, select, textarea) {
+  color: var(--readable-ink) !important;
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.16) !important;
+}
+
+:is(.new-site-page, .form-site-page, .transitos-info-page, .site-admin-page, .live-edit-page, .survey-page)
+  :is(input::placeholder, textarea::placeholder) {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+.transitos-shell,
+.transitos-shell .content {
+  color: var(--readable-ink) !important;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(209, 244, 255, 0.78), transparent 34%),
+    radial-gradient(circle at 94% 14%, rgba(255, 231, 238, 0.72), transparent 32%),
+    linear-gradient(135deg, #f8fcff 0%, #edf6fb 100%) !important;
+}
+
+.transitos-shell :is(.sidebar, .transitos-sidebar, .side-nav, .sidebar-card, .nav-shell, .topbar, .page-hero, .hero-card, .summary-hero, .metric-card, .dashboard-card, .record-card, .vehicle-card, .subcontractor-card, .project-card, .driver-card, .expense-card, .survey-card, .period-filter, .content-panel, .workspace-card, .calendar-card, .service-card, .service-summary-row, .service-summary-list, .service-summary-detail-overview, .service-summary-detail-card, .service-group-edit-form, .traffic-row, .document-card, .project-route-layout, .status-card, .section, .expandable-profile-card, .add-cash-disclosure, .view-on-map, .skiper-panel, .skiper-motion-frame, .mobile-drawer-panel, .profile-expanded) {
+  background: var(--readable-surface) !important;
+  color: var(--readable-ink) !important;
+  border-color: var(--readable-line) !important;
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.1) !important;
+  filter: none !important;
+}
+
+.transitos-shell :is(h1, h2, h3, h4, h5, h6, strong, b, label, legend, th, .page-title, .card-title, .record-title, .route-title, .vehicle-title, .project-title, .sidebar-brand-title, .profile-main strong, .record-head h2) {
+  color: var(--readable-strong) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.transitos-shell :is(p, li, td, small, span, .muted, .helper-text, .description, .card-copy, .route-subtitle, .vehicle-meta, .record-meta, .sidebar-brand-meta, .profile-main small, .profile-main em) {
+  color: var(--readable-muted) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.transitos-shell :is(.nav a, .nav button, .sidebar a, .sidebar button, .nav-link, .site-return-link, .compact-button, .ghost, .mobile-nav-trigger, .mobile-transitos-menu button, .mobile-drawer-open) {
+  min-height: 46px !important;
+  color: var(--readable-ink) !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid var(--readable-line) !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.transitos-shell :is(.nav a.active, .nav button.active, .sidebar a.active, .sidebar button.active, .nav-link.active, [aria-current="page"]) {
+  color: #073b5a !important;
+  background: linear-gradient(90deg, rgba(222, 247, 255, 0.98), rgba(255, 255, 255, 0.98)) !important;
+  border-color: rgba(14, 165, 233, 0.34) !important;
+}
+
+.transitos-shell :is(svg, .nav svg, .sidebar svg, .icon-button svg) {
+  color: #17466f !important;
+  stroke: currentColor !important;
+  opacity: 1 !important;
+}
+
+.transitos-shell :is(input, textarea, select),
+.modal-window :is(input, textarea, select) {
+  color: var(--readable-ink) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.16) !important;
+  box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.04) !important;
+}
+
+.transitos-shell :is(input::placeholder, textarea::placeholder),
+.modal-window :is(input::placeholder, textarea::placeholder) {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+.transitos-shell :is(.primary, .btn-primary, .button-primary, .login-submit-button, .save-button, .submit-button),
+.modal-window :is(.primary, .btn-primary, .button-primary, .save-button, .submit-button) {
+  color: #ffffff !important;
+  background: linear-gradient(90deg, #dc2626, #123b6d) !important;
+  border-color: transparent !important;
+}
+
+.transitos-shell :is(.danger, .danger.icon-button, .service-summary-delete),
+.modal-window :is(.danger, .danger.icon-button, .service-summary-delete) {
+  color: #b91c1c !important;
+  background: #fff1f2 !important;
+  border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+.transitos-shell :is(.badge, .pill, .status-pill),
+.modal-window :is(.badge, .pill, .status-pill) {
+  opacity: 1 !important;
+  text-shadow: none !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  font-weight: 800 !important;
+}
+
+.transitos-shell :is(.badge.green, .status-active, .badge-success, .success-pill),
+.modal-window :is(.badge.green, .status-active, .badge-success, .success-pill) {
+  color: #047857 !important;
+  background: #d1fae5 !important;
+}
+
+.transitos-shell :is(.badge.yellow, .status-pending, .badge-warning, .warning-pill),
+.modal-window :is(.badge.yellow, .status-pending, .badge-warning, .warning-pill) {
+  color: #92400e !important;
+  background: #fef3c7 !important;
+}
+
+.transitos-shell :is(.badge.gray, .status-muted),
+.modal-window :is(.badge.gray, .status-muted) {
+  color: #475569 !important;
+  background: #e2e8f0 !important;
+}
+
+.transitos-shell :is(.badge.blue, .status-info),
+.modal-window :is(.badge.blue, .status-info) {
+  color: #075985 !important;
+  background: #e0f2fe !important;
+}
+
+.transitos-shell :is(.badge.red, .status-danger, .danger-pill),
+.modal-window :is(.badge.red, .status-danger, .danger-pill) {
+  color: #b91c1c !important;
+  background: #fee2e2 !important;
+}
+
+.transitos-shell :is(.record-head, .profile-expanded, .service-summary-row, .service-summary-list) {
+  overflow: visible !important;
+}
+
+.transitos-shell :is(.card, .record-head, .profile-expanded, .service-summary-row, .service-summary-list, .vehicle-card, .subcontractor-card, .project-card):has(.inline-disclosure-menu[open]) {
+  position: relative !important;
+  z-index: 2000 !important;
+}
+
+body .modal-backdrop {
+  z-index: 2147482000 !important;
+  background: rgba(15, 23, 42, 0.42) !important;
+  backdrop-filter: blur(8px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(110%) !important;
+}
+
+body .modal-window,
+body :is(.dialog, .popover, .sheet, .dropdown-panel, .inline-menu-panel, .menu-panel, [role="dialog"], [role="menu"]) {
+  color: var(--readable-ink) !important;
+  background: #ffffff !important;
+  border-color: var(--readable-line) !important;
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.26) !important;
+}
+
+body .modal-window :is(h1, h2, h3, h4, strong, b, label, p, small, span, .muted) {
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+body .modal-window :is(h1, h2, h3, h4, strong, b, label) {
+  color: var(--readable-strong) !important;
+}
+
+body .modal-window :is(p, small, span, .muted) {
+  color: var(--readable-muted) !important;
+}
+
+.inline-disclosure-menu,
+.inline-disclosure-menu[open],
+.inline-disclosure-menu > div,
+body :is(.popover, .dropdown, .dropdown-menu, .action-menu, .more-menu, [data-radix-popper-content-wrapper]) {
+  z-index: 2147482600 !important;
+}
+
+.inline-disclosure-menu > div,
+body :is(.popover, .dropdown-menu, .action-menu, .more-menu) {
+  color: var(--readable-ink) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.14) !important;
+  box-shadow: 0 24px 56px rgba(15, 23, 42, 0.22) !important;
+}
+
+.inline-disclosure-menu > div :is(a, button, summary, .ghost, .icon-button) {
+  color: var(--readable-ink) !important;
+  background: transparent !important;
+}
+
+body .modal-window :is(.actions, .form-actions, .modal-actions, .modal-footer, .service-group-edit-actions, .service-group-danger, .service-summary-delete) {
+  color: var(--readable-ink) !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+.transitos-login-page {
+  color: #ffffff !important;
+  background:
+    radial-gradient(circle at 14% 12%, rgba(14, 165, 233, 0.32), transparent 34%),
+    radial-gradient(circle at 86% 18%, rgba(220, 38, 38, 0.22), transparent 32%),
+    linear-gradient(135deg, #06101f 0%, #0f172a 100%) !important;
+}
+
+.transitos-login-page :is(.login-card, .transitos-login-card, .auth01-card, .auth01-panel) {
+  color: #ffffff !important;
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 28px 90px rgba(2, 6, 23, 0.45) !important;
+}
+
+.transitos-login-page :is(h1, h2, h3, p, span, strong, small, label, .login-title, .auth-title, .auth-copy, .helper-text, .muted) {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.32) !important;
+}
+
+.transitos-login-page :is(input, textarea, select) {
+  color: var(--readable-ink) !important;
+  background: #ffffff !important;
+}
+
+.transitos-login-page :is(.login-submit-button, .submit-button) {
+  color: #ffffff !important;
+  background: linear-gradient(90deg, #dc2626, #123b6d) !important;
+}
+
+.transitos-login-page :is(.login-home-link, .secondary-link) {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.new-rate-ticker,
+.transitos-rate-ticker {
+  position: fixed !important;
+  left: max(16px, env(safe-area-inset-left)) !important;
+  right: max(16px, env(safe-area-inset-right)) !important;
+  bottom: max(12px, env(safe-area-inset-bottom)) !important;
+  width: auto !important;
+  min-height: 52px !important;
+  color: var(--readable-ink) !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.16) !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  overflow: hidden !important;
+}
+
+.new-rate-ticker *,
+.transitos-rate-ticker * {
+  color: var(--readable-ink) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.new-rate-ticker .skiper-ticker-rail,
+.transitos-rate-ticker .skiper-ticker-rail {
+  min-width: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+.new-rate-ticker .skiper-ticker-rail > div,
+.transitos-rate-ticker .skiper-ticker-rail > div {
+  display: flex !important;
+  align-items: center !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  gap: 14px !important;
+  animation: transitos-ticker-stable 56s linear infinite !important;
+  will-change: transform !important;
+}
+
+.new-rate-ticker .skiper-ticker-rail span,
+.transitos-rate-ticker .skiper-ticker-rail span {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  color: var(--readable-ink) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08) !important;
+}
+
+body[data-operation-pending="true"] :is(a, button, input, select, textarea, summary, [role="button"]):not(.global-operation-overlay *):not(.global-operation-overlay) {
+  pointer-events: none !important;
+  cursor: progress !important;
+}
+
+body[data-operation-pending="true"] .global-operation-overlay {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 2147483000 !important;
+}
+
+.global-operation-card {
+  background: #ffffff !important;
+  color: var(--readable-ink) !important;
+}
+
+.global-operation-card :is(strong, span, p) {
+  color: var(--readable-ink) !important;
+  opacity: 1 !important;
+}
+
+.brand img,
+.sidebar-brand img,
+.new-site-logo img,
+.new-gateway-logo img,
+.vehicle-survey-qr-preview img {
+  background: transparent !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  html,
+  body {
+    color-scheme: light !important;
+  }
+
+  .transitos-shell,
+  .transitos-shell .content,
+  .new-site-page,
+  .form-site-page,
+  .site-admin-page,
+  .live-edit-page,
+  .survey-page {
+    color: var(--readable-ink) !important;
+    background: var(--readable-app-bg) !important;
+  }
+
+  .new-gateway {
+    color: #ffffff !important;
+    background: #07111f !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .new-gateway {
+    min-height: 100dvh !important;
+  }
+
+  .new-gateway .new-gateway-copy :is(h1, .new-gateway-title) {
+    font-size: clamp(2.4rem, 14vw, 4.2rem) !important;
+    line-height: 0.92 !important;
+  }
+
+  .transitos-shell :is(.sidebar, .transitos-sidebar, .side-nav) {
+    display: none !important;
+  }
+
+  .transitos-shell .content {
+    width: 100% !important;
+    padding: 18px 14px max(120px, calc(env(safe-area-inset-bottom) + 98px)) !important;
+  }
+
+  .transitos-shell :is(.card, .topbar, .page-hero, .summary-hero, .metric-card, .record-card, .service-summary-row, .service-summary-list) {
+    border-radius: 22px !important;
+  }
+
+  .new-rate-ticker,
+  .transitos-rate-ticker {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    min-height: 46px !important;
+    border-radius: 20px !important;
+  }
+
+  .new-rate-ticker .skiper-ticker-rail span,
+  .transitos-rate-ticker .skiper-ticker-rail span {
+    font-size: 0.82rem !important;
+    padding: 0.58rem 0.74rem !important;
+  }
+
+  body .modal-window {
+    width: min(100%, calc(100vw - 18px)) !important;
+    max-height: calc(100dvh - 18px) !important;
+    border-radius: 22px !important;
+  }
+}
+
+/* TransitOS clean restart layer - 2026-07-16 */
+:root,
+html,
+body {
+  color-scheme: light !important;
+}
+
+:root {
+  --restart-ink: #0f172a;
+  --restart-strong: #07111f;
+  --restart-muted: #475569;
+  --restart-surface: rgba(255, 255, 255, 0.985);
+  --restart-line: rgba(15, 23, 42, 0.14);
+  --restart-shadow: 0 22px 62px rgba(15, 23, 42, 0.14);
+  --restart-primary: #17213f;
+  --restart-red: #dc2430;
+}
+
+html,
+body {
+  background: #f6fbff !important;
+  color: var(--restart-ink) !important;
+  overflow-x: hidden !important;
+}
+
+body {
+  padding-bottom: max(94px, calc(env(safe-area-inset-bottom) + 84px)) !important;
+}
+
+body *,
+body *::before,
+body *::after {
+  text-shadow: none !important;
+}
+
+:is(.transitos-shell, .new-site-page, .form-site-page, .site-admin-page, .live-edit-page, .survey-page, .transitos-info-page) {
+  background: linear-gradient(135deg, #f8fcff, #eef7ff 52%, #fff7f9) !important;
+  color: var(--restart-ink) !important;
+}
+
+:is(.transitos-shell, .new-site-page, .form-site-page, .site-admin-page, .live-edit-page, .survey-page, .transitos-info-page)
+  :is(h1, h2, h3, h4, h5, h6, strong, b, label, legend, th, .title, .page-title, .card-title, .record-title, .route-title, .vehicle-title, .project-title, .sidebar-brand-title, .survey-kicker) {
+  color: var(--restart-strong) !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+:is(.transitos-shell, .new-site-page, .form-site-page, .site-admin-page, .live-edit-page, .survey-page, .transitos-info-page)
+  :is(p, li, td, small, .muted, .helper-text, .description, .card-copy, .route-subtitle, .vehicle-meta, .record-meta, .sidebar-brand-meta, .page-subtitle) {
+  color: var(--restart-muted) !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.transitos-shell :is(.sidebar, .transitos-sidebar, .side-nav, .sidebar-card, .nav-shell, .topbar, .page-hero, .hero-card, .summary-hero, .metric-card, .dashboard-card, .record-card, .vehicle-card, .subcontractor-card, .project-card, .driver-card, .expense-card, .survey-card, .period-filter, .content-panel, .workspace-card, .calendar-card, .service-card, .service-summary-row, .service-summary-list, .service-summary-detail-overview, .service-summary-detail-card, .service-group-edit-form, .traffic-row, .document-card, .project-route-layout, .status-card, .section, .expandable-profile-card, .add-cash-disclosure, .view-on-map, .skiper-panel, .skiper-motion-frame, .mobile-drawer-panel, .profile-expanded),
+:is(.modal-window, [role="dialog"], .sheet, .modal-card, .dialog, .popover, .dropdown-panel, .inline-menu-panel, .menu-panel, [role="menu"]),
+.survey-page :is(.survey-form-card, .survey-section, .survey-readonly, .survey-rating-row, .survey-report-card, .survey-report-sheet, .survey-info-block) {
+  background: var(--restart-surface) !important;
+  color: var(--restart-ink) !important;
+  border: 1px solid var(--restart-line) !important;
+  box-shadow: var(--restart-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.transitos-shell :is(.sidebar, .transitos-sidebar, .side-nav, .sidebar-card, .nav-shell, .topbar, .page-hero, .hero-card, .summary-hero, .metric-card, .dashboard-card, .record-card, .vehicle-card, .subcontractor-card, .project-card, .driver-card, .expense-card, .survey-card, .period-filter, .content-panel, .workspace-card, .calendar-card, .service-card, .service-summary-row, .service-summary-list, .service-summary-detail-overview, .service-summary-detail-card, .service-group-edit-form, .traffic-row, .document-card, .project-route-layout, .status-card, .section, .expandable-profile-card, .add-cash-disclosure, .view-on-map, .skiper-panel, .skiper-motion-frame, .mobile-drawer-panel, .profile-expanded)
+  :is(h1, h2, h3, h4, h5, h6, strong, b, label, span, small, p, em, li),
+:is(.modal-window, [role="dialog"], .sheet, .modal-card, .dialog, .popover, .dropdown-panel, .inline-menu-panel, .menu-panel, [role="menu"]) :is(h1, h2, h3, h4, h5, h6, strong, b, label, span, small, p, em, li),
+.survey-page :is(.survey-form-card, .survey-section, .survey-readonly, .survey-rating-row, .survey-report-card, .survey-report-sheet, .survey-info-block) :is(h1, h2, h3, h4, h5, h6, strong, b, label, span, small, p, em, li) {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+:is(.transitos-shell, .new-site-page, .form-site-page, .site-admin-page, .live-edit-page, .survey-page, .modal-window) :is(input, select, textarea) {
+  background: #fff !important;
+  color: var(--restart-ink) !important;
+  border: 1px solid var(--restart-line) !important;
+  min-height: 44px !important;
+}
+
+:is(.transitos-shell, .new-site-page, .form-site-page, .site-admin-page, .live-edit-page, .survey-page, .modal-window) :is(input, textarea)::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+:is(.transitos-shell, .transitos-login-page, .new-site-page, .form-site-page, .site-admin-page, .live-edit-page, .survey-page, .modal-window) :is(.primary, .submit-button, .login-submit-button, .registry-action, .button-primary, .survey-submit, .new-primary) {
+  background: linear-gradient(135deg, var(--restart-red), #1c3765) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+:is(.transitos-shell, .new-site-page, .form-site-page, .site-admin-page, .live-edit-page, .survey-page, .modal-window) :is(.ghost, .compact-button, .secondary-link, .icon-button, summary, .nav-link, .site-return-link) {
+  background: #fff !important;
+  color: var(--restart-ink) !important;
+  border-color: var(--restart-line) !important;
+}
+
+.new-gateway {
+  color: #fff !important;
+  background: #07111f !important;
+}
+
+.new-gateway .gateway-hero-copy :is(h1, p, span, strong),
+.new-gateway .new-gateway-copy :is(h1, p, span, strong),
+.new-gateway :is(.gateway-title, .new-gateway-title) {
+  color: #fff !important;
+  opacity: 1 !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45) !important;
+}
+
+.new-gateway :is(.entry-card, .new-entry-card) {
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: var(--restart-ink) !important;
+}
+
+.new-gateway :is(.entry-card, .new-entry-card) :is(h2, h3, p, strong, span, small) {
+  color: var(--restart-ink) !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.transitos-login-page {
+  background: linear-gradient(135deg, #07111f, #12213c) !important;
+  color: #fff !important;
+}
+
+.transitos-login-page :is(.login-card, .transitos-login-card, .auth01-card, .auth01-panel) {
+  background: rgba(7, 17, 31, 0.92) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 28px 90px rgba(2, 6, 23, 0.45) !important;
+}
+
+.transitos-login-page :is(h1, h2, h3, p, span, strong, small, label, .login-title, .auth-title, .auth-copy, .helper-text, .muted) {
+  color: #fff !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.transitos-login-page :is(input, select, textarea) {
+  color: var(--restart-ink) !important;
+  background: #fff !important;
+}
+
+.new-rate-ticker,
+.transitos-rate-ticker {
+  position: fixed !important;
+  left: max(14px, env(safe-area-inset-left)) !important;
+  right: max(14px, env(safe-area-inset-right)) !important;
+  bottom: max(12px, env(safe-area-inset-bottom)) !important;
+  width: auto !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  overflow: hidden !important;
+  z-index: 2147481000 !important;
+  background: rgba(255, 255, 255, 0.99) !important;
+  color: var(--restart-ink) !important;
+  border: 1px solid var(--restart-line) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.16) !important;
+  pointer-events: none !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+.new-rate-ticker .ticker-visibility-shell,
+.new-rate-ticker .skiper-ticker-rail,
+.transitos-rate-ticker .skiper-ticker-rail {
+  width: 100% !important;
+  min-width: 100% !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+.new-rate-ticker .skiper-ticker-rail > div,
+.transitos-rate-ticker .skiper-ticker-rail > div {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  animation: transitos-restart-ticker 92s linear infinite !important;
+}
+
+@keyframes transitos-restart-ticker {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.new-rate-ticker .skiper-ticker-rail span,
+.transitos-rate-ticker .skiper-ticker-rail span {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  color: var(--restart-ink) !important;
+  background: #fff !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body[data-operation-pending="true"] :is(a, button, input, select, textarea, summary, [role="button"]):not(.global-operation-overlay *):not(.global-operation-overlay) {
+  pointer-events: none !important;
+  cursor: progress !important;
+}
+
+.global-operation-overlay {
+  z-index: 2147483000 !important;
+  background: rgba(248, 251, 255, 0.84) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.global-operation-overlay[data-visible="true"] {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.global-operation-card {
+  background: #fff !important;
+  color: var(--restart-ink) !important;
+  border: 1px solid var(--restart-line) !important;
+  box-shadow: var(--restart-shadow) !important;
+}
+
+.global-operation-card :is(strong, span, p) {
+  color: var(--restart-ink) !important;
+  opacity: 1 !important;
+}
+
+.operation-road img {
+  animation: transitos-bus-rtl 1.35s ease-in-out infinite !important;
+  transform: translateX(42%) scaleX(1) !important;
+}
+
+@keyframes transitos-bus-rtl {
+  0% { transform: translateX(42%) scaleX(1); }
+  100% { transform: translateX(-42%) scaleX(1); }
+}
+
+:is(.modal-window, [role="dialog"], .sheet, .modal-card) {
+  max-height: min(88dvh, 920px) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+:is(.modal-window, [role="dialog"], .sheet, .modal-card) :is(.modal-body, .sheet-body, .form-body, .dialog-body, .section) {
+  overflow: auto !important;
+  padding-bottom: 104px !important;
+}
+
+:is(.modal-actions, .sheet-actions, .dialog-actions, .sticky-actions, .modal-footer, .actions, .service-group-edit-actions, .service-group-danger, .service-summary-delete) {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 10 !important;
+  background: rgba(255, 255, 255, 0.99) !important;
+  border-top: 1px solid var(--restart-line) !important;
+}
+
+.inline-disclosure-menu,
+.inline-disclosure-menu[open],
+.inline-disclosure-menu > div,
+body :is(.popover, .dropdown, .dropdown-menu, .action-menu, .more-menu, [data-radix-popper-content-wrapper]) {
+  z-index: 2147482600 !important;
+}
+
+.transitos-shell :is(.card, .record-head, .profile-expanded, .service-summary-row, .service-summary-list, .vehicle-card, .subcontractor-card, .project-card):has(.inline-disclosure-menu[open]) {
+  overflow: visible !important;
+  z-index: 2147482000 !important;
+}
+
+.inline-disclosure-menu > div,
+body :is(.popover, .dropdown-menu, .action-menu, .more-menu) {
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  min-width: 220px !important;
+  background: #fff !important;
+  color: var(--restart-ink) !important;
+  border: 1px solid var(--restart-line) !important;
+  box-shadow: 0 24px 56px rgba(15, 23, 42, 0.22) !important;
+}
+
+.inline-disclosure-menu > div :is(a, button, summary, .ghost, .icon-button) {
+  color: var(--restart-ink) !important;
+  background: transparent !important;
+}
+
+.brand img,
+.sidebar-brand img,
+.new-site-logo img,
+.new-gateway-logo img,
+.vehicle-survey-qr-preview img {
+  background: transparent !important;
+}
+
+.survey-page textarea {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.survey-page textarea:focus {
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.16) !important;
+  border-color: #0ea5e9 !important;
+  transform: translateY(-1px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  html,
+  body {
+    color-scheme: light !important;
+  }
+
+  .transitos-shell,
+  .transitos-shell .content,
+  .new-site-page,
+  .form-site-page,
+  .site-admin-page,
+  .live-edit-page,
+  .survey-page {
+    color: var(--restart-ink) !important;
+    background: #f6fbff !important;
+  }
+
+  .new-gateway {
+    color: #fff !important;
+    background: #07111f !important;
+  }
+}
+
+@media (max-width: 760px) {
+  html,
+  body {
+    overflow-x: hidden !important;
+  }
+
+  body {
+    padding-bottom: max(112px, calc(env(safe-area-inset-bottom) + 98px)) !important;
+  }
+
+  .transitos-shell {
+    display: block !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+  }
+
+  .transitos-shell .content {
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 92px 14px max(132px, calc(env(safe-area-inset-bottom) + 112px)) !important;
+  }
+
+  .transitos-shell :is(.sidebar, .desktop-nav, .transitos-sidebar, .side-nav) {
+    display: none !important;
+  }
+
+  .transitos-mobile-chrome {
+    position: fixed !important;
+    top: max(10px, env(safe-area-inset-top)) !important;
+    left: 12px !important;
+    right: 12px !important;
+    z-index: 2147481800 !important;
+    min-height: 58px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    color: var(--restart-ink) !important;
+    border: 1px solid var(--restart-line) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 18px 46px rgba(15, 23, 42, 0.16) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 8px 10px !important;
+  }
+
+  .transitos-mobile-chrome :is(span, strong) {
+    color: var(--restart-ink) !important;
+    opacity: 1 !important;
+  }
+
+  .transitos-mobile-logo img {
+    max-width: 138px !important;
+    max-height: 38px !important;
+    object-fit: contain !important;
+  }
+
+  .mobile-drawer-open {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    min-height: 44px !important;
+    max-width: 48vw !important;
+    padding: 0 14px !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    color: var(--restart-ink) !important;
+    border: 1px solid var(--restart-line) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .mobile-drawer-panel {
+    position: fixed !important;
+    top: calc(max(10px, env(safe-area-inset-top)) + 66px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 154px) !important;
+    overflow: auto !important;
+    z-index: 2147481900 !important;
+    background: #fff !important;
+    color: var(--restart-ink) !important;
+    border: 1px solid var(--restart-line) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 28px 80px rgba(15, 23, 42, 0.24) !important;
+  }
+
+  .mobile-drawer-panel :is(a, label, span, strong) {
+    color: var(--restart-ink) !important;
+    opacity: 1 !important;
+  }
+
+  .topbar {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+  }
+
+  .topbar-actions {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .transitos-shell :is(.grid, .summary-grid, .metric-grid, .survey-admin-metrics) {
+    grid-template-columns: 1fr !important;
+  }
+
+  .transitos-shell :is(.card, .topbar, .page-hero, .summary-hero, .metric-card, .record-card, .service-summary-row, .service-summary-list, .status-card) {
+    border-radius: 22px !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .new-rate-ticker,
+  .transitos-rate-ticker {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    max-height: 58px !important;
+    border-radius: 20px !important;
+  }
+
+  .new-rate-ticker .skiper-ticker-rail span,
+  .transitos-rate-ticker .skiper-ticker-rail span {
+    font-size: 0.82rem !important;
+    padding: 0.58rem 0.74rem !important;
+  }
+
+  .modal-window,
+  [role="dialog"],
+  .sheet,
+  .modal-card {
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: 88dvh !important;
+    border-radius: 22px !important;
+  }
+
+  .modal-window :is(.grid, .form-grid),
+  [role="dialog"] :is(.grid, .form-grid) {
+    grid-template-columns: 1fr !important;
+  }
+
+  .survey-form-card,
+  .survey-report-card,
+  .survey-report-sheet {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .survey-answer-grid,
+  .survey-info-grid {
+    grid-template-columns: 1fr !important;
   }
 }

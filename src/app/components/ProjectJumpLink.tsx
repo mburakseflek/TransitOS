@@ -41,9 +41,6 @@ export function ProjectJumpLink({
       aria-pressed={isActive}
       onClick={() => {
         selection?.setActiveProjectId(projectId);
-        window.requestAnimationFrame(() => {
-          document.getElementById(`project-detail-${projectId}`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        });
       }}
     >
       {children}

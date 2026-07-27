@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "SeflekTur TransitOS",
-    statusBarStyle: "black-translucent"
+    statusBarStyle: "default"
   },
   icons: {
     icon: [
@@ -31,12 +31,14 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  viewportFit: "cover"
+  viewportFit: "cover",
+  colorScheme: "light",
+  themeColor: "#F6F9FC"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="tr">
+    <html lang="tr" className="light" style={{ colorScheme: "light" }}>
       <body>
         <RouteLoadingOverlay />
         <GlobalOperationOverlay />

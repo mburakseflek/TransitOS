@@ -16064,6 +16064,39 @@ body .modal-window > .section {
   color: var(--tos-readable-text, #101827);
 }
 
+.project-accordion-summary:focus-visible {
+  outline: 3px solid rgba(18, 164, 204, 0.45);
+  outline-offset: -3px;
+}
+
+.project-accordion-copy {
+  min-width: 0;
+}
+
+.project-accordion-copy :is(h2, p) {
+  overflow-wrap: anywhere;
+}
+
+.project-accordion-toggle {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--tos-readable-border, rgba(23, 56, 95, 0.14));
+  border-radius: 999px;
+  color: var(--tos-readable-text, #101827);
+  background: rgba(255, 255, 255, 0.72);
+  transition:
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+.project-accordion[open] > .project-accordion-summary .project-accordion-toggle {
+  transform: rotate(180deg);
+  background: rgba(81, 214, 255, 0.16);
+}
+
 .project-accordion-summary h2 {
   margin: 8px 0 4px;
 }
@@ -16154,7 +16187,8 @@ body .modal-window > .section {
 
 @media (max-width: 980px) {
   .project-accordion-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
   }
 
   .project-accordion-metrics {
@@ -16167,6 +16201,10 @@ body .modal-window > .section {
 }
 
 @media (max-width: 640px) {
+  .project-accordion-summary {
+    padding: 14px;
+  }
+
   .route-summary {
     grid-template-columns: 1fr;
   }

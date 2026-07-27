@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
-import { ProjectJumpLink, ProjectPanel, ProjectSelectionProvider } from "@/app/components/ProjectJumpLink";
 import {
   AdaptiveSlider,
   FloatingInput,
@@ -114,35 +113,46 @@ export default async function ProjectsPage({
           </ModalAction>
         </QuickCreateCard> : null}
       </div>
-      <ProjectSelectionProvider initialProjectId={initialProjectId}>
-        <div className="project-layout project-selection-layout section">
-          <aside className="card project-list">
-            <h2 style={{ marginTop: 0 }}>Projeler</h2>
-            <div className="stack">
-              {projects.map((project) => (
-                <ProjectJumpLink className="route-card selectable-card project-jump-card" projectId={project.id} key={project.id}>
-                  <div className="record-head">
-                    <strong>{project.name}</strong>
-                    <span className={statusClass(project.status)}>{statusTitle(project.status)}</span>
-                  </div>
-                  <p className="muted">{project.clientCompany}</p>
-                  <p className="muted">{project.personnelCount} personel · {project.routes.length} güzergah</p>
-                </ProjectJumpLink>
-              ))}
-              {projects.length === 0 ? <p className="muted">Henüz proje yok.</p> : null}
-            </div>
-          </aside>
-
-          <section className="stack project-detail-stack">
-            {projects.map((project) => (
-              <ProjectPanel projectId={project.id} key={project.id}>
-                <ProjectCard project={project} initialRouteId={initialProjectId === project.id ? initialRouteId : null} vehicles={vehicles} projectOwners={projectOwners} endOfToday={endOfToday} canEdit={canEdit} showMoney={canEdit} periodMonth={period.month} defaultServiceDate={defaultServiceDate} periodQuery={`month=${period.month}&range=${period.range}`} />
-              </ProjectPanel>
-            ))}
-            {projects.length === 0 ? <section className="card muted">Başlamak için Proje Ekle penceresini kullanın.</section> : null}
-          </section>
-        </div>
-      </ProjectSelectionProvider>
+      <section className="stack project-accordion-stack section">
+        {projects.map((project) => (
+          <details
+            className="project-accordion"
+            id={`project-${project.id}`}
+            key={project.id}
+            open={initialProjectId === project.id}
+          >
+            <summary className="project-accordion-summary">
+              <div className="project-accordion-copy">
+                <div className="record-head">
+                  <h2>{project.name}</h2>
+                  <span className={statusClass(project.status)}>{statusTitle(project.status)}</span>
+                </div>
+                <p className="muted">{project.clientCompany}</p>
+                <div className="inline-actions project-accordion-metrics">
+                  <span className="badge gray">{project.personnelCount} personel</span>
+                  <span className="badge blue">{project.routes.length} güzergah</span>
+                </div>
+              </div>
+              <span className="project-accordion-toggle" aria-hidden="true">
+                <ChevronDown size={20} />
+              </span>
+            </summary>
+            <ProjectCard
+              project={project}
+              initialRouteId={initialProjectId === project.id ? initialRouteId : null}
+              vehicles={vehicles}
+              projectOwners={projectOwners}
+              endOfToday={endOfToday}
+              canEdit={canEdit}
+              showMoney={canEdit}
+              periodMonth={period.month}
+              defaultServiceDate={defaultServiceDate}
+              periodQuery={`month=${period.month}&range=${period.range}`}
+            />
+          </details>
+        ))}
+        {projects.length === 0 ? <section className="card muted">Başlamak için Proje Ekle penceresini kullanın.</section> : null}
+      </section>
 
       <OneOffJobsPanel routes={oneOffRoutes} vehicles={vehicles} canEdit={canEdit} />
     </AppShell>

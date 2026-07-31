@@ -15,6 +15,167 @@
   --surface-clean-text: #101827;
 }
 
+/* The TransitOS login has its own light-theme contract so global glass
+   styles and a device dark mode cannot reduce form contrast. */
+html:has(#transitos-login-screen),
+body:has(#transitos-login-screen) {
+  color-scheme: only light !important;
+  background: #f4f8fc !important;
+}
+
+#transitos-login-screen {
+  background: #f4f8fc !important;
+  color: #101827 !important;
+  color-scheme: only light !important;
+}
+
+#transitos-login-screen,
+#transitos-login-screen * {
+  box-sizing: border-box;
+}
+
+#transitos-login-screen .transitos-login-card {
+  background: #ffffff !important;
+  color: #101827 !important;
+}
+
+#transitos-login-screen .auth01-transitos {
+  background: #142238 !important;
+  color: #ffffff !important;
+}
+
+#transitos-login-screen .auth01-transitos :is(span, h1, p) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+#transitos-login-screen .auth01-transitos p {
+  color: #d8e3ee !important;
+  -webkit-text-fill-color: #d8e3ee !important;
+}
+
+#transitos-login-screen .transitos-login-brand-word {
+  color: #101827 !important;
+  -webkit-text-fill-color: #101827 !important;
+}
+
+#transitos-login-screen .transitos-login-brand-os {
+  color: #d81f32 !important;
+  -webkit-text-fill-color: #d81f32 !important;
+}
+
+#transitos-login-screen .frequency-selector legend {
+  color: #101827 !important;
+  -webkit-text-fill-color: #101827 !important;
+}
+
+#transitos-login-screen .frequency-option {
+  background: #f8fafc !important;
+  color: #172033 !important;
+}
+
+#transitos-login-screen .frequency-option > span {
+  color: #172033 !important;
+  -webkit-text-fill-color: #172033 !important;
+}
+
+#transitos-login-screen .frequency-option:has(input:checked) {
+  background: #e6f7fc !important;
+  border-color: #22b9e6 !important;
+}
+
+#transitos-login-screen .frequency-option:has(input:checked) > span,
+#transitos-login-screen .frequency-option input:checked + span {
+  color: #0b3e55 !important;
+  -webkit-text-fill-color: #0b3e55 !important;
+}
+
+#transitos-login-screen .floating-input input {
+  background: #ffffff !important;
+  color: #101827 !important;
+  -webkit-text-fill-color: #101827 !important;
+}
+
+#transitos-login-screen .floating-input > span {
+  background: #ffffff !important;
+  color: #526173 !important;
+  -webkit-text-fill-color: #526173 !important;
+}
+
+#transitos-login-screen .login-submit-button,
+#transitos-login-screen .login-submit-button * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+#transitos-login-screen .login-home-link,
+#transitos-login-screen .login-home-link * {
+  background: #f8fafc !important;
+  color: #172033 !important;
+  -webkit-text-fill-color: #172033 !important;
+}
+
+#transitos-login-screen input:-webkit-autofill {
+  -webkit-text-fill-color: #101827 !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+}
+
+@media (max-width: 640px) {
+  #transitos-login-screen {
+    min-height: 100svh !important;
+    padding:
+      max(16px, env(safe-area-inset-top))
+      12px
+      max(16px, env(safe-area-inset-bottom)) !important;
+  }
+
+  #transitos-login-screen .transitos-login-card {
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+
+  #transitos-login-screen .auth01-transitos {
+    grid-template-columns: 48px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+
+  #transitos-login-screen .auth01-transitos .auth01-icon {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  #transitos-login-screen .auth01-transitos h1 {
+    font-size: 1.35rem !important;
+    line-height: 1.12 !important;
+  }
+
+  #transitos-login-screen .auth01-transitos p {
+    font-size: 0.9rem !important;
+    line-height: 1.45 !important;
+  }
+
+  #transitos-login-screen .transitos-login-brand {
+    font-size: 1.75rem !important;
+  }
+
+  #transitos-login-screen .frequency-selector > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #transitos-login-screen .frequency-option {
+    min-height: 48px !important;
+    padding: 8px 10px !important;
+  }
+}
+
+@media (max-width: 340px) {
+  #transitos-login-screen .frequency-selector > div {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Final light-theme lock.
    Keep this block last so legacy component styles cannot restore dark surfaces. */
 :root,
@@ -18587,4 +18748,440 @@ body {
   filter: none !important;
   opacity: 1 !important;
   mix-blend-mode: normal !important;
+}
+
+/* TransitOS login uses an isolated, high-contrast light-theme contract. */
+html:has(.transitos-login-page) {
+  color-scheme: light !important;
+  background: #f4f8fc !important;
+}
+
+.transitos-login-page {
+  min-height: 100dvh !important;
+  display: grid !important;
+  place-items: center !important;
+  padding:
+    max(20px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(20px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left)) !important;
+  background: #f4f8fc !important;
+  color: #101827 !important;
+  color-scheme: light !important;
+  overflow-x: hidden !important;
+}
+
+.transitos-login-page .transitos-login-card {
+  width: min(100%, 680px) !important;
+  margin: 0 !important;
+  padding: 24px !important;
+  display: grid !important;
+  gap: 14px !important;
+  overflow: visible !important;
+  border: 1px solid #d6dee8 !important;
+  border-radius: 24px !important;
+  background: #ffffff !important;
+  color: #101827 !important;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12) !important;
+}
+
+.transitos-login-page .transitos-login-card .field {
+  margin: 0 !important;
+}
+
+.transitos-login-page .auth01-transitos {
+  min-height: 0 !important;
+  height: auto !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: 18px !important;
+  padding: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 20px !important;
+  background: #142238 !important;
+  color: #ffffff !important;
+}
+
+.transitos-login-page .auth01-transitos > div:last-child {
+  min-width: 0 !important;
+}
+
+.transitos-login-page .auth01-transitos .auth01-icon {
+  background: #234058 !important;
+  color: #35c8f5 !important;
+}
+
+.transitos-login-page .auth01-transitos :is(span, h1, p) {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.transitos-login-page .auth01-transitos p {
+  color: #d8e3ee !important;
+}
+
+.transitos-login-page .transitos-login-brand {
+  display: flex !important;
+  align-items: baseline !important;
+  flex-wrap: nowrap !important;
+  gap: 6px !important;
+  margin: 4px 0 0 !important;
+  color: #101827 !important;
+  font-size: clamp(1.85rem, 5vw, 2.4rem) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.transitos-login-page .transitos-login-brand > .transitos-login-brand-word {
+  color: #101827 !important;
+}
+
+.transitos-login-page .transitos-login-brand > .transitos-login-brand-os {
+  color: #d81f32 !important;
+}
+
+.transitos-login-page .frequency-selector {
+  margin: 0 0 2px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: #101827 !important;
+}
+
+.transitos-login-page .frequency-selector legend {
+  margin-bottom: 8px !important;
+  color: #101827 !important;
+  font-weight: 750 !important;
+  opacity: 1 !important;
+}
+
+.transitos-login-page .frequency-selector > div {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.transitos-login-page .frequency-option {
+  min-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 14px !important;
+  background: #f8fafc !important;
+  color: #172033 !important;
+  cursor: pointer !important;
+}
+
+.transitos-login-page .frequency-option > span {
+  color: #172033 !important;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+}
+
+.transitos-login-page .frequency-option:has(input:checked) {
+  border-color: #22b9e6 !important;
+  background: #e6f7fc !important;
+  box-shadow: 0 0 0 2px rgba(34, 185, 230, 0.18) !important;
+}
+
+.transitos-login-page .frequency-option:has(input:checked) > span {
+  color: #0b3e55 !important;
+}
+
+.transitos-login-page .floating-input {
+  position: relative !important;
+  display: block !important;
+  margin: 0 !important;
+}
+
+.transitos-login-page .floating-input input {
+  width: 100% !important;
+  min-height: 56px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  color: #101827 !important;
+  -webkit-text-fill-color: #101827 !important;
+  caret-color: #0b718f !important;
+  font-size: 16px !important;
+}
+
+.transitos-login-page .floating-input > span {
+  padding: 0 4px !important;
+  background: #ffffff !important;
+  color: #526173 !important;
+  opacity: 1 !important;
+}
+
+.transitos-login-page .floating-input input:focus {
+  border-color: #0ea5c6 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 198, 0.16) !important;
+}
+
+.transitos-login-page .floating-input input:focus + span,
+.transitos-login-page .floating-input input:not(:placeholder-shown) + span {
+  color: #0b5f7b !important;
+}
+
+.transitos-login-page .login-submit-button {
+  min-height: 56px !important;
+  border: 0 !important;
+  background: linear-gradient(90deg, #d91f32, #1f457c) !important;
+  color: #ffffff !important;
+}
+
+.transitos-login-page .login-submit-button :is(span, strong) {
+  color: #ffffff !important;
+}
+
+.transitos-login-page .login-home-link {
+  min-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 14px !important;
+  background: #f8fafc !important;
+  color: #172033 !important;
+  font-weight: 650 !important;
+  text-decoration: none !important;
+}
+
+.transitos-login-page .login-error {
+  border: 1px solid #f6c7c2 !important;
+  background: #fff1f0 !important;
+  color: #b42318 !important;
+}
+
+@media (max-width: 640px) {
+  .transitos-login-page {
+    display: block !important;
+    padding:
+      max(16px, env(safe-area-inset-top))
+      12px
+      max(16px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .transitos-login-page .transitos-login-card {
+    width: 100% !important;
+    padding: 16px !important;
+    border-radius: 20px !important;
+  }
+
+  .transitos-login-page .auth01-transitos {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    padding: 18px !important;
+  }
+
+  .transitos-login-page .auth01-transitos .auth01-icon {
+    width: 52px !important;
+    height: 52px !important;
+  }
+
+  .transitos-login-page .auth01-transitos h1 {
+    font-size: clamp(1.55rem, 8vw, 2.15rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  .transitos-login-page .transitos-login-brand {
+    font-size: 2rem !important;
+  }
+
+  .transitos-login-page .frequency-selector > div {
+    grid-template-columns: 1fr !important;
+  }
+
+  .transitos-login-page .frequency-option {
+    min-height: 50px !important;
+  }
+}
+
+/* Final TransitOS login contrast guard. Keep last to override legacy theme rules. */
+body #transitos-login-screen {
+  min-height: 100svh !important;
+  overflow-x: hidden !important;
+  background: #edf3f8 !important;
+  color: #101827 !important;
+  color-scheme: light !important;
+  -webkit-text-size-adjust: 100%;
+}
+
+body #transitos-login-screen .transitos-login-card {
+  background: #ffffff !important;
+  color: #101827 !important;
+}
+
+body #transitos-login-screen .auth01-transitos {
+  min-height: 0 !important;
+  height: auto !important;
+  background: #142238 !important;
+  color: #ffffff !important;
+}
+
+body #transitos-login-screen .auth01-transitos :is(span, h1, p) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+body #transitos-login-screen .auth01-transitos p {
+  color: #d7e1ed !important;
+  -webkit-text-fill-color: #d7e1ed !important;
+}
+
+body #transitos-login-screen .transitos-login-brand,
+body #transitos-login-screen .transitos-login-brand-word {
+  color: #101827 !important;
+  -webkit-text-fill-color: #101827 !important;
+}
+
+body #transitos-login-screen .transitos-login-brand-os {
+  color: #d81f32 !important;
+  -webkit-text-fill-color: #d81f32 !important;
+}
+
+body #transitos-login-screen .frequency-selector legend {
+  color: #101827 !important;
+  -webkit-text-fill-color: #101827 !important;
+}
+
+body #transitos-login-screen .frequency-option {
+  background: #f8fafc !important;
+  color: #172033 !important;
+}
+
+body #transitos-login-screen .frequency-option > span {
+  color: #172033 !important;
+  -webkit-text-fill-color: #172033 !important;
+}
+
+body #transitos-login-screen .frequency-option:has(input:checked) {
+  border-color: #20b8e6 !important;
+  background: #dff5fb !important;
+  box-shadow: 0 0 0 2px rgba(32, 184, 230, 0.14) !important;
+}
+
+body #transitos-login-screen .frequency-option:has(input:checked) > span {
+  color: #07384b !important;
+  -webkit-text-fill-color: #07384b !important;
+}
+
+body #transitos-login-screen .floating-input input {
+  background: #ffffff !important;
+  color: #101827 !important;
+  -webkit-text-fill-color: #101827 !important;
+  caret-color: #0b718f !important;
+  opacity: 1 !important;
+}
+
+body #transitos-login-screen .floating-input > span {
+  background: #ffffff !important;
+  color: #526173 !important;
+  -webkit-text-fill-color: #526173 !important;
+  opacity: 1 !important;
+}
+
+body #transitos-login-screen .floating-input input:focus + span,
+body #transitos-login-screen .floating-input input:not(:placeholder-shown) + span {
+  color: #0b5f7b !important;
+  -webkit-text-fill-color: #0b5f7b !important;
+}
+
+body #transitos-login-screen .floating-input input:-webkit-autofill {
+  -webkit-text-fill-color: #101827 !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+}
+
+body #transitos-login-screen .login-submit-button,
+body #transitos-login-screen .login-submit-button :is(span, strong) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+body #transitos-login-screen .login-home-link {
+  background: #f8fafc !important;
+  color: #172033 !important;
+  -webkit-text-fill-color: #172033 !important;
+}
+
+body #transitos-login-screen .login-home-link * {
+  color: #172033 !important;
+  -webkit-text-fill-color: #172033 !important;
+}
+
+body #transitos-login-screen .login-error {
+  color: #b42318 !important;
+  -webkit-text-fill-color: #b42318 !important;
+}
+
+@media (max-width: 640px) {
+  body #transitos-login-screen {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding:
+      max(12px, env(safe-area-inset-top))
+      10px
+      max(16px, env(safe-area-inset-bottom)) !important;
+  }
+
+  body #transitos-login-screen .transitos-login-card {
+    width: min(100%, 430px) !important;
+    padding: 14px !important;
+    gap: 12px !important;
+    border-radius: 20px !important;
+  }
+
+  body #transitos-login-screen .auth01-transitos {
+    grid-template-columns: 48px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 14px !important;
+    align-items: center !important;
+  }
+
+  body #transitos-login-screen .auth01-transitos .auth01-icon {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  body #transitos-login-screen .auth01-transitos h1 {
+    font-size: 1.35rem !important;
+    line-height: 1.12 !important;
+  }
+
+  body #transitos-login-screen .auth01-transitos p {
+    font-size: 0.88rem !important;
+    line-height: 1.45 !important;
+  }
+
+  body #transitos-login-screen .transitos-login-brand {
+    font-size: 1.85rem !important;
+    line-height: 1 !important;
+  }
+
+  body #transitos-login-screen .frequency-selector > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  body #transitos-login-screen .frequency-option {
+    min-height: 48px !important;
+    padding: 8px !important;
+  }
+
+  body #transitos-login-screen .floating-input input {
+    min-height: 54px !important;
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 350px) {
+  body #transitos-login-screen .frequency-selector > div {
+    grid-template-columns: 1fr !important;
+  }
 }

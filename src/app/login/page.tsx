@@ -12,7 +12,10 @@ export default async function LoginPage({
   const isSiteAdminLogin = nextPath.startsWith("/site-admin");
 
   return (
-    <main className={`login-page ${isSiteAdminLogin ? "site-admin-login-page" : "transitos-login-page"}`}>
+    <main
+      id={isSiteAdminLogin ? "site-admin-login-screen" : "transitos-login-screen"}
+      className={`login-page ${isSiteAdminLogin ? "site-admin-login-page" : "transitos-login-page"}`}
+    >
       <LoginFormShell className={`card login-card ${isSiteAdminLogin ? "site-admin-login-card" : "transitos-login-card"}`}>
         <input type="hidden" name="next" value={nextPath} />
         {isSiteAdminLogin ? <SiteAdminLoginHeader /> : <TransitOSLoginHeader />}
@@ -63,8 +66,9 @@ function TransitOSLoginHeader() {
         body="Taşeron, araç, güzergah ve servis planlamasını tek veri merkezi üzerinden yöneten kurumsal TransitOS platformu."
         mode="transitos"
       />
-      <div className="brand">
-        Transit<span>OS</span>
+      <div className="brand transitos-login-brand" aria-label="TransitOS">
+        <span className="transitos-login-brand-word">Transit</span>
+        <span className="transitos-login-brand-os">OS</span>
       </div>
     </>
   );

@@ -184,6 +184,12 @@ model ServiceAssignment {
   financialLines  FinancialDocumentLine[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+
+  @@index([serviceDate])
+  @@index([monthKey])
+  @@index([projectId, serviceDate])
+  @@index([routeId, serviceDate])
+  @@index([vehicleId, serviceDate])
 }
 
 model VehicleSurveyResponse {
@@ -241,6 +247,11 @@ model Expense {
   financialLines  FinancialDocumentLine[]
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
+
+  @@index([expenseDate])
+  @@index([monthKey])
+  @@index([subcontractorId, expenseDate])
+  @@index([vehicleId, expenseDate])
 }
 
 model FinancialDocument {

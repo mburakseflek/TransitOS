@@ -19377,3 +19377,142 @@ body .modal-window > .section :is(.section, .stack, form) {
     animation-duration: 120s !important;
   }
 }
+
+/* Clean market strip: independent from every legacy ticker selector above. */
+.market-strip {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  left: max(14px, env(safe-area-inset-left));
+  z-index: 1200;
+  height: 48px;
+  padding: 0;
+  overflow: hidden;
+  color: #e8f5ff;
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  border-radius: 16px;
+  background: #0b1b31;
+  box-shadow: 0 12px 30px rgba(2, 8, 23, 0.2);
+  pointer-events: none;
+}
+
+.market-strip-app {
+  left: max(320px, calc(env(safe-area-inset-left) + 320px));
+  right: max(24px, env(safe-area-inset-right));
+}
+
+.market-strip-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.market-strip-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  height: 100%;
+  animation: market-strip-scroll 44s linear infinite;
+  will-change: transform;
+}
+
+.market-strip-group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 28px;
+  height: 100%;
+  padding-right: 28px;
+}
+
+.market-strip-item {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 9px;
+  height: 100%;
+  color: inherit;
+  font-size: 0.84rem;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.market-strip-item i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.13);
+}
+
+@keyframes market-strip-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.period-picker-field input[type="month"],
+.period-native-range select,
+.field-row input:is([type="date"], [type="time"], [type="month"], [type="datetime-local"]) {
+  min-height: 48px;
+  color-scheme: light;
+  font: inherit;
+}
+
+.period-native-range {
+  display: grid;
+  gap: 6px;
+}
+
+.period-native-range > span,
+.period-picker-field > label {
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.earning-warning {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 16px 18px;
+  color: #713f12;
+  border: 1px solid #f5c451;
+  border-radius: 18px;
+  background: #fff8df;
+  box-shadow: 0 10px 28px rgba(146, 94, 13, 0.1);
+}
+
+.earning-warning p {
+  margin: 4px 0;
+}
+
+.earning-warning small {
+  display: block;
+  color: #854d0e;
+}
+
+@media (max-width: 900px) {
+  .market-strip-app {
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .earning-warning {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .earning-warning .compact-button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .market-strip-track {
+    animation-duration: 100s;
+  }
+}

@@ -291,21 +291,9 @@ export default async function FinancePage({
 }
 
 function PeriodOptionField({ currentMonth, label, hint }: { currentMonth: string; label: string; hint: string }) {
-  const [year, month] = currentMonth.split("-").map(Number);
-  const options = Array.from({ length: 18 }, (_, index) => {
-    const date = new Date(year, month - 10 + index, 1);
-    const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    return {
-      value,
-      label: date.toLocaleDateString("tr-TR", { month: "long", year: "numeric" })
-    };
-  });
-
   return (
     <Field label={label} hint={hint}>
-      <select name="monthKey" defaultValue={currentMonth}>
-        {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-      </select>
+      <input name="monthKey" type="month" defaultValue={currentMonth} required />
     </Field>
   );
 }

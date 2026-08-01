@@ -150,7 +150,7 @@ export async function SiteFooter({ tickerItems }: { tickerItems: string[] }) {
         </a>
       ) : null}
 
-      <MarketTicker className="new-rate-ticker" fallbackItems={tickerItems} withVisibilityShell />
+      <MarketTicker fallbackItems={tickerItems} placement="site" />
     </>
   );
 }

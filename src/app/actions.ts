@@ -147,17 +147,18 @@ export async function createSubcontractor(formData: FormData) {
   });
 
   if (loginId) {
+    const passwordHash = await bcrypt.hash(password, 10);
     await prisma.user.upsert({
       where: { loginId },
       create: {
         loginId,
-        passwordHash: await bcrypt.hash(password, 10),
+        passwordHash,
         displayName: subcontractor.companyName,
         role: "SUBCONTRACTOR",
         subcontractorId: subcontractor.id
       },
       update: {
-        passwordHash: await bcrypt.hash(password, 10),
+        passwordHash,
         displayName: subcontractor.companyName,
         role: "SUBCONTRACTOR",
         subcontractorId: subcontractor.id,
@@ -214,11 +215,12 @@ export async function createAccessUser(formData: FormData) {
   const role = userRole(formData);
   const projectIds = formData.getAll("projectIds").map(String).filter(Boolean);
   const loginId = text(formData, "loginId");
+  const passwordHash = await bcrypt.hash(text(formData, "password") || "1234", 10);
   await prisma.user.upsert({
     where: { loginId },
     create: {
       loginId,
-      passwordHash: await bcrypt.hash(text(formData, "password") || "1234", 10),
+      passwordHash,
       displayName: text(formData, "displayName"),
       role,
       subcontractorId: role === UserRole.SUBCONTRACTOR ? optionalId(formData, "subcontractorId") : null,
@@ -230,7 +232,7 @@ export async function createAccessUser(formData: FormData) {
         : undefined
     },
     update: {
-      passwordHash: await bcrypt.hash(text(formData, "password") || "1234", 10),
+      passwordHash,
       displayName: text(formData, "displayName"),
       role,
       subcontractorId: role === UserRole.SUBCONTRACTOR ? optionalId(formData, "subcontractorId") : null,

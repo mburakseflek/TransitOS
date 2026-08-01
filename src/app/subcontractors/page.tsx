@@ -15,7 +15,10 @@ export default async function SubcontractorsPage() {
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
   const subcontractors = canManage ? await prisma.subcontractor.findMany({
-    include: { users: true, vehicles: { include: { assignments: true } }, expenses: true },
+    include: {
+      users: { select: { loginId: true } },
+      vehicles: { include: { assignments: { select: { serviceDate: true } } } }
+    },
     orderBy: { companyName: "asc" }
   }) : [];
 

@@ -1,16 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SkiperTickerRail } from "@/app/components/RegistryInterfaceKit";
 
 export function MarketTicker({
-  className,
   fallbackItems,
-  withVisibilityShell = false
+  placement = "app"
 }: {
-  className: string;
   fallbackItems: string[];
-  withVisibilityShell?: boolean;
+  placement?: "app" | "site";
 }) {
   const [items, setItems] = useState(fallbackItems);
 
@@ -32,10 +29,27 @@ export function MarketTicker({
     };
   }, []);
 
-  const rail = <SkiperTickerRail items={items} />;
   return (
-    <div className={className} aria-label="Döviz ve akaryakıt bilgi bandı">
-      {withVisibilityShell ? <div className="ticker-visibility-shell">{rail}</div> : rail}
+    <aside className={`market-strip market-strip-${placement}`} aria-label="Döviz ve akaryakıt bilgi bandı">
+      <div className="market-strip-viewport">
+        <div className="market-strip-track">
+          <TickerItems items={items} />
+          <TickerItems items={items} hidden />
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function TickerItems({ items, hidden = false }: { items: string[]; hidden?: boolean }) {
+  return (
+    <div className="market-strip-group" aria-hidden={hidden || undefined}>
+      {items.map((item, index) => (
+        <span className="market-strip-item" key={`${item}-${index}`}>
+          <i aria-hidden="true" />
+          {item}
+        </span>
+      ))}
     </div>
   );
 }

@@ -151,7 +151,7 @@ export async function AppShell({
           </div>
         </div>
         {children}
-        <MarketTicker className="transitos-rate-ticker" fallbackItems={tickerItems} />
+        <MarketTicker fallbackItems={tickerItems} placement="app" />
       </section>
     </main>
   );

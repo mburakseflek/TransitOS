@@ -64,7 +64,6 @@ export default async function ProjectsPage({
           },
           orderBy: { name: "asc" }
         },
-        assignments: true
       },
       orderBy: { createdAt: "desc" }
     }),

@@ -1,8 +1,10 @@
-import { Bus, CalendarDays, Clock3, FolderKanban, MapPinned, Users } from "lucide-react";
+import { AlertTriangle, Bus, CalendarDays, Clock3, FolderKanban, MapPinned, Users } from "lucide-react";
+import { FinancialDocumentType } from "@prisma/client";
 import { AppShell } from "@/app/components/AppShell";
 import { CalendarMiniPanel, OnboardingScreen, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { YandexTrafficMap } from "@/app/components/YandexTrafficMap";
 import { prisma } from "@/lib/db";
+import { formatTRY } from "@/lib/format";
 import { serviceDirectionTitle } from "@/lib/labels";
 import { getTrafficSnapshot, getYandexMapKitApiKey, istanbulTrafficMapEmbedUrl } from "@/lib/traffic";
 import { cookies } from "next/headers";
@@ -10,6 +12,7 @@ import { readSessionToken } from "@/lib/auth";
 import {
   assignmentAccessWhere,
   isProjectOwner,
+  isManager,
   isSubcontractor,
   projectAccessWhere,
   vehicleAccessWhere
@@ -26,12 +29,15 @@ export default async function DashboardPage() {
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
+  const previousMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const previousMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999);
+  const previousMonthKey = `${previousMonthStart.getFullYear()}-${String(previousMonthStart.getMonth() + 1).padStart(2, "0")}`;
 
   const vehicleScope = vehicleAccessWhere(user);
   const assignmentScope = assignmentAccessWhere(user);
   const projectScope = projectAccessWhere(user);
 
-  const [subcontractors, vehicles, activeProjects, todayAssignments, completedAssignments, trafficSnapshot] = await Promise.all([
+  const [subcontractors, vehicles, activeProjects, todayAssignments, completedAssignments, trafficSnapshot, pendingPreviousEarnings] = await Promise.all([
     projectOwnerView || subcontractorView ? Promise.resolve(0) : prisma.subcontractor.count(),
     prisma.vehicle.count({ where: vehicleScope }),
     prisma.project.count({ where: { status: "ACTIVE", ...projectScope } }),
@@ -46,10 +52,39 @@ export default async function DashboardPage() {
       orderBy: { serviceDate: "desc" },
       take: 12
     }),
-    getTrafficSnapshot()
+    getTrafficSnapshot(),
+    isManager(user) ? prisma.subcontractor.findMany({
+      where: {
+        vehicles: { some: { assignments: { some: { serviceDate: { gte: previousMonthStart, lte: previousMonthEnd } } } } },
+        financialDocuments: { none: { type: FinancialDocumentType.SUBCONTRACTOR_EARNING, monthKey: previousMonthKey } }
+      },
+      select: {
+        id: true,
+        companyName: true,
+        vehicles: {
+          select: {
+            assignments: {
+              where: { serviceDate: { gte: previousMonthStart, lte: previousMonthEnd } },
+              select: { pricePerService: true, serviceCount: true }
+            }
+          }
+        },
+        expenses: {
+          where: { expenseDate: { gte: previousMonthStart, lte: previousMonthEnd } },
+          select: { amount: true }
+        }
+      },
+      orderBy: { companyName: "asc" }
+    }) : Promise.resolve([])
   ]);
   const trafficItems = trafficSnapshot.items;
   const yandexApiKey = getYandexMapKitApiKey();
+  const pendingPreviousEarningTotal = pendingPreviousEarnings.reduce((total, subcontractor) => {
+    const gross = subcontractor.vehicles.flatMap((vehicle) => vehicle.assignments)
+      .reduce((sum, assignment) => sum + Number(assignment.pricePerService) * assignment.serviceCount, 0);
+    const expenses = subcontractor.expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+    return total + gross - expenses;
+  }, 0);
 
   return (
     <AppShell active="/dashboard" title="Ana Panel" subtitle="SeflekTur TransitOS Cloud v2.0 ortak veri merkezi">
@@ -59,6 +94,18 @@ export default async function DashboardPage() {
         <Metric title="Aktif Projeler" value={activeProjects} icon={<FolderKanban size={22} />} />
         <Metric title="Bugünkü Servis" value={todayAssignments.length} icon={<CalendarDays size={22} />} />
       </div>
+
+      {pendingPreviousEarnings.length > 0 ? (
+        <section className="earning-warning" role="status" aria-live="polite">
+          <AlertTriangle size={24} aria-hidden="true" />
+          <div>
+            <strong>Önceki aydan kesilmemiş hakediş var</strong>
+            <p>{previousMonthKey} döneminde {pendingPreviousEarnings.length} taşeron için toplam {formatTRY(pendingPreviousEarningTotal)} hakediş kesilmeyi bekliyor.</p>
+            <small>{pendingPreviousEarnings.map((item) => item.companyName).join(", ")}</small>
+          </div>
+          <a className="primary compact-button" href={`/transitos/earnings?month=${previousMonthKey}&range=1`}>Hakedişleri kontrol et</a>
+        </section>
+      ) : null}
 
       <OnboardingScreen
         eyebrow="Günlük Operasyon"

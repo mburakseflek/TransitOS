@@ -44,36 +44,6 @@ export function SkiperMotionFrame({
   );
 }
 
-export function SkiperTickerRail({
-  items,
-  tone = "navy"
-}: {
-  items: string[];
-  tone?: Tone;
-}) {
-  const cleanItems = items.map((item) => item.trim()).filter(Boolean);
-  const safeItems = cleanItems.length ? cleanItems : ["Canlı piyasa verisi hazırlanıyor"];
-  const repeatCount = safeItems.length < 6 ? 6 : 4;
-  const railItems = Array.from({ length: repeatCount }, () => safeItems).flat();
-
-  return (
-    <div className={`skiper-ticker-rail skiper-panel-${tone}`} aria-label="Canlı bilgi akışı">
-      <div className="skiper-ticker-track">
-        <div className="skiper-ticker-group">
-          {railItems.map((item, index) => (
-            <span key={`primary-${item}-${index}`}>{item}</span>
-          ))}
-        </div>
-        <div className="skiper-ticker-group" aria-hidden="true">
-          {railItems.map((item, index) => (
-            <span key={`secondary-${item}-${index}`}>{item}</span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function SkiperLogoShowcase({
   items,
   label = "Referans ve iş ortağı logoları"

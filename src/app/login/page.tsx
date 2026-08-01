@@ -37,11 +37,19 @@ export default async function LoginPage({
         )}
 
         <div className="field">
-          <FloatingInput name="loginId" label={isSiteAdminLogin ? "Site yönetici ID" : "Kullanıcı ID"} required autoComplete="off" />
+          <FloatingInput
+            name="loginId"
+            label={isSiteAdminLogin ? "Site yönetici ID" : "Kullanıcı ID"}
+            placeholder={isSiteAdminLogin ? "Site yönetici ID'nizi yazın" : "Kullanıcı ID'nizi yazın"}
+            required
+            autoComplete="username"
+          />
+          <small className="login-field-hint">Yöneticiniz tarafından verilen kullanıcı ID’sini girin.</small>
         </div>
 
         <div className="field">
-          <FloatingInput name="password" label="Şifre" type="password" required autoComplete="off" />
+          <FloatingInput name="password" label="Şifre" placeholder="Şifrenizi yazın" type="password" required autoComplete="current-password" />
+          <small className="login-field-hint">Şifreniz büyük ve küçük harfe duyarlıdır.</small>
         </div>
 
         {params?.error ? <p className="login-error">{params.error}</p> : null}

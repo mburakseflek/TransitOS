@@ -19185,3 +19185,195 @@ body #transitos-login-screen .login-error {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* TransitOS mobile reliability: clear states, stable actions and uninterrupted ticker. */
+.modal-window .frequency-selector > div {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.modal-window .frequency-option {
+  min-width: 0 !important;
+  min-height: 48px !important;
+  cursor: pointer !important;
+}
+
+.modal-window .frequency-option > span {
+  min-height: 48px !important;
+  padding: 10px 12px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 14px !important;
+  color: #334155 !important;
+  background: #f8fafc !important;
+  box-shadow: none !important;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, box-shadow 160ms ease !important;
+}
+
+.modal-window .frequency-option:has(input:checked) > span,
+.modal-window .frequency-option input:checked + span {
+  border-color: #0b86aa !important;
+  color: #07384b !important;
+  background: #dff5fb !important;
+  box-shadow: inset 0 0 0 2px #23b9e5, 0 6px 18px rgba(11, 134, 170, 0.14) !important;
+}
+
+.modal-window .frequency-option:has(input:checked) > span::before,
+.modal-window .frequency-option input:checked + span::before {
+  content: "✓";
+  margin-right: 7px;
+  color: #08779a;
+  font-weight: 900;
+}
+
+body .modal-window > .modal-body,
+body .modal-window > .section {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding-bottom: max(32px, env(safe-area-inset-bottom)) !important;
+}
+
+body .modal-window > .modal-body :is(.section, .stack, form),
+body .modal-window > .section :is(.section, .stack, form) {
+  overflow: visible !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.service-summary-detail .service-group-edit-actions,
+.service-summary-detail .service-group-danger,
+.service-summary-detail .service-summary-delete,
+.modal-window .actions {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  transform: none !important;
+}
+
+.service-summary-detail .service-group-danger .danger {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 48px !important;
+  width: auto !important;
+  max-width: 100% !important;
+  padding: 10px 16px !important;
+}
+
+.skiper-ticker-track {
+  display: flex !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  gap: 0 !important;
+  animation: transitos-continuous-ticker 48s linear infinite !important;
+}
+
+.skiper-ticker-group {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding-right: 12px !important;
+}
+
+/* Only the inner track moves. Older ticker layers animated the rail and each
+   group as well, which pushed labels outside the visible band. */
+.new-rate-ticker .skiper-ticker-rail,
+.transitos-rate-ticker .skiper-ticker-rail {
+  display: block !important;
+  width: 100% !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+.new-rate-ticker .skiper-ticker-rail > .skiper-ticker-track,
+.transitos-rate-ticker .skiper-ticker-rail > .skiper-ticker-track {
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 !important;
+  transform: translate3d(0, 0, 0);
+  animation: transitos-continuous-ticker 48s linear infinite !important;
+}
+
+.new-rate-ticker .skiper-ticker-group,
+.transitos-rate-ticker .skiper-ticker-group {
+  height: 48px !important;
+  min-height: 48px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+.new-rate-ticker .skiper-ticker-group > span,
+.transitos-rate-ticker .skiper-ticker-group > span {
+  height: 36px !important;
+  min-height: 36px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 1.2 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+@keyframes transitos-continuous-ticker {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+#transitos-login-screen .floating-input input {
+  padding: 24px 14px 8px !important;
+}
+
+#transitos-login-screen .floating-input input::placeholder {
+  color: #7a8798 !important;
+  opacity: 1 !important;
+}
+
+#transitos-login-screen .floating-input > span,
+#transitos-login-screen .floating-input input:focus + span,
+#transitos-login-screen .floating-input input:not(:placeholder-shown) + span {
+  top: 5px !important;
+  transform: scale(0.78) !important;
+  color: #334155 !important;
+  font-weight: 800 !important;
+}
+
+#transitos-login-screen .login-field-hint {
+  display: block !important;
+  margin: 6px 4px 0 !important;
+  color: #526173 !important;
+  font-size: 0.78rem !important;
+  line-height: 1.4 !important;
+  text-shadow: none !important;
+}
+
+@media (max-width: 640px) {
+  body .modal-backdrop {
+    padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)) !important;
+  }
+
+  body .modal-window {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+
+  .service-summary-detail .service-group-danger .danger,
+  .modal-window .actions > button,
+  .modal-window .actions > .primary,
+  .modal-window .actions > .danger {
+    width: 100% !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skiper-ticker-track {
+    animation-duration: 120s !important;
+  }
+}

@@ -2,10 +2,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import { WhatsAppIcon } from "@/app/components/WhatsAppIcon";
-import { SkiperMotionFrame, SkiperTickerRail } from "@/app/components/RegistryInterfaceKit";
+import { SkiperMotionFrame } from "@/app/components/RegistryInterfaceKit";
 import { CorporateMobileNav } from "@/app/seflektur/CorporateMobileNav";
 import { readSiteContent, SiteCard } from "@/lib/site-content";
-import { getMarketTickerItems } from "@/lib/market-data";
+import { MarketTicker } from "@/app/components/MarketTicker";
 
 const siteNavLinks = [
   { href: "/seflektur", label: "Ana Sayfa" },
@@ -124,7 +124,6 @@ export function MobileAppPromo({
 
 export async function SiteFooter({ tickerItems }: { tickerItems: string[] }) {
   const content = await readSiteContent();
-  const liveTickerItems = await getMarketTickerItems(tickerItems);
   const whatsappNumber = whatsappLinkNumber(content.whatsappNumber || content.contactPhone);
 
   return (
@@ -151,11 +150,7 @@ export async function SiteFooter({ tickerItems }: { tickerItems: string[] }) {
         </a>
       ) : null}
 
-      <div className="new-rate-ticker" aria-label="Döviz ve akaryakıt bilgi bandı">
-        <div className="ticker-visibility-shell">
-          <SkiperTickerRail items={liveTickerItems} />
-        </div>
-      </div>
+      <MarketTicker className="new-rate-ticker" fallbackItems={tickerItems} withVisibilityShell />
     </>
   );
 }

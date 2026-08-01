@@ -100,12 +100,6 @@ function disableSubmitControls(form: HTMLFormElement) {
   });
 }
 
-function startOperationLock(label: string) {
-  document.body.dataset.operationPending = "true";
-  document.body.dataset.operationLabel = label;
-  window.dispatchEvent(new CustomEvent("transitos:operation-start", { detail: { label } }));
-}
-
 export function confirmDirtyFormExit(root: ParentNode = document) {
   return !hasDirtyForms(root) || canLeaveDirtyForm();
 }
@@ -142,11 +136,10 @@ export function InteractionGuards() {
         return;
       }
 
-      const label = submitterOperationLabel(submitter, form);
       form.dataset.submitting = "true";
       form.dataset.dirty = "false";
       form.setAttribute("aria-busy", "true");
-      startOperationLock(label);
+      form.dataset.loadingLabel = submitterOperationLabel(submitter, form);
       disableSubmitControls(form);
     }
 

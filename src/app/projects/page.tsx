@@ -465,6 +465,7 @@ function ServiceGroupDetails({
         <input type="hidden" name="_returnTo" value={returnTo} />
         <DeleteButton ariaLabel="Bu servis grubunu sil">
           <Trash2 size={17} aria-hidden="true" />
+          <span>Servis grubunu sil</span>
         </DeleteButton>
       </form>
 

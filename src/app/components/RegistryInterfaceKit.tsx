@@ -370,6 +370,7 @@ export function FloatingInput({
   required = false,
   autoComplete,
   inputMode,
+  placeholder,
   min,
   max
 }: {
@@ -380,6 +381,7 @@ export function FloatingInput({
   required?: boolean;
   autoComplete?: string;
   inputMode?: "text" | "numeric" | "decimal" | "tel" | "email" | "search" | "url";
+  placeholder?: string;
   min?: number;
   max?: number;
 }) {
@@ -394,7 +396,7 @@ export function FloatingInput({
         inputMode={inputMode}
         min={min}
         max={max}
-        placeholder=" "
+        placeholder={placeholder ?? " "}
       />
       <span>{label}</span>
     </label>

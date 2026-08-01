@@ -2,7 +2,6 @@
 
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ExpenseCategory, FinancialDocumentLineKind, FinancialDocumentType, RecordStatus, ServiceDirection, UserRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
@@ -167,10 +166,6 @@ export async function createSubcontractor(formData: FormData) {
       }
     });
   }
-
-  revalidatePath("/transitos/subcontractors");
-  revalidatePath("/transitos/settings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/subcontractors"));
 }
 
@@ -212,10 +207,6 @@ export async function updateSubcontractor(formData: FormData) {
       }
     });
   }
-
-  revalidatePath("/transitos/subcontractors");
-  revalidatePath("/transitos/settings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/subcontractors"));
 }
 
@@ -247,7 +238,6 @@ export async function createAccessUser(formData: FormData) {
       ownerProjects: { set: role === UserRole.PROJECT_OWNER ? projectIds.map((id) => ({ id })) : [] }
     }
   });
-  revalidatePath("/transitos/settings");
   redirect(returnTo(formData, "/transitos/settings"));
 }
 
@@ -267,13 +257,11 @@ export async function updateAccessUser(formData: FormData) {
       ownerProjects: { set: role === UserRole.PROJECT_OWNER ? projectIds.map((id) => ({ id })) : [] }
     }
   });
-  revalidatePath("/transitos/settings");
   redirect(returnTo(formData, "/transitos/settings"));
 }
 
 export async function deleteAccessUser(formData: FormData) {
   await prisma.user.delete({ where: { id: text(formData, "id") } });
-  revalidatePath("/transitos/settings");
   redirect(returnTo(formData, "/transitos/settings"));
 }
 
@@ -287,9 +275,6 @@ export async function deleteSubcontractor(formData: FormData) {
   await prisma.driverDocument.deleteMany({ where: { vehicleId: { in: vehicleIds } } });
   await prisma.vehicle.deleteMany({ where: { subcontractorId: id } });
   await prisma.subcontractor.delete({ where: { id } });
-  revalidatePath("/transitos/subcontractors");
-  revalidatePath("/transitos/settings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/subcontractors"));
 }
 
@@ -308,9 +293,6 @@ export async function createVehicle(formData: FormData) {
       driverPhone: formatPhoneTR(text(formData, "driverPhone"))
     }
   });
-  revalidatePath("/transitos/vehicles");
-  revalidatePath("/transitos/drivers");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/vehicles"));
 }
 
@@ -331,9 +313,6 @@ export async function updateVehicle(formData: FormData) {
       driverPhone: formatPhoneTR(text(formData, "driverPhone"))
     }
   });
-  revalidatePath("/transitos/vehicles");
-  revalidatePath("/transitos/drivers");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/vehicles"));
 }
 
@@ -343,9 +322,6 @@ export async function deleteVehicle(formData: FormData) {
   await prisma.expense.deleteMany({ where: { vehicleId: id } });
   await prisma.driverDocument.deleteMany({ where: { vehicleId: id } });
   await prisma.vehicle.delete({ where: { id } });
-  revalidatePath("/transitos/vehicles");
-  revalidatePath("/transitos/drivers");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/vehicles"));
 }
 
@@ -360,8 +336,6 @@ export async function createProject(formData: FormData) {
       ownerUsers: ownerUserIds.length ? { connect: ownerUserIds.map((id) => ({ id })) } : undefined
     }
   });
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -377,15 +351,11 @@ export async function updateProject(formData: FormData) {
       ownerUsers: { set: ownerUserIds.map((id) => ({ id })) }
     }
   });
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, `/transitos/projects?project=${text(formData, "id")}`));
 }
 
 export async function deleteProject(formData: FormData) {
   await prisma.project.delete({ where: { id: text(formData, "id") } });
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -403,8 +373,6 @@ export async function createRoute(formData: FormData) {
       defaultClientPricePerService: 0
     }
   });
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/routes");
   redirect(returnTo(formData, `/transitos/projects?project=${optionalId(formData, "projectId") ?? ""}&route=${route.id}`));
 }
 
@@ -421,17 +389,11 @@ export async function updateRoute(formData: FormData) {
       standardWorkDays: 0
     }
   });
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/routes");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
   redirect(returnTo(formData, `/transitos/projects?route=${routeId}`));
 }
 
 export async function deleteRoute(formData: FormData) {
   await prisma.serviceRoute.delete({ where: { id: text(formData, "id") } });
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/routes");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -459,10 +421,6 @@ export async function createAssignment(formData: FormData) {
       monthKey: monthKey(serviceDate)
     }
   });
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, `/transitos/projects?project=${optionalId(formData, "projectId") ?? ""}&route=${text(formData, "routeId")}`));
 }
 
@@ -490,11 +448,6 @@ export async function updateAssignment(formData: FormData) {
       monthKey: monthKey(serviceDate)
     }
   });
-
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, `/transitos/projects?project=${optionalId(formData, "projectId") ?? ""}&route=${routeId}`));
 }
 
@@ -543,11 +496,6 @@ export async function createBulkAssignments(formData: FormData) {
   if (records.length) {
     await prisma.serviceAssignment.createMany({ data: records });
   }
-
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, `/transitos/projects?project=${text(formData, "projectId")}&route=${text(formData, "routeId")}`));
 }
 
@@ -627,11 +575,6 @@ export async function updateAssignmentGroup(formData: FormData) {
       }
     }
   });
-
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, fallbackUrl));
 }
 
@@ -643,11 +586,6 @@ export async function deleteAssignmentGroup(formData: FormData) {
       where: { id: { in: assignmentIds } }
     });
   }
-
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -682,12 +620,6 @@ export async function createOneOffJob(formData: FormData) {
       monthKey: monthKey(serviceDate)
     }
   });
-
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/routes");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -727,31 +659,16 @@ export async function updateOneOffJob(formData: FormData) {
       }
     });
   }
-
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/routes");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function deleteOneOffJob(formData: FormData) {
   await prisma.serviceRoute.delete({ where: { id: text(formData, "routeId") } });
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/routes");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function deleteAssignment(formData: FormData) {
   await prisma.serviceAssignment.delete({ where: { id: text(formData, "id") } });
-  revalidatePath("/transitos/projects");
-  revalidatePath("/transitos/calendar");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -850,10 +767,6 @@ export async function issueSubcontractorEarningDocument(formData: FormData) {
       }
     }
   });
-
-  revalidatePath("/transitos/finance");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, `/transitos/finance?month=${period.monthKey}`));
 }
 
@@ -926,10 +839,6 @@ export async function issueProjectInvoiceDocument(formData: FormData) {
       }
     }
   });
-
-  revalidatePath("/transitos/finance");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, `/transitos/finance?month=${period.monthKey}`));
 }
 
@@ -945,10 +854,6 @@ export async function cancelSubcontractorEarningDocument(formData: FormData) {
       type: FinancialDocumentType.SUBCONTRACTOR_EARNING
     }
   });
-
-  revalidatePath("/transitos/finance");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/finance"));
 }
 
@@ -964,10 +869,6 @@ export async function cancelProjectInvoiceDocument(formData: FormData) {
       type: FinancialDocumentType.PROJECT_INVOICE
     }
   });
-
-  revalidatePath("/transitos/finance");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/finance"));
 }
 
@@ -986,9 +887,6 @@ export async function createExpense(formData: FormData) {
       notes: optional(formData, "notes")
     }
   });
-  revalidatePath("/transitos/expenses");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/expenses"));
 }
 
@@ -1008,17 +906,11 @@ export async function updateExpense(formData: FormData) {
       notes: optional(formData, "notes")
     }
   });
-  revalidatePath("/transitos/expenses");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/expenses"));
 }
 
 export async function deleteExpense(formData: FormData) {
   await prisma.expense.delete({ where: { id: text(formData, "id") } });
-  revalidatePath("/transitos/expenses");
-  revalidatePath("/transitos/earnings");
-  revalidatePath("/transitos/dashboard");
   redirect(returnTo(formData, "/transitos/expenses"));
 }
 
@@ -1035,15 +927,11 @@ export async function createDriverDocument(formData: FormData) {
       fileUrl
     }
   });
-  revalidatePath("/transitos/drivers");
-  revalidatePath("/transitos/vehicles");
   redirect(returnTo(formData, "/transitos/drivers"));
 }
 
 export async function deleteDriverDocument(formData: FormData) {
   await prisma.driverDocument.delete({ where: { id: text(formData, "id") } });
-  revalidatePath("/transitos/drivers");
-  revalidatePath("/transitos/vehicles");
   redirect(returnTo(formData, "/transitos/drivers"));
 }
 
@@ -1136,9 +1024,6 @@ export async function submitVehicleSurvey(formData: FormData) {
     }
     throw error;
   }
-
-  revalidatePath("/transitos/surveys");
-  revalidatePath("/transitos/vehicles");
   redirectSurvey(vehicleId, "thanks");
 }
 
@@ -1151,9 +1036,6 @@ export async function deleteVehicleSurveyResponse(formData: FormData) {
   await prisma.vehicleSurveyResponse.delete({
     where: { id: text(formData, "id") }
   });
-
-  revalidatePath("/transitos/surveys");
-  revalidatePath("/surveys");
   redirect(returnTo(formData, "/transitos/surveys"));
 }
 
@@ -1167,12 +1049,10 @@ export async function createStop(formData: FormData) {
       order: numberValue(formData, "order")
     }
   });
-  revalidatePath("/transitos/routes");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function deleteStop(formData: FormData) {
   await prisma.routeStop.delete({ where: { id: text(formData, "id") } });
-  revalidatePath("/transitos/routes");
   redirect(returnTo(formData, "/transitos/projects"));
 }

@@ -17,9 +17,9 @@ import {
   UsersRound
 } from "lucide-react";
 import { readSessionToken } from "@/lib/auth";
-import { getMarketTickerItems } from "@/lib/market-data";
 import { roleTitle } from "@/lib/permissions";
-import { ExpandableProfileCard, SkiperTickerRail } from "@/app/components/RegistryInterfaceKit";
+import { ExpandableProfileCard } from "@/app/components/RegistryInterfaceKit";
+import { MarketTicker } from "@/app/components/MarketTicker";
 import { LogoutButton } from "@/app/components/LogoutButton";
 export { ModalAction } from "@/app/components/ModalAction";
 
@@ -57,12 +57,12 @@ export async function AppShell({
   const displayName = user?.displayName ?? "Şeflek Tur";
   const currentRoleTitle = roleTitle(user?.role);
   const activePath = active.replace(/^\/transitos/, "");
-  const tickerItems = await getMarketTickerItems([
+  const tickerItems = [
     "USD/TL: güncel veri bekleniyor",
     "EUR/TL: güncel veri bekleniyor",
     "Motorin İstanbul Avrupa: güncel veri bekleniyor",
     "Benzin İstanbul Avrupa: güncel veri bekleniyor"
-  ]);
+  ];
   const visibleNavItems = navItems
     .filter((item) => isNavVisible(item.label, user?.role))
     .map((item) => user?.role === "PROJECT_OWNER" && item.label === "Hakedişler" ? { ...item, label: "Faturalar" } : item);
@@ -151,9 +151,7 @@ export async function AppShell({
           </div>
         </div>
         {children}
-        <div className="transitos-rate-ticker" aria-label="Döviz ve akaryakıt bilgi bandı">
-          <SkiperTickerRail items={tickerItems} />
-        </div>
+        <MarketTicker className="transitos-rate-ticker" fallbackItems={tickerItems} />
       </section>
     </main>
   );

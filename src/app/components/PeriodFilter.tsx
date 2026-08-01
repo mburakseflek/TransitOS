@@ -29,10 +29,12 @@ const rangeOptions = [
 
 export function PeriodFilter({
   searchParams,
-  hidden = {}
+  hidden = {},
+  monthlyOnly = false
 }: {
   searchParams?: PeriodSearchParams | null;
   hidden?: Record<string, string | undefined | null>;
+  monthlyOnly?: boolean;
 }) {
   const period = parsePeriod(searchParams);
   const hiddenEntries = Object.entries(hidden).filter(([, value]) => Boolean(value));
@@ -40,7 +42,7 @@ export function PeriodFilter({
   const initialMonth = Number(period.month.slice(5, 7)) - 1;
   const [selectedYear, setSelectedYear] = useState(initialYear);
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(initialMonth);
-  const [selectedRange, setSelectedRange] = useState(String(period.range));
+  const [selectedRange, setSelectedRange] = useState(monthlyOnly ? "1" : String(period.range));
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [popoverPosition, setPopoverPosition] = useState({ left: 16, top: 80 });
@@ -135,7 +137,7 @@ export function PeriodFilter({
           </button>
         ))}
       </div>
-      <div className="period-range-group" aria-label="Rapor kapsamı">
+      {!monthlyOnly ? <div className="period-range-group" aria-label="Rapor kapsamı">
         <span>Kapsam</span>
         <div>
           {rangeOptions.map((option) => (
@@ -150,7 +152,7 @@ export function PeriodFilter({
             </button>
           ))}
         </div>
-      </div>
+      </div> : null}
       <button className="primary period-apply-button" type="button" onClick={() => setOpen(false)}>
         Dönemi kullan
       </button>
@@ -163,7 +165,7 @@ export function PeriodFilter({
         <input key={key} type="hidden" name={key} value={value ?? ""} />
       ))}
       <input type="hidden" name="month" value={selectedMonthValue} />
-      <input type="hidden" name="range" value={selectedRange} />
+      <input type="hidden" name="range" value={monthlyOnly ? "1" : selectedRange} />
       <div className="period-picker-field">
         <span>Dönem</span>
         <button

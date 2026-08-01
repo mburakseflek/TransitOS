@@ -68,7 +68,7 @@ export default async function EarningsPage({
 
     return (
       <AppShell active="/transitos/earnings" title="Hakedişler" subtitle="Taşeron hakedişlerini dönem bazlı oluşturun, iptal edin ve yeniden düzenleyin.">
-        <PeriodFilter searchParams={params} />
+        <PeriodFilter searchParams={params} monthlyOnly />
         <section className="grid">
           <Metric title="Kesilmiş Hakediş" value={formatTRY(issuedTotal)} tone="green" />
           <Metric title="Kesilmeyi Bekleyen" value={formatTRY(pendingTotal)} tone="yellow" />
@@ -216,7 +216,7 @@ export default async function EarningsPage({
 
     return (
       <AppShell active="/transitos/earnings" title="Faturalar" subtitle="Yalnızca Şeflek Tur tarafından kesilmiş proje faturaları görüntülenir.">
-        <PeriodFilter searchParams={params} />
+        <PeriodFilter searchParams={params} monthlyOnly />
         <section className="stack">
           {documents.map((document) => (
             <DocumentCard key={document.id} document={document} title="Proje Fatura Belgesi" owner={`${document.project?.clientCompany ?? "-"} · ${document.project?.name ?? "-"}`} />
@@ -259,7 +259,7 @@ export default async function EarningsPage({
 
     return (
       <AppShell active="/transitos/earnings" title="Hakedişler" subtitle="Yalnızca Şeflek Tur tarafından kesilmiş hakediş belgeleri görüntülenir.">
-        <PeriodFilter searchParams={params} />
+        <PeriodFilter searchParams={params} monthlyOnly />
         <section className="stack">
           {documents.map((document) => (
             <DocumentCard key={document.id} document={document} title="Taşıyıcı Hakediş Belgesi" owner={document.subcontractor?.companyName ?? "Taşeron"} />

@@ -6,7 +6,7 @@ type MarketItem = {
 
 const tcmbTodayUrl = "https://www.tcmb.gov.tr/kurlar/today.xml";
 const petrolOfisiUrl = "https://www.petrolofisi.com.tr/akaryakit-fiyatlari";
-const marketFetchTimeoutMs = 1200;
+const marketFetchTimeoutMs = 5000;
 const marketCacheMs = 10 * 60 * 1000;
 
 let tickerCache: { items: string[]; expiresAt: number } | null = null;
@@ -65,12 +65,27 @@ async function fetchExchangeItems(): Promise<MarketItem[]> {
   ].filter(Boolean) as MarketItem[];
 }
 
-function extractFuelPrice(html: string, fuel: "benzin" | "mazot" | "LPG") {
+function extractLegacyFuelPrice(html: string, fuel: "benzin" | "mazot" | "LPG") {
   const normalized = html.replace(/\s+/g, " ");
   const pattern = fuel === "LPG"
     ? /İstanbul Avrupa'da bugünkü güncel LPG litre fiyatı ([\d.,]+) TL/i
     : new RegExp(`İstanbul Avrupa'da bugünkü güncel ${fuel} litre fiyatı ([\\d.,]+) TL`, "i");
   return normalized.match(pattern)?.[1];
+}
+
+function extractIstanbulEuropeFuelPrices(html: string) {
+  const normalized = html
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ");
+  const row = normalized.match(/ISTANBUL\s*\(AVRUPA\)([\s\S]{0,500})/i)?.[1] ?? "";
+  const prices = Array.from(row.matchAll(/(\d{1,3}[.,]\d{2})/g), (match) => match[1]);
+
+  return {
+    gasoline: prices[0] ?? extractLegacyFuelPrice(html, "benzin"),
+    diesel: prices[2] ?? extractLegacyFuelPrice(html, "mazot"),
+    lpg: prices[10] ?? extractLegacyFuelPrice(html, "LPG")
+  };
 }
 
 async function fetchFuelItems(): Promise<MarketItem[]> {
@@ -84,9 +99,7 @@ async function fetchFuelItems(): Promise<MarketItem[]> {
   }
 
   const html = await response.text();
-  const gasoline = extractFuelPrice(html, "benzin");
-  const diesel = extractFuelPrice(html, "mazot");
-  const lpg = extractFuelPrice(html, "LPG");
+  const { gasoline, diesel, lpg } = extractIstanbulEuropeFuelPrices(html);
 
   return [
     gasoline ? { label: "Benzin İstanbul Avrupa", value: `₺${formatTRY(gasoline)}`, source: "Petrol Ofisi" } : null,
@@ -110,11 +123,15 @@ async function loadMarketTickerItems(fallbackItems: string[]) {
     ...(fuelResult.status === "fulfilled" ? fuelResult.value : [])
   ];
 
-  if (!items.length) {
-    return fallbackItems;
-  }
+  const liveItems = items.map((item) => `${item.label}: ${item.value} (${item.source})`);
+  if (!liveItems.length) return fallbackItems;
 
-  return items.map((item) => `${item.label}: ${item.value} (${item.source})`);
+  const liveLabels = new Set(items.map((item) => item.label.split(" ")[0].toLocaleLowerCase("tr-TR")));
+  const missingFallbacks = fallbackItems.filter((item) => {
+    const label = item.split(":")[0].split(" ")[0].toLocaleLowerCase("tr-TR");
+    return !liveLabels.has(label);
+  });
+  return [...liveItems, ...missingFallbacks];
 }
 
 export async function getMarketTickerItems(fallbackItems: string[]) {

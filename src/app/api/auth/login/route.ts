@@ -23,7 +23,8 @@ export async function POST(request: Request) {
     return loginFailure(request, isFormSubmit, "Eksik bilgi.");
   }
 
-  const { role, loginId, password, next } = body.data;
+  const { role, password, next } = body.data;
+  const loginId = body.data.loginId.trim();
   const adminId = process.env.ADMIN_LOGIN_ID ?? "admin";
   const adminPassword = process.env.ADMIN_PASSWORD ?? "";
   const successPath = safeNextPath(next);
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
   if (role === "MANAGER") {
     const isBuiltInAdmin = adminPassword.length > 0 && loginId.trim().toLowerCase() === adminId.toLowerCase() && password === adminPassword;
     if (!isBuiltInAdmin) {
-      const manager = await prisma.user.findUnique({ where: { loginId: loginId.trim() } });
+      const manager = await findUserByLoginId(loginId);
       const managerPasswordMatches = manager ? await bcrypt.compare(password, manager.passwordHash) : false;
       if (!manager || manager.role !== "MANAGER" || !managerPasswordMatches) {
         return loginFailure(request, isFormSubmit, "Giriş bilgileri hatalı.", next);
@@ -71,10 +72,7 @@ export async function POST(request: Request) {
     return loginSuccess(request, isFormSubmit, successPath);
   }
 
-  const user = await prisma.user.findUnique({
-    where: { loginId: loginId.trim() },
-    include: { subcontractor: true, serviceProjects: true, ownerProjects: true }
-  });
+  const user = await findUserByLoginId(loginId);
 
   if (!user || user.role !== role) {
     return loginFailure(request, isFormSubmit, "Giriş bilgileri hatalı.", next);
@@ -112,21 +110,37 @@ export async function POST(request: Request) {
   return loginSuccess(request, isFormSubmit, successPath);
 }
 
+async function findUserByLoginId(loginId: string) {
+  return prisma.user.findFirst({
+    where: { loginId: { equals: loginId, mode: "insensitive" } },
+    include: { subcontractor: true, serviceProjects: true, ownerProjects: true }
+  });
+}
+
 function safeNextPath(next?: string) {
   return next && next.startsWith("/") && !next.startsWith("//") ? next : "/transitos/dashboard";
 }
 
 function loginSuccess(request: Request, isFormSubmit: boolean, next: string) {
   if (!isFormSubmit) return NextResponse.json({ ok: true });
-  return NextResponse.redirect(new URL(next, request.url), { status: 303 });
+  return NextResponse.redirect(redirectUrl(request, next), { status: 303 });
 }
 
 function loginFailure(request: Request, isFormSubmit: boolean, message: string, next?: string) {
   if (!isFormSubmit) {
     return NextResponse.json({ message }, { status: message === "Eksik bilgi." ? 400 : 401 });
   }
-  const url = new URL("/login", request.url);
+  const url = redirectUrl(request, "/login");
   url.searchParams.set("error", message);
   url.searchParams.set("next", safeNextPath(next));
   return NextResponse.redirect(url, { status: 303 });
+}
+
+function redirectUrl(request: Request, path: string) {
+  const requestUrl = new URL(request.url);
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const host = forwardedHost || request.headers.get("host") || requestUrl.host;
+  const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const protocol = forwardedProtocol || requestUrl.protocol.replace(":", "");
+  return new URL(path, `${protocol}://${host}`);
 }

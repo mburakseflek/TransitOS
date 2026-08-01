@@ -28,6 +28,7 @@ import {
 import { prisma } from "@/lib/db";
 import { serviceDirectionTitle } from "@/lib/labels";
 import { MonthCalendarSelector } from "@/app/components/MonthCalendarSelector";
+import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { readSessionToken } from "@/lib/auth";
 import { formatTRY } from "@/lib/format";
 import { parsePeriod, periodDateWhere } from "@/lib/period";
@@ -92,6 +93,7 @@ export default async function ProjectsPage({
 
   return (
     <AppShell active="/transitos/projects" title="Projeler" subtitle="Proje şirketi, güzergahlar, araç planları ve bağımsız tek seferlik işler.">
+      <PeriodFilter searchParams={params} hidden={{ project: initialProjectId, route: initialRouteId }} monthlyOnly />
       <div className="toolbar">
         {canEdit ? <QuickCreateCard title="Proje" body="Şirket, sahibi ve güzergah yapısını ekleyin.">
           <ModalAction label="Proje Ekle" title="Proje Ekle">

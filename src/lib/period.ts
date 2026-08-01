@@ -34,7 +34,9 @@ export function periodDateWhere(period: ReturnType<typeof parsePeriod>) {
 }
 
 function validMonth(value?: string) {
-  return Boolean(value && /^\d{4}-\d{2}$/.test(value));
+  if (!value || !/^\d{4}-\d{2}$/.test(value)) return false;
+  const month = Number(value.slice(5, 7));
+  return month >= 1 && month <= 12;
 }
 
 function parseRange(value?: string): PeriodRange {

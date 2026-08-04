@@ -70,7 +70,14 @@ export function RouteLoadingOverlay() {
       style={{ "--loader-progress": progress / 100 } as CSSProperties}
       aria-hidden={!visible}
     >
-      <img src="/brand/transitos-service-vehicle.png" alt="" />
+      <div className="route-loader-card" role="status" aria-live="polite">
+        <img src="/brand/seflek-logo-navy.png" alt="" />
+        <div>
+          <strong>TransitOS hazırlanıyor</strong>
+          <span>İşleminiz güvenle tamamlanıyor.</span>
+        </div>
+        <i aria-hidden="true" />
+      </div>
     </div>
   );
 }

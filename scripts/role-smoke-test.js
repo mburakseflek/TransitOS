@@ -171,6 +171,21 @@ async function main() {
       monthKey: month
     }
   });
+  await prisma.serviceAssignment.create({
+    data: {
+      projectId: projectA.id,
+      routeId: routeA.id,
+      vehicleId: vehicleB.id,
+      serviceDate: now,
+      serviceTime: now,
+      direction: "EVENING",
+      serviceCount: 1,
+      kilometers: 0,
+      pricePerService: 900,
+      clientPricePerService: 1300,
+      monthKey: month
+    }
+  });
 
   await prisma.expense.create({
     data: {
@@ -266,6 +281,19 @@ async function main() {
   ok("Taseron sadece kendi aracini gorur", subVehicles.length === 1 && subVehicles[0].id === vehicleA.id);
   ok("Taseron sadece kendi servislerini gorur", subAssignments.length === 1 && subAssignments[0].vehicleId === vehicleA.id);
   ok("Taseron sadece kesilmis hakedis belgesini gorur", subDocs.length === 1);
+  const scopedSubcontractorProjects = await prisma.project.findMany({
+    where: { assignments: { some: { vehicle: { subcontractorId: subcontractorA.id } } }, name: { startsWith: prefix } },
+    include: {
+      routes: {
+        where: { assignments: { some: { vehicle: { subcontractorId: subcontractorA.id } } } },
+        include: { assignments: { where: { vehicle: { subcontractorId: subcontractorA.id } } } }
+      }
+    }
+  });
+  ok(
+    "Ayni projede diger taseronun servisi gizlenir",
+    scopedSubcontractorProjects.flatMap((project) => project.routes).flatMap((route) => route.assignments).every((assignment) => assignment.vehicleId === vehicleA.id)
+  );
 
   const ownerProjects = await prisma.project.findMany({
     where: { ownerUsers: { some: { id: projectOwner.id } }, name: { startsWith: prefix } }
@@ -277,7 +305,7 @@ async function main() {
     where: { type: "PROJECT_INVOICE", project: { ownerUsers: { some: { id: projectOwner.id } } }, notes: prefix }
   });
   ok("Proje sahibi sadece kendi projesini gorur", ownerProjects.length === 1 && ownerProjects[0].id === projectA.id);
-  ok("Proje sahibi tahsisli araci gorur", ownerVehicles.length === 1 && ownerVehicles[0].id === vehicleA.id);
+  ok("Proje sahibi projesine tahsisli araclari gorur", ownerVehicles.length === 2);
   ok("Proje sahibi proje faturasini gorur", ownerDocs.length === 1);
 
   const failed = checks.filter((item) => !item.ok);

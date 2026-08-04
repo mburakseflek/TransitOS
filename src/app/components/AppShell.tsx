@@ -6,6 +6,7 @@ import {
   Bus,
   CalendarDays,
   ChartNoAxesCombined,
+  CircleHelp,
   ClipboardCheck,
   FolderKanban,
   Gauge,
@@ -67,9 +68,10 @@ export async function AppShell({
     .filter((item) => isNavVisible(item.label, user?.role))
     .map((item) => user?.role === "PROJECT_OWNER" && item.label === "Hakedişler" ? { ...item, label: "Faturalar" } : item);
   const activeNavLabel = visibleNavItems.find((item) => item.path === activePath)?.label ?? "Menü";
+  const guide = roleGuide(user.role);
 
   return (
-    <main className="shell transitos-shell">
+    <main className="shell transitos-shell" data-user-role={user.role}>
       <input className="mobile-drawer-check" id="transitos-mobile-drawer" type="checkbox" aria-hidden="true" />
       <div className="transitos-mobile-chrome" aria-label="TransitOS mobil hızlı menü">
         <Link className="transitos-mobile-logo" href="/transitos/dashboard" aria-label="TransitOS ana panele dön">
@@ -150,11 +152,46 @@ export async function AppShell({
             </ExpandableProfileCard>
           </div>
         </div>
+        <section className="role-guide-card" aria-label="Bu ekranda ne yapabilirsiniz?">
+          <CircleHelp size={20} aria-hidden="true" />
+          <div>
+            <strong>{guide.title}</strong>
+            <span>{guide.body}</span>
+          </div>
+          <Link href={guide.href as never}>{guide.action}</Link>
+        </section>
         {children}
         <MarketTicker fallbackItems={tickerItems} placement="app" />
       </section>
     </main>
   );
+}
+
+function roleGuide(role: string) {
+  if (role === "SUBCONTRACTOR") return {
+    title: "Size ait operasyon alanı",
+    body: "Yalnız firmanızın araçları, taşıdığı servisler, güzergahlar ve hakedişleri gösterilir.",
+    href: "/transitos/projects",
+    action: "Servislerimi gör"
+  };
+  if (role === "PROJECT_OWNER") return {
+    title: "Proje sahibi görünümü",
+    body: "Yalnız sahibi olduğunuz projeler, servis planları, araçlar ve faturalar gösterilir.",
+    href: "/transitos/projects",
+    action: "Projelerimi gör"
+  };
+  if (role === "SERVICE_SUPERVISOR") return {
+    title: "Operasyon çalışma alanı",
+    body: "Size atanan projelerin servis, araç ve güzergah işlemlerini buradan yönetebilirsiniz.",
+    href: "/transitos/projects",
+    action: "Operasyona git"
+  };
+  return {
+    title: "Yönetici çalışma alanı",
+    body: "Önce projeyi seçin, ardından güzergah ve servis işlemlerini adım adım tamamlayın.",
+    href: "/transitos/projects",
+    action: "Projeleri yönet"
+  };
 }
 
 function isNavVisible(label: string, role?: string) {
@@ -179,6 +216,29 @@ export function Field({ label, hint, children }: { label: string; hint: string; 
       </span>
       {children}
     </label>
+  );
+}
+
+export function FormSection({
+  title,
+  description,
+  children,
+  optional = false
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  optional?: boolean;
+}) {
+  return (
+    <fieldset className="form-flow-section">
+      <legend>
+        <strong>{title}</strong>
+        {optional ? <span>İsteğe bağlı</span> : null}
+      </legend>
+      <p>{description}</p>
+      <div className="form-flow-fields">{children}</div>
+    </fieldset>
   );
 }
 

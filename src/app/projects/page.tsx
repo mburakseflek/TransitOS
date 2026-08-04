@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { ChevronDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
+import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import {
   AdaptiveSlider,
   FloatingInput,
@@ -32,7 +32,7 @@ import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { readSessionToken } from "@/lib/auth";
 import { formatTRY } from "@/lib/format";
 import { parsePeriod, periodDateWhere } from "@/lib/period";
-import { canEditOperations, projectAccessWhere, routeAccessWhere, vehicleAccessWhere } from "@/lib/permissions";
+import { assignmentAccessWhere, canEditOperations, isProjectOwner, isSubcontractor, projectAccessWhere, routeAccessWhere, vehicleAccessWhere } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -55,9 +55,10 @@ export default async function ProjectsPage({
       include: {
         ownerUsers: { select: { id: true, displayName: true, loginId: true } },
         routes: {
+          where: routeAccessWhere(user),
           include: {
             assignments: {
-              where: { serviceDate: periodDateWhere(period) },
+              where: { AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)] },
               include: { vehicle: true },
               orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
             }
@@ -72,17 +73,17 @@ export default async function ProjectsPage({
       where: { AND: [{ projectId: null }, routeAccessWhere(user)] },
       include: {
         assignments: {
-          where: { serviceDate: periodDateWhere(period) },
+          where: { AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)] },
           include: { vehicle: true }
         }
       },
       orderBy: { createdAt: "desc" }
     }),
-    prisma.user.findMany({
+    canEdit ? prisma.user.findMany({
       where: { role: "PROJECT_OWNER" },
       select: { id: true, displayName: true, loginId: true },
       orderBy: { displayName: "asc" }
-    })
+    }) : Promise.resolve([])
   ]);
   const requestedProjectId = params?.project ?? null;
   const initialProjectId = projects.some((project) => project.id === requestedProjectId)
@@ -91,7 +92,15 @@ export default async function ProjectsPage({
   const initialRouteId = params?.route ?? null;
 
   return (
-    <AppShell active="/transitos/projects" title="Projeler" subtitle="Proje şirketi, güzergahlar, araç planları ve bağımsız tek seferlik işler.">
+    <AppShell
+      active="/transitos/projects"
+      title={isSubcontractor(user) ? "Servis Projelerim" : isProjectOwner(user) ? "Projelerim" : "Projeler"}
+      subtitle={isSubcontractor(user)
+        ? "Yalnızca firmanızın araçlarıyla taşıdığı servisler ve güzergahlar gösterilir."
+        : isProjectOwner(user)
+          ? "Yalnızca sahibi olduğunuz projeler, güzergahlar ve servis planları gösterilir."
+          : "Proje şirketi, güzergahlar, araç planları ve bağımsız tek seferlik işler."}
+    >
       <PeriodFilter searchParams={params} hidden={{ project: initialProjectId, route: initialRouteId }} monthlyOnly />
       <div className="toolbar">
         {canEdit ? <QuickCreateCard title="Proje" body="Şirket, sahibi ve güzergah yapısını ekleyin.">
@@ -513,49 +522,47 @@ function ProjectFields({ project, projectOwners }: { project?: any; projectOwner
   const selectedOwnerIds = new Set((project?.ownerUsers ?? []).map((item: any) => item.id));
   return (
     <>
-      <Field label="Proje adı" hint="İç takipte görünen ad."><input name="name" defaultValue={project?.name ?? ""} required /></Field>
-      <Field label="Proje şirketi" hint="Hizmet verilen şirket."><input name="clientCompany" defaultValue={project?.clientCompany ?? ""} required /></Field>
-      <Field label="Personel" hint="Taşınacak toplam personel."><input name="personnelCount" type="number" defaultValue={project?.personnelCount ?? 0} /></Field>
-      <Field label="Durum" hint="Planlama, aktif veya tamamlandı.">
-        <select name="status" defaultValue={project?.status ?? "PLANNING"}>
-          <option value="PLANNING">Planlama</option>
-          <option value="ACTIVE">Aktif</option>
-          <option value="COMPLETED">Tamamlandı</option>
-          <option value="PASSIVE">Pasif</option>
-        </select>
-      </Field>
-      <Field label="Proje sahibi" hint="Bu kişiler sadece kendi proje/fatura detaylarını görür.">
-        <div className="checkbox-grid">
-          {projectOwners.map((owner) => (
-            <label key={owner.id}>
-              <input type="checkbox" name="ownerUserIds" value={owner.id} defaultChecked={selectedOwnerIds.has(owner.id)} />
-              <span>{owner.displayName}<small>{owner.loginId}</small></span>
-            </label>
-          ))}
-          {projectOwners.length === 0 ? <small className="muted">Önce Ayarlar panelinden Proje Sahibi kullanıcısı ekleyin.</small> : null}
-        </div>
-      </Field>
+      <FormSection title="Proje bilgileri" description="Önce projeyi tanımlayan temel bilgileri girin.">
+        <Field label="Proje adı" hint="İç takipte görünen ad."><input name="name" defaultValue={project?.name ?? ""} required /></Field>
+        <Field label="Proje şirketi" hint="Hizmet verilen şirket."><input name="clientCompany" defaultValue={project?.clientCompany ?? ""} required /></Field>
+        <Field label="Personel" hint="Taşınacak toplam personel."><input name="personnelCount" type="number" defaultValue={project?.personnelCount ?? 0} /></Field>
+        <Field label="Durum" hint="Planlama, aktif veya tamamlandı.">
+          <select name="status" defaultValue={project?.status ?? "PLANNING"}>
+            <option value="PLANNING">Planlama</option><option value="ACTIVE">Aktif</option><option value="COMPLETED">Tamamlandı</option><option value="PASSIVE">Pasif</option>
+          </select>
+        </Field>
+      </FormSection>
+      <FormSection title="Görüntüleme yetkisi" description="Projeyi görebilecek proje sahibi kullanıcılarını seçin." optional>
+        <Field label="Proje sahibi" hint="Seçilen kişiler yalnız kendi proje ve fatura detaylarını görür.">
+          <div className="checkbox-grid">
+            {projectOwners.map((owner) => (
+              <label key={owner.id}><input type="checkbox" name="ownerUserIds" value={owner.id} defaultChecked={selectedOwnerIds.has(owner.id)} /><span>{owner.displayName}<small>{owner.loginId}</small></span></label>
+            ))}
+            {projectOwners.length === 0 ? <small className="muted">Önce Ayarlar panelinden Proje Sahibi kullanıcısı ekleyin.</small> : null}
+          </div>
+        </Field>
+      </FormSection>
     </>
   );
 }
 
 function RouteFields({ route }: { route?: any }) {
   return (
-    <>
+    <FormSection title="Güzergah bilgileri" description="Servisin nereden başlayıp nerede biteceğini tanımlayın.">
       <Field label="Güzergah adı" hint="Kartlarda ve raporlarda görünen ad."><input name="name" defaultValue={route?.name ?? ""} required /></Field>
       <Field label="Başlangıç" hint="Çıkış noktası."><input name="startPoint" defaultValue={route?.startPoint ?? ""} required /></Field>
       <Field label="Bitiş" hint="Varış noktası."><input name="endPoint" defaultValue={route?.endPoint ?? ""} required /></Field>
-    </>
+    </FormSection>
   );
 }
 
 function AssignmentFields({ vehicles, defaultDate }: { vehicles: { id: string; fleetNumber: string; plateNumber: string }[]; defaultDate: string }) {
   return (
     <>
-      <Field label="Aylık tablo" hint="Uygulamadaki gibi ay içinden tek gün seçin.">
-        <MonthCalendarSelector name="serviceDate" mode="single" defaultDate={defaultDate} />
-      </Field>
-      <Field label="Saat" hint="Timeline’da görünecek saat."><input name="serviceTime" type="time" defaultValue="07:30" required /></Field>
+      <FormSection title="Tarih ve saat" description="Servisin yapılacağı günü ve başlangıç saatini seçin.">
+        <Field label="Gün" hint="Cihazınızın tarih seçicisi açılır."><input name="serviceDate" type="date" defaultValue={defaultDate} required /></Field>
+        <Field label="Saat" hint="Cihazınızın saat seçicisi açılır."><input name="serviceTime" type="time" defaultValue="07:30" required /></Field>
+      </FormSection>
       <AssignmentOptions vehicles={vehicles} />
     </>
   );
@@ -563,11 +570,7 @@ function AssignmentFields({ vehicles, defaultDate }: { vehicles: { id: string; f
 
 function AssignmentOptions({ vehicles }: { vehicles: { id: string; fleetNumber: string; plateNumber: string }[] }) {
   return (
-    <>
-      <div className="pricing-note">
-        <strong>Ücret bu servis kaydında belirlenir.</strong>
-        <span>Her servis kendi taşıyıcı hakedişini ve proje sahibi fatura tutarını saklar.</span>
-      </div>
+    <FormSection title="Servis ayrıntıları" description="Araç, servis türü ve ücret bilgilerini tamamlayın.">
       <Field label="Araç" hint="Bu servise gidecek araç.">
         <select name="vehicleId" required>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.fleetNumber} · {vehicle.plateNumber}</option>)}</select>
       </Field>
@@ -577,7 +580,7 @@ function AssignmentOptions({ vehicles }: { vehicles: { id: string; fleetNumber: 
       <Field label="Servis adedi" hint="O gün yapılacak servis sayısı."><AdaptiveSlider name="serviceCount" label="Servis sayısı" min={1} max={20} defaultValue={1} helper="Tek servis için 1, aynı gün tekrar için artırın." /></Field>
       <Field label="Taşıyıcı hakedişi" hint="Bu servisin taşeron servis başı TL tutarı."><FloatingInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue="0" inputMode="decimal" /></Field>
       <Field label="Proje fatura tutarı" hint="Bu servisin proje sahibine servis başı TL tutarı."><FloatingInput name="clientPricePerService" label="₺ Proje servis başı" defaultValue="0" inputMode="decimal" /></Field>
-    </>
+    </FormSection>
   );
 }
 

@@ -1,6 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { ExternalLink, Pencil, QrCode, Trash2 } from "lucide-react";
-import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
+import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { ExpandableProfileCard, InlineDisclosureMenu, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { createVehicle, deleteVehicle, updateVehicle } from "@/app/actions";
@@ -51,7 +51,7 @@ export default async function VehiclesPage({
       },
       orderBy: { fleetNumber: "asc" }
     }),
-    prisma.subcontractor.findMany({ orderBy: { companyName: "asc" } })
+    canEdit ? prisma.subcontractor.findMany({ orderBy: { companyName: "asc" } }) : Promise.resolve([])
   ]);
 
   return (
@@ -276,27 +276,22 @@ function groupVehicleAssignments(assignments: any[]) {
 function VehicleFields({ vehicle, subcontractors }: { vehicle?: any; subcontractors: { id: string; companyName: string }[] }) {
   return (
     <>
-      <Field label="Araç kodu" hint="Filoda görünen kısa kod."><input name="fleetNumber" defaultValue={vehicle?.fleetNumber ?? ""} required /></Field>
-      <Field label="Plaka" hint="Resmi araç plakası."><input name="plateNumber" defaultValue={vehicle?.plateNumber ?? ""} required /></Field>
-      <Field label="Taşeron" hint="Aracın bağlı olduğu taşeron.">
-        <select name="subcontractorId" defaultValue={vehicle?.subcontractorId ?? ""}>
-          <option value="">Atanmamış</option>
-          {subcontractors.map((item) => <option key={item.id} value={item.id}>{item.companyName}</option>)}
-        </select>
-      </Field>
-      <Field label="Marka" hint="Araç markası."><input name="make" defaultValue={vehicle?.make ?? ""} /></Field>
-      <Field label="Model" hint="Araç modeli."><input name="model" defaultValue={vehicle?.model ?? ""} /></Field>
-      <Field label="Model yılı" hint="Örn. 2024."><input name="modelYear" defaultValue={vehicle?.modelYear ?? ""} /></Field>
-      <Field label="Kapasite" hint="Koltuk/personel kapasitesi."><input name="capacity" type="number" defaultValue={vehicle?.capacity ?? 0} /></Field>
-      <Field label="Durum" hint="Aktif, pasif veya bakımda.">
-        <select name="status" defaultValue={vehicle?.status ?? "ACTIVE"}>
-          <option value="ACTIVE">Aktif</option>
-          <option value="PASSIVE">Pasif</option>
-          <option value="MAINTENANCE">Bakımda</option>
-        </select>
-      </Field>
-      <Field label="Şoför" hint="Ad soyad."><input name="driverName" defaultValue={vehicle?.driverName ?? ""} /></Field>
-      <Field label="Şoför telefon" hint="+90 formatında saklanır."><input name="driverPhone" defaultValue={vehicle?.driverPhone ?? ""} /></Field>
+      <FormSection title="Araç bilgileri" description="Aracı tanımlayan zorunlu bilgileri girin.">
+        <Field label="Araç kodu" hint="Filoda görünen kısa kod."><input name="fleetNumber" defaultValue={vehicle?.fleetNumber ?? ""} required /></Field>
+        <Field label="Plaka" hint="Resmi araç plakası."><input name="plateNumber" defaultValue={vehicle?.plateNumber ?? ""} required /></Field>
+        <Field label="Taşeron" hint="Aracın bağlı olduğu taşeron."><select name="subcontractorId" defaultValue={vehicle?.subcontractorId ?? ""}><option value="">Atanmamış</option>{subcontractors.map((item) => <option key={item.id} value={item.id}>{item.companyName}</option>)}</select></Field>
+        <Field label="Durum" hint="Aktif, pasif veya bakımda."><select name="status" defaultValue={vehicle?.status ?? "ACTIVE"}><option value="ACTIVE">Aktif</option><option value="PASSIVE">Pasif</option><option value="MAINTENANCE">Bakımda</option></select></Field>
+      </FormSection>
+      <FormSection title="Teknik bilgiler" description="Model ve kapasite bilgilerini ekleyin." optional>
+        <Field label="Marka" hint="Araç markası."><input name="make" defaultValue={vehicle?.make ?? ""} /></Field>
+        <Field label="Model" hint="Araç modeli."><input name="model" defaultValue={vehicle?.model ?? ""} /></Field>
+        <Field label="Model yılı" hint="Örn. 2024."><input name="modelYear" inputMode="numeric" defaultValue={vehicle?.modelYear ?? ""} /></Field>
+        <Field label="Kapasite" hint="Koltuk/personel kapasitesi."><input name="capacity" type="number" defaultValue={vehicle?.capacity ?? 0} /></Field>
+      </FormSection>
+      <FormSection title="Şoför bilgileri" description="Aracın aktif şoförünü tanımlayın." optional>
+        <Field label="Şoför" hint="Ad soyad."><input name="driverName" autoComplete="name" defaultValue={vehicle?.driverName ?? ""} /></Field>
+        <Field label="Şoför telefon" hint="+90 formatında saklanır."><input name="driverPhone" type="tel" autoComplete="tel" defaultValue={vehicle?.driverPhone ?? ""} /></Field>
+      </FormSection>
     </>
   );
 }

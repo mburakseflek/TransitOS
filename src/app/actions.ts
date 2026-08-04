@@ -8,7 +8,7 @@ import { prisma } from "@/lib/db";
 import { formatPhoneTR, monthKey, normalizePhoneDigitsTR } from "@/lib/format";
 import { readSessionToken } from "@/lib/auth";
 import { expenseCategoryTitle, serviceDirectionTitle } from "@/lib/labels";
-import { isManager, isServiceSupervisor } from "@/lib/permissions";
+import { canEditOperations, canManageSubcontractors, canManageUsers, isManager, isServiceSupervisor } from "@/lib/permissions";
 
 function text(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -124,11 +124,30 @@ async function currentSessionUser() {
   return sessionCookie ? await readSessionToken(sessionCookie).catch(() => null) : null;
 }
 
+async function requireOperationsEditor() {
+  const user = await currentSessionUser();
+  if (!canEditOperations(user)) redirect("/transitos/dashboard");
+  return user;
+}
+
+async function requireSubcontractorManager() {
+  const user = await currentSessionUser();
+  if (!canManageSubcontractors(user)) redirect("/transitos/dashboard");
+  return user;
+}
+
+async function requireUserManager() {
+  const user = await currentSessionUser();
+  if (!canManageUsers(user)) redirect("/transitos/dashboard");
+  return user;
+}
+
 function persistedUserId(user: Awaited<ReturnType<typeof currentSessionUser>>) {
   return user?.id && user.id !== "admin" ? user.id : undefined;
 }
 
 export async function createSubcontractor(formData: FormData) {
+  await requireSubcontractorManager();
   const loginId = text(formData, "loginId");
   const password = text(formData, "password") || "1234";
   const subcontractor = await prisma.subcontractor.create({
@@ -171,6 +190,7 @@ export async function createSubcontractor(formData: FormData) {
 }
 
 export async function updateSubcontractor(formData: FormData) {
+  await requireSubcontractorManager();
   const id = text(formData, "id");
   const loginId = text(formData, "loginId");
   const password = text(formData, "password");
@@ -212,6 +232,7 @@ export async function updateSubcontractor(formData: FormData) {
 }
 
 export async function createAccessUser(formData: FormData) {
+  await requireUserManager();
   const role = userRole(formData);
   const projectIds = formData.getAll("projectIds").map(String).filter(Boolean);
   const loginId = text(formData, "loginId");
@@ -244,6 +265,7 @@ export async function createAccessUser(formData: FormData) {
 }
 
 export async function updateAccessUser(formData: FormData) {
+  await requireUserManager();
   const role = userRole(formData);
   const projectIds = formData.getAll("projectIds").map(String).filter(Boolean);
   const password = text(formData, "password");
@@ -263,11 +285,13 @@ export async function updateAccessUser(formData: FormData) {
 }
 
 export async function deleteAccessUser(formData: FormData) {
+  await requireUserManager();
   await prisma.user.delete({ where: { id: text(formData, "id") } });
   redirect(returnTo(formData, "/transitos/settings"));
 }
 
 export async function deleteSubcontractor(formData: FormData) {
+  await requireSubcontractorManager();
   const id = text(formData, "id");
   await prisma.user.deleteMany({ where: { subcontractorId: id } });
   await prisma.expense.deleteMany({ where: { subcontractorId: id } });
@@ -281,6 +305,7 @@ export async function deleteSubcontractor(formData: FormData) {
 }
 
 export async function createVehicle(formData: FormData) {
+  await requireOperationsEditor();
   await prisma.vehicle.create({
     data: {
       subcontractorId: optional(formData, "subcontractorId"),
@@ -299,6 +324,7 @@ export async function createVehicle(formData: FormData) {
 }
 
 export async function updateVehicle(formData: FormData) {
+  await requireOperationsEditor();
   const id = text(formData, "id");
   await prisma.vehicle.update({
     where: { id },
@@ -319,6 +345,7 @@ export async function updateVehicle(formData: FormData) {
 }
 
 export async function deleteVehicle(formData: FormData) {
+  await requireOperationsEditor();
   const id = text(formData, "id");
   await prisma.serviceAssignment.deleteMany({ where: { vehicleId: id } });
   await prisma.expense.deleteMany({ where: { vehicleId: id } });
@@ -328,6 +355,7 @@ export async function deleteVehicle(formData: FormData) {
 }
 
 export async function createProject(formData: FormData) {
+  await requireOperationsEditor();
   const ownerUserIds = formData.getAll("ownerUserIds").map(String).filter(Boolean);
   await prisma.project.create({
     data: {
@@ -342,6 +370,7 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProject(formData: FormData) {
+  await requireOperationsEditor();
   const ownerUserIds = formData.getAll("ownerUserIds").map(String).filter(Boolean);
   await prisma.project.update({
     where: { id: text(formData, "id") },
@@ -357,11 +386,13 @@ export async function updateProject(formData: FormData) {
 }
 
 export async function deleteProject(formData: FormData) {
+  await requireOperationsEditor();
   await prisma.project.delete({ where: { id: text(formData, "id") } });
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function createRoute(formData: FormData) {
+  await requireOperationsEditor();
   const route = await prisma.serviceRoute.create({
     data: {
       projectId: optionalId(formData, "projectId"),
@@ -379,6 +410,7 @@ export async function createRoute(formData: FormData) {
 }
 
 export async function updateRoute(formData: FormData) {
+  await requireOperationsEditor();
   const routeId = text(formData, "id");
   await prisma.serviceRoute.update({
     where: { id: routeId },
@@ -395,11 +427,13 @@ export async function updateRoute(formData: FormData) {
 }
 
 export async function deleteRoute(formData: FormData) {
+  await requireOperationsEditor();
   await prisma.serviceRoute.delete({ where: { id: text(formData, "id") } });
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function createAssignment(formData: FormData) {
+  await requireOperationsEditor();
   const serviceDate = dateValue(formData, "serviceDate");
   const routeId = text(formData, "routeId");
   const route = await prisma.serviceRoute.findUnique({
@@ -427,6 +461,7 @@ export async function createAssignment(formData: FormData) {
 }
 
 export async function updateAssignment(formData: FormData) {
+  await requireOperationsEditor();
   const serviceDate = dateValue(formData, "serviceDate");
   const routeId = text(formData, "routeId");
   const route = await prisma.serviceRoute.findUnique({
@@ -454,6 +489,7 @@ export async function updateAssignment(formData: FormData) {
 }
 
 export async function createBulkAssignments(formData: FormData) {
+  await requireOperationsEditor();
   const selectedDates = formData.getAll("serviceDates").map(String).filter(Boolean);
   const startDate = dateValue(formData, "startDate");
   const endDate = dateValue(formData, "endDate");
@@ -502,6 +538,7 @@ export async function createBulkAssignments(formData: FormData) {
 }
 
 export async function updateAssignmentGroup(formData: FormData) {
+  await requireOperationsEditor();
   const assignmentIds = ids(formData, "assignmentIds");
   const routeId = text(formData, "routeId");
   const fallbackUrl = `/transitos/projects?project=${optionalId(formData, "projectId") ?? ""}&route=${routeId}`;
@@ -581,6 +618,7 @@ export async function updateAssignmentGroup(formData: FormData) {
 }
 
 export async function deleteAssignmentGroup(formData: FormData) {
+  await requireOperationsEditor();
   const assignmentIds = ids(formData, "assignmentIds");
 
   if (assignmentIds.length) {
@@ -592,6 +630,7 @@ export async function deleteAssignmentGroup(formData: FormData) {
 }
 
 export async function createOneOffJob(formData: FormData) {
+  await requireOperationsEditor();
   const serviceDate = dateValue(formData, "serviceDate");
   const route = await prisma.serviceRoute.create({
     data: {
@@ -626,6 +665,7 @@ export async function createOneOffJob(formData: FormData) {
 }
 
 export async function updateOneOffJob(formData: FormData) {
+  await requireOperationsEditor();
   const serviceDate = dateValue(formData, "serviceDate");
   const assignmentId = text(formData, "assignmentId");
 
@@ -665,11 +705,13 @@ export async function updateOneOffJob(formData: FormData) {
 }
 
 export async function deleteOneOffJob(formData: FormData) {
+  await requireOperationsEditor();
   await prisma.serviceRoute.delete({ where: { id: text(formData, "routeId") } });
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function deleteAssignment(formData: FormData) {
+  await requireOperationsEditor();
   await prisma.serviceAssignment.delete({ where: { id: text(formData, "id") } });
   redirect(returnTo(formData, "/transitos/projects"));
 }
@@ -875,6 +917,7 @@ export async function cancelProjectInvoiceDocument(formData: FormData) {
 }
 
 export async function createExpense(formData: FormData) {
+  await requireUserManager();
   const expenseDate = dateValue(formData, "expenseDate");
   const subcontractorId = text(formData, "subcontractorId");
   const vehicleId = await expenseVehicleId(subcontractorId, optionalId(formData, "vehicleId"));
@@ -893,6 +936,7 @@ export async function createExpense(formData: FormData) {
 }
 
 export async function updateExpense(formData: FormData) {
+  await requireUserManager();
   const expenseDate = dateValue(formData, "expenseDate");
   const subcontractorId = text(formData, "subcontractorId");
   const vehicleId = await expenseVehicleId(subcontractorId, optionalId(formData, "vehicleId"));
@@ -912,11 +956,13 @@ export async function updateExpense(formData: FormData) {
 }
 
 export async function deleteExpense(formData: FormData) {
+  await requireUserManager();
   await prisma.expense.delete({ where: { id: text(formData, "id") } });
   redirect(returnTo(formData, "/transitos/expenses"));
 }
 
 export async function createDriverDocument(formData: FormData) {
+  await requireOperationsEditor();
   const vehicleId = text(formData, "vehicleId");
   const fileUrl = text(formData, "fileUrl");
   if (!fileUrl) {
@@ -933,6 +979,7 @@ export async function createDriverDocument(formData: FormData) {
 }
 
 export async function deleteDriverDocument(formData: FormData) {
+  await requireOperationsEditor();
   await prisma.driverDocument.delete({ where: { id: text(formData, "id") } });
   redirect(returnTo(formData, "/transitos/drivers"));
 }
@@ -1030,6 +1077,7 @@ export async function submitVehicleSurvey(formData: FormData) {
 }
 
 export async function deleteVehicleSurveyResponse(formData: FormData) {
+  await requireOperationsEditor();
   const user = await currentSessionUser();
   if (!isManager(user) && !isServiceSupervisor(user)) {
     redirect("/transitos/surveys" as never);
@@ -1042,6 +1090,7 @@ export async function deleteVehicleSurveyResponse(formData: FormData) {
 }
 
 export async function createStop(formData: FormData) {
+  await requireOperationsEditor();
   await prisma.routeStop.create({
     data: {
       routeId: text(formData, "routeId"),
@@ -1055,6 +1104,7 @@ export async function createStop(formData: FormData) {
 }
 
 export async function deleteStop(formData: FormData) {
+  await requireOperationsEditor();
   await prisma.routeStop.delete({ where: { id: text(formData, "id") } });
   redirect(returnTo(formData, "/transitos/projects"));
 }

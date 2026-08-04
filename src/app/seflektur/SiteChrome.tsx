@@ -36,9 +36,16 @@ export function SiteHeader() {
           ))}
         </nav>
       </header>
-      <Link className="transitos-corner-entry" href="/login?next=/transitos/dashboard" aria-label="TransitOS sistemine giriş yap">
-        <MonitorCog size={18} aria-hidden="true" />
-        <span><strong>TransitOS</strong><small>Sisteme giriş</small></span>
+      <Link className="transitos-corner-entry" href="/login?next=/transitos/dashboard" aria-label="TransitOS operasyon paneline giriş yap">
+        <span className="transitos-corner-icon" aria-hidden="true">
+          <MonitorCog size={22} />
+        </span>
+        <span className="transitos-corner-copy">
+          <small>Şeflek Tur operasyon sistemi</small>
+          <strong>TransitOS Paneline Giriş</strong>
+          <em>Yetkili kullanıcılar için</em>
+        </span>
+        <ArrowRight className="transitos-corner-arrow" size={20} aria-hidden="true" />
       </Link>
     </>
   );

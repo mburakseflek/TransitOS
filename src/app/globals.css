@@ -19385,14 +19385,14 @@ body .modal-window > .section :is(.section, .stack, form) {
   bottom: max(12px, env(safe-area-inset-bottom));
   left: max(14px, env(safe-area-inset-left));
   z-index: 1200;
-  height: 48px;
+  height: 54px;
   padding: 0;
   overflow: hidden;
-  color: #e8f5ff;
-  border: 1px solid rgba(125, 211, 252, 0.28);
+  color: #ffffff;
+  border: 1px solid rgba(125, 211, 252, 0.4);
   border-radius: 16px;
-  background: #0b1b31;
-  box-shadow: 0 12px 30px rgba(2, 8, 23, 0.2);
+  background: #071a2f;
+  box-shadow: 0 12px 30px rgba(2, 8, 23, 0.26);
   pointer-events: none;
 }
 
@@ -19412,7 +19412,7 @@ body .modal-window > .section :is(.section, .stack, form) {
   align-items: center;
   width: max-content;
   height: 100%;
-  animation: market-strip-scroll 44s linear infinite;
+  animation: market-strip-scroll 62s linear infinite;
   will-change: transform;
 }
 
@@ -19420,21 +19420,22 @@ body .modal-window > .section :is(.section, .stack, form) {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 28px;
+  gap: 38px;
   height: 100%;
-  padding-right: 28px;
+  padding-right: 38px;
 }
 
 .market-strip-item {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   height: 100%;
   color: inherit;
-  font-size: 0.84rem;
-  font-weight: 750;
-  line-height: 1;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.005em;
   white-space: nowrap;
 }
 
@@ -19761,21 +19762,31 @@ body .modal-window > .section :is(.section, .stack, form) {
   z-index: 950;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 8px 12px;
+  gap: 12px;
+  width: min(340px, calc(100vw - 32px));
+  min-height: 76px;
+  padding: 12px 14px;
   color: #fff;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 16px;
-  background: #14243b;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(255,255,255,0.34);
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0b5dcc 0%, #1877f2 100%);
+  box-shadow: 0 16px 36px rgba(11, 93, 204, 0.32);
   text-decoration: none;
+  cursor: pointer;
+  transition: box-shadow 180ms ease, filter 180ms ease;
 }
 
-.transitos-corner-entry span,
+.transitos-corner-entry:hover { filter: brightness(1.06); box-shadow: 0 18px 40px rgba(11, 93, 204, 0.4); }
+.transitos-corner-entry:focus-visible { outline: 3px solid #ffffff; outline-offset: 3px; }
+.transitos-corner-icon { display: grid; flex: 0 0 44px; width: 44px; height: 44px; place-items: center; border-radius: 13px; background: rgba(255,255,255,0.17); }
+.transitos-corner-copy { display: block; min-width: 0; flex: 1; }
 .transitos-corner-entry strong,
-.transitos-corner-entry small { display: block; color: inherit; line-height: 1.1; }
-.transitos-corner-entry small { margin-top: 3px; opacity: 0.72; font-size: 0.68rem; }
+.transitos-corner-entry small,
+.transitos-corner-entry em { display: block; color: inherit; font-style: normal; line-height: 1.2; }
+.transitos-corner-entry small { opacity: 0.82; font-size: 0.72rem; font-weight: 650; }
+.transitos-corner-entry strong { margin-top: 3px; font-size: 0.98rem; font-weight: 800; letter-spacing: -0.01em; }
+.transitos-corner-entry em { margin-top: 3px; opacity: 0.86; font-size: 0.72rem; font-weight: 550; }
+.transitos-corner-arrow { flex: 0 0 auto; }
 
 .transitos-shell[data-user-role="SUBCONTRACTOR"] .project-accordion-metrics .badge.gray {
   display: none !important;
@@ -19803,12 +19814,15 @@ body .modal-window > .section :is(.section, .stack, form) {
   .transitos-shell .topbar { padding: 16px !important; border-radius: 18px !important; }
   .form-flow-section { padding: 16px; }
   .form-flow-fields .field-row { grid-template-columns: 1fr !important; gap: 8px !important; }
-  .transitos-corner-entry { top: auto; right: 12px; bottom: 76px; }
+  .transitos-corner-entry { top: auto; right: 12px; bottom: 82px; width: min(340px, calc(100vw - 24px)); }
+  .market-strip { height: 54px; }
+  .market-strip-item { font-size: 0.88rem; }
   .role-guide-card { grid-template-columns: auto minmax(0, 1fr); }
   .role-guide-card > a { grid-column: 2; white-space: normal; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .opening-pulse i { animation: none; }
+  .market-strip-track { animation-duration: 120s; }
   .route-loader, .transitos-shell * { scroll-behavior: auto !important; }
 }

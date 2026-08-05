@@ -61,7 +61,7 @@ export default async function SettingsPage() {
             </ModalAction>
           </div>
 
-          <table className="table section">
+          <table className="table section user-access-table">
             <thead><tr><th>Kullanıcı</th><th>Rol</th><th>Bağlı Kayıt</th><th>Projeler</th><th></th></tr></thead>
             <tbody>
               {users.map((item) => {
@@ -72,11 +72,11 @@ export default async function SettingsPage() {
                     : [];
                 return (
                   <tr key={item.id}>
-                    <td><strong>{item.displayName}</strong><br /><small className="muted">{item.loginId}</small></td>
-                    <td><span className="badge blue">{roleTitle(item.role)}</span></td>
-                    <td>{item.subcontractor?.companyName ?? "-"}</td>
-                    <td>{projectNames.join(", ") || "-"}</td>
-                    <td>
+                    <td data-label="Kullanıcı"><strong>{item.displayName}</strong><br /><small className="muted">{item.loginId}</small></td>
+                    <td data-label="Rol"><span className="badge blue">{roleTitle(item.role)}</span></td>
+                    <td data-label="Bağlı kayıt">{item.subcontractor?.companyName ?? "-"}</td>
+                    <td data-label="Projeler">{projectNames.join(", ") || "-"}</td>
+                    <td data-label="İşlemler">
                       <ModalAction label="..." title={`${item.displayName} Yetkileri`}>
                         <div className="stack">
                           <form className="stack" action={updateAccessUser}>

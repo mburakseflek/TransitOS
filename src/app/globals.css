@@ -19824,11 +19824,12 @@ body .modal-window > .section :is(.section, .stack, form) {
     top: auto;
     right: max(12px, env(safe-area-inset-right));
     bottom: calc(146px + env(safe-area-inset-bottom));
-    width: auto;
-    min-width: 210px;
-    max-width: calc(100vw - 24px);
+    width: 58px;
+    min-width: 58px;
+    max-width: 58px;
+    height: 58px;
     min-height: 58px;
-    padding: 7px 15px 7px 7px;
+    padding: 7px;
     color: #ffffff !important;
     z-index: 1400;
   }
@@ -19839,6 +19840,7 @@ body .modal-window > .section :is(.section, .stack, form) {
   .transitos-corner-entry strong { font-size: 1rem; }
   .transitos-corner-entry em { font-size: 0.7rem; }
   .transitos-corner-icon { flex-basis: 42px; width: 42px; height: 42px; }
+  .transitos-corner-copy { display: none; }
   .market-strip { height: 54px; }
   .market-strip-item { font-size: 0.88rem; }
   .role-guide-card { grid-template-columns: auto minmax(0, 1fr); }

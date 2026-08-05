@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
+import { MonitorCog } from "lucide-react";
 import { InteractionGuards } from "@/app/components/InteractionGuards";
 import { InteractionEffects } from "@/app/components/InteractionEffects";
 import { GlobalOperationOverlay } from "@/app/components/GlobalOperationOverlay";
@@ -40,6 +42,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="tr" className="light" style={{ colorScheme: "light" }}>
       <body>
+        <Link
+          className="global-transitos-fixed-button"
+          href="/login?next=/transitos/dashboard"
+          aria-label="TransitOS operasyon paneline giriş yap"
+        >
+          <MonitorCog size={25} strokeWidth={2.3} aria-hidden="true" />
+          <span>TransitOS</span>
+        </Link>
         <RouteLoadingOverlay />
         <GlobalOperationOverlay />
         <InteractionGuards />

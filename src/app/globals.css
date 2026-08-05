@@ -19755,45 +19755,6 @@ body .modal-window > .section :is(.section, .stack, form) {
 .opening-pulse i:nth-child(3) { animation-delay: 300ms; }
 @keyframes opening-pulse { to { opacity: 0.3; transform: translateY(-4px); } }
 
-.transitos-corner-entry {
-  position: fixed;
-  top: auto;
-  right: max(14px, env(safe-area-inset-right));
-  bottom: calc(148px + env(safe-area-inset-bottom));
-  z-index: 1400;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  width: auto;
-  min-width: 214px;
-  min-height: 58px;
-  padding: 7px 16px 7px 7px;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 999px;
-  background: #071a2f !important;
-  box-shadow: 0 14px 34px rgba(2, 8, 23, 0.4);
-  text-decoration: none;
-  cursor: pointer;
-  isolation: isolate;
-  transition: box-shadow 180ms ease, background-color 180ms ease;
-}
-
-.transitos-corner-entry:hover { background: #0b2847 !important; box-shadow: 0 16px 38px rgba(2, 8, 23, 0.48); }
-.transitos-corner-entry:focus-visible { outline: 3px solid #ffffff; outline-offset: 3px; }
-.transitos-corner-entry,
-.transitos-corner-entry * { color: #ffffff !important; }
-.transitos-corner-entry svg { color: #ffffff !important; stroke: #ffffff !important; }
-.transitos-corner-icon { display: grid; flex: 0 0 44px; width: 44px; height: 44px; place-items: center; color: #ffffff !important; border-radius: 999px; background: rgba(255,255,255,0.14); }
-.transitos-corner-copy { display: block; min-width: 0; flex: 1; }
-.transitos-corner-entry strong,
-.transitos-corner-entry small,
-.transitos-corner-entry em { display: block; color: #ffffff !important; font-style: normal; line-height: 1.2; }
-.transitos-corner-entry small { margin-top: 2px; opacity: 1; font-size: 0.75rem; font-weight: 650; }
-.transitos-corner-entry strong { font-size: 1rem; font-weight: 850; letter-spacing: -0.01em; }
-.transitos-corner-entry em { margin-top: 3px; opacity: 0.86; font-size: 0.72rem; font-weight: 550; }
-.transitos-corner-arrow { flex: 0 0 auto; }
-
 .transitos-shell[data-user-role="SUBCONTRACTOR"] .project-accordion-metrics .badge.gray {
   display: none !important;
 }
@@ -19820,27 +19781,6 @@ body .modal-window > .section :is(.section, .stack, form) {
   .transitos-shell .topbar { padding: 16px !important; border-radius: 18px !important; }
   .form-flow-section { padding: 16px; }
   .form-flow-fields .field-row { grid-template-columns: 1fr !important; gap: 8px !important; }
-  .transitos-corner-entry {
-    top: auto;
-    right: max(12px, env(safe-area-inset-right));
-    bottom: calc(146px + env(safe-area-inset-bottom));
-    width: 58px;
-    min-width: 58px;
-    max-width: 58px;
-    height: 58px;
-    min-height: 58px;
-    padding: 7px;
-    color: #ffffff !important;
-    z-index: 1400;
-  }
-  .transitos-corner-entry * { color: #ffffff !important; }
-  .transitos-corner-entry small,
-  .transitos-corner-entry em { opacity: 1; }
-  .transitos-corner-entry small { font-size: 0.74rem; }
-  .transitos-corner-entry strong { font-size: 1rem; }
-  .transitos-corner-entry em { font-size: 0.7rem; }
-  .transitos-corner-icon { flex-basis: 42px; width: 42px; height: 42px; }
-  .transitos-corner-copy { display: none; }
   .market-strip { height: 54px; }
   .market-strip-item { font-size: 0.88rem; }
   .role-guide-card { grid-template-columns: auto minmax(0, 1fr); }
@@ -19890,4 +19830,73 @@ body .modal-window > .section :is(.section, .stack, form) {
   .opening-pulse i { animation: none; }
   .market-strip-track { animation-duration: 120s; }
   .route-loader, .transitos-shell * { scroll-behavior: auto !important; }
+}
+
+/* Global TransitOS entry: intentionally isolated from page and legacy button styles. */
+.global-transitos-fixed-button {
+  position: fixed !important;
+  top: auto !important;
+  right: max(16px, env(safe-area-inset-right)) !important;
+  bottom: calc(148px + env(safe-area-inset-bottom)) !important;
+  left: auto !important;
+  z-index: 2147483000 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  width: 148px !important;
+  min-width: 148px !important;
+  max-width: 148px !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  margin: 0 !important;
+  padding: 0 15px !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 999px !important;
+  background: #061a30 !important;
+  box-shadow: 0 14px 34px rgba(2, 8, 23, 0.46) !important;
+  transform: none !important;
+  filter: none !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  isolation: isolate !important;
+}
+
+.global-transitos-fixed-button svg {
+  flex: 0 0 auto !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.global-transitos-fixed-button span {
+  display: block !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.01em !important;
+  white-space: nowrap !important;
+}
+
+.global-transitos-fixed-button:hover { background: #0b2a4b !important; }
+.global-transitos-fixed-button:focus-visible { outline: 3px solid #ffffff !important; outline-offset: 3px !important; }
+
+@media (max-width: 720px) {
+  .global-transitos-fixed-button {
+    right: max(12px, env(safe-area-inset-right)) !important;
+    bottom: calc(146px + env(safe-area-inset-bottom)) !important;
+    width: 132px !important;
+    min-width: 132px !important;
+    max-width: 132px !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    padding: 0 12px !important;
+  }
+  .global-transitos-fixed-button span { font-size: 0.86rem !important; }
 }

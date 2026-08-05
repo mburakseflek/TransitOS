@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight, MonitorCog } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { WhatsAppIcon } from "@/app/components/WhatsAppIcon";
 import { SkiperMotionFrame } from "@/app/components/RegistryInterfaceKit";
 import { CorporateMobileNav } from "@/app/seflektur/CorporateMobileNav";
@@ -37,20 +37,6 @@ export function SiteHeader() {
         </nav>
       </header>
     </>
-  );
-}
-
-export function TransitOSFloatingEntry() {
-  return (
-    <Link className="transitos-corner-entry" href="/login?next=/transitos/dashboard" aria-label="TransitOS operasyon paneline giriş yap">
-      <span className="transitos-corner-icon" aria-hidden="true">
-        <MonitorCog size={25} strokeWidth={2.3} />
-      </span>
-      <span className="transitos-corner-copy">
-        <strong>TransitOS</strong>
-        <small>Operasyon paneline giriş</small>
-      </span>
-    </Link>
   );
 }
 

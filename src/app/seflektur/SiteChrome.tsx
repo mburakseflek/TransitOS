@@ -38,14 +38,12 @@ export function SiteHeader() {
       </header>
       <Link className="transitos-corner-entry" href="/login?next=/transitos/dashboard" aria-label="TransitOS operasyon paneline giriş yap">
         <span className="transitos-corner-icon" aria-hidden="true">
-          <MonitorCog size={22} />
+          <MonitorCog size={25} strokeWidth={2.3} />
         </span>
         <span className="transitos-corner-copy">
-          <small>Şeflek Tur operasyon sistemi</small>
-          <strong>TransitOS Paneline Giriş</strong>
-          <em>Yetkili kullanıcılar için</em>
+          <strong>TransitOS</strong>
+          <small>Operasyon paneline giriş</small>
         </span>
-        <ArrowRight className="transitos-corner-arrow" size={20} aria-hidden="true" />
       </Link>
     </>
   );

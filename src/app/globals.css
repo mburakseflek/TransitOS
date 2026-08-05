@@ -13029,7 +13029,7 @@ form[data-dirty="true"] :is(input, select, textarea):not([type="hidden"]) {
   pointer-events: none !important;
 }
 
-@media (min-width: 861px) {
+@media (min-width: 1101px) {
   .new-site-nav {
     position: sticky !important;
     top: 0 !important;
@@ -13102,7 +13102,7 @@ form[data-dirty="true"] :is(input, select, textarea):not([type="hidden"]) {
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
   .new-site-page,
   .form-site-page,
   .transitos-info-page,
@@ -14041,7 +14041,7 @@ body {
   }
 }
 
-@media (min-width: 861px) {
+@media (min-width: 1101px) {
   .site-mobile-nav-check,
   .site-mobile-menu-button,
   .site-mobile-nav-backdrop,
@@ -14057,7 +14057,7 @@ body {
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
   .new-site-nav {
     position: sticky !important;
     top: max(10px, env(safe-area-inset-top)) !important;
@@ -14447,13 +14447,13 @@ body {
   display: none;
 }
 
-@media (min-width: 861px) {
+@media (min-width: 1101px) {
   .site-mobile-chrome {
     display: none !important;
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
   .new-site-page,
   .form-site-page,
   .transitos-info-page {
@@ -14713,7 +14713,7 @@ body {
 }
 
 /* Corporate mobile navigation client-state layer */
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
   .site-mobile-menu-button,
   .site-mobile-nav-backdrop,
   .site-mobile-drawer-head button {
@@ -19839,14 +19839,14 @@ body .modal-window > .section :is(.section, .stack, form) {
   right: max(16px, env(safe-area-inset-right)) !important;
   bottom: calc(148px + env(safe-area-inset-bottom)) !important;
   left: auto !important;
-  z-index: 2147483000 !important;
+  z-index: 12900 !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 9px !important;
-  width: 148px !important;
-  min-width: 148px !important;
-  max-width: 148px !important;
+  width: 176px !important;
+  min-width: 176px !important;
+  max-width: 176px !important;
   height: 56px !important;
   min-height: 56px !important;
   margin: 0 !important;
@@ -19891,12 +19891,20 @@ body .modal-window > .section :is(.section, .stack, form) {
   .global-transitos-fixed-button {
     right: max(12px, env(safe-area-inset-right)) !important;
     bottom: calc(146px + env(safe-area-inset-bottom)) !important;
-    width: 132px !important;
-    min-width: 132px !important;
-    max-width: 132px !important;
+    width: 158px !important;
+    min-width: 158px !important;
+    max-width: 158px !important;
     height: 54px !important;
     min-height: 54px !important;
     padding: 0 12px !important;
   }
-  .global-transitos-fixed-button span { font-size: 0.86rem !important; }
+  .global-transitos-fixed-button span { font-size: 0.84rem !important; }
+}
+
+@media (max-width: 1100px) {
+  body:has(.site-mobile-drawer.is-open) .global-transitos-fixed-button {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
 }

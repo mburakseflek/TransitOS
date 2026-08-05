@@ -48,7 +48,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           aria-label="TransitOS operasyon paneline giriş yap"
         >
           <MonitorCog size={25} strokeWidth={2.3} aria-hidden="true" />
-          <span>TransitOS</span>
+          <span>TransitOS Giriş</span>
         </Link>
         <RouteLoadingOverlay />
         <GlobalOperationOverlay />

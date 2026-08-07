@@ -61,7 +61,10 @@ export default async function ProjectsPage({
         clientCompany: true,
         personnelCount: true,
         status: true,
-        _count: { select: { routes: { where: routeAccessWhere(user) } } }
+        routes: {
+          where: routeAccessWhere(user),
+          select: { id: true }
+        }
       },
       orderBy: { createdAt: "desc" }
     }),
@@ -159,7 +162,7 @@ export default async function ProjectsPage({
                 <p className="muted">{project.clientCompany}</p>
                 <div className="inline-actions project-accordion-metrics">
                   <span className="badge gray">{project.personnelCount} personel</span>
-                  <span className="badge blue">{project._count.routes} güzergah</span>
+                  <span className="badge blue">{project.routes.length} güzergah</span>
                 </div>
               </div>
               <span className="project-accordion-toggle" aria-hidden="true">

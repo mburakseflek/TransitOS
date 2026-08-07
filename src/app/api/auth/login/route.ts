@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     const isBuiltInAdmin = adminPassword.length > 0 && loginId.trim().toLowerCase() === adminId.toLowerCase() && password === adminPassword;
     if (!isBuiltInAdmin) {
       const manager = await findUserByLoginId(loginId);
-      const managerPasswordMatches = manager ? await bcrypt.compare(password, manager.passwordHash) : false;
+      const managerPasswordMatches = manager?.role === "MANAGER" ? await bcrypt.compare(password, manager.passwordHash) : false;
       if (!manager || manager.role !== "MANAGER" || !managerPasswordMatches) {
         return loginFailure(request, isFormSubmit, "Giriş bilgileri hatalı.", next);
       }
@@ -113,7 +113,17 @@ export async function POST(request: Request) {
 async function findUserByLoginId(loginId: string) {
   return prisma.user.findFirst({
     where: { loginId: { equals: loginId, mode: "insensitive" } },
-    include: { subcontractor: true, serviceProjects: true, ownerProjects: true }
+    select: {
+      id: true,
+      loginId: true,
+      passwordHash: true,
+      displayName: true,
+      role: true,
+      subcontractorId: true,
+      subcontractor: { select: { status: true } },
+      serviceProjects: { select: { id: true } },
+      ownerProjects: { select: { id: true } }
+    }
   });
 }
 

@@ -1,4 +1,6 @@
 import { cookies } from "next/headers";
+import type { Route } from "next";
+import Link from "next/link";
 import { ChevronDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import {
@@ -46,25 +48,20 @@ export default async function ProjectsPage({
   const sessionCookie = (await cookies()).get("transitos_session")?.value;
   const user = sessionCookie ? await readSessionToken(sessionCookie).catch(() => null) : null;
   const canEdit = canEditOperations(user);
+  const requestedProjectId = params?.project ?? null;
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
   const defaultServiceDate = defaultDateForPeriod(period.month);
-  const [projects, vehicles, oneOffRoutes, projectOwners] = await Promise.all([
+  const [projects, vehicles, oneOffRoutes, projectOwners, requestedProject] = await Promise.all([
     prisma.project.findMany({
       where: projectAccessWhere(user),
-      include: {
-        ownerUsers: { select: { id: true, displayName: true, loginId: true } },
-        routes: {
-          where: routeAccessWhere(user),
-          include: {
-            assignments: {
-              where: { AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)] },
-              include: { vehicle: true },
-              orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
-            }
-          },
-          orderBy: { name: "asc" }
-        },
+      select: {
+        id: true,
+        name: true,
+        clientCompany: true,
+        personnelCount: true,
+        status: true,
+        _count: { select: { routes: { where: routeAccessWhere(user) } } }
       },
       orderBy: { createdAt: "desc" }
     }),
@@ -83,13 +80,30 @@ export default async function ProjectsPage({
       where: { role: "PROJECT_OWNER" },
       select: { id: true, displayName: true, loginId: true },
       orderBy: { displayName: "asc" }
-    }) : Promise.resolve([])
+    }) : Promise.resolve([]),
+    requestedProjectId ? prisma.project.findFirst({
+      where: { AND: [{ id: requestedProjectId }, projectAccessWhere(user)] },
+      include: {
+        ownerUsers: { select: { id: true, displayName: true, loginId: true } },
+        routes: {
+          where: routeAccessWhere(user),
+          include: {
+            assignments: {
+              where: { AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)] },
+              include: { vehicle: true },
+              orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
+            }
+          },
+          orderBy: { name: "asc" }
+        }
+      }
+    }) : Promise.resolve(null)
   ]);
-  const requestedProjectId = params?.project ?? null;
-  const initialProjectId = projects.some((project) => project.id === requestedProjectId)
+  const initialProjectId = requestedProject && projects.some((project) => project.id === requestedProjectId)
     ? requestedProjectId
-    : projects[0]?.id ?? null;
-  const initialRouteId = params?.route ?? null;
+    : null;
+  const initialRouteId = initialProjectId ? params?.route ?? null : null;
+  const selectedProject = initialProjectId ? requestedProject : null;
 
   return (
     <AppShell
@@ -124,14 +138,19 @@ export default async function ProjectsPage({
         </QuickCreateCard> : null}
       </div>
       <section className="stack project-accordion-stack section">
-        {projects.map((project) => (
-          <details
-            className="project-accordion"
+        {projects.map((project) => {
+          const selected = initialProjectId === project.id;
+          const projectHref = `/transitos/projects?project=${project.id}&month=${period.month}&range=${period.range}`;
+          return <section
+            className={`project-accordion${selected ? " selected" : ""}`}
             id={`project-${project.id}`}
             key={project.id}
-            open={initialProjectId === project.id}
           >
-            <summary className="project-accordion-summary">
+            <Link
+              className="project-accordion-summary"
+              href={(selected ? `/transitos/projects?month=${period.month}&range=${period.range}` : projectHref) as Route}
+              aria-expanded={selected}
+            >
               <div className="project-accordion-copy">
                 <div className="record-head">
                   <h2>{project.name}</h2>
@@ -140,15 +159,15 @@ export default async function ProjectsPage({
                 <p className="muted">{project.clientCompany}</p>
                 <div className="inline-actions project-accordion-metrics">
                   <span className="badge gray">{project.personnelCount} personel</span>
-                  <span className="badge blue">{project.routes.length} güzergah</span>
+                  <span className="badge blue">{project._count.routes} güzergah</span>
                 </div>
               </div>
               <span className="project-accordion-toggle" aria-hidden="true">
                 <ChevronDown size={20} />
               </span>
-            </summary>
-            <ProjectCard
-              project={project}
+            </Link>
+            {selected && selectedProject ? <ProjectCard
+              project={selectedProject}
               initialRouteId={initialProjectId === project.id ? initialRouteId : null}
               vehicles={vehicles}
               projectOwners={projectOwners}
@@ -158,9 +177,9 @@ export default async function ProjectsPage({
               periodMonth={period.month}
               defaultServiceDate={defaultServiceDate}
               periodQuery={`month=${period.month}&range=${period.range}`}
-            />
-          </details>
-        ))}
+            /> : null}
+          </section>;
+        })}
         {projects.length === 0 ? <section className="card muted">Başlamak için Proje Ekle penceresini kullanın.</section> : null}
       </section>
 

@@ -31,12 +31,22 @@ export function ModalAction({
 }) {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showSubmittingFeedback, setShowSubmittingFeedback] = useState(false);
   const [mounted, setMounted] = useState(false);
   const titleId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!submitting) {
+      setShowSubmittingFeedback(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setShowSubmittingFeedback(true), 350);
+    return () => window.clearTimeout(timer);
+  }, [submitting]);
 
   useEffect(() => {
     if (!open) {
@@ -115,7 +125,7 @@ export function ModalAction({
           </button>
         </div>
         <div className="section modal-body">{children}</div>
-        {submitting ? (
+        {showSubmittingFeedback ? (
           <div className="modal-operation-lock" role="status" aria-live="polite">
             <div className="operation-road compact" aria-hidden="true">
               <img src="/brand/transitos-service-vehicle.png" alt="" />

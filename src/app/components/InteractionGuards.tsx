@@ -89,14 +89,18 @@ function submitterOperationLabel(submitter: HTMLElement | null, form: HTMLFormEl
   return formLabel ? `${formLabel} işlemi yapılıyor` : "İşlem tamamlanıyor";
 }
 
-function disableSubmitControls(form: HTMLFormElement) {
+function disableSubmitControl(form: HTMLFormElement, submitter: HTMLElement | null) {
   window.requestAnimationFrame(() => {
-    form.querySelectorAll<HTMLElement>("button, input[type='submit'], input[type='button']").forEach((control) => {
-      if ("disabled" in control) {
-        (control as HTMLButtonElement | HTMLInputElement).disabled = true;
-      }
-      control.setAttribute("aria-disabled", "true");
-    });
+    if (!submitter || !("disabled" in submitter)) return;
+    (submitter as HTMLButtonElement | HTMLInputElement).disabled = true;
+    submitter.setAttribute("aria-disabled", "true");
+    window.setTimeout(() => {
+      if (!submitter.isConnected) return;
+      (submitter as HTMLButtonElement | HTMLInputElement).disabled = false;
+      submitter.removeAttribute("aria-disabled");
+      form.dataset.submitting = "false";
+      form.removeAttribute("aria-busy");
+    }, 8000);
   });
 }
 
@@ -140,7 +144,7 @@ export function InteractionGuards() {
       form.dataset.dirty = "false";
       form.setAttribute("aria-busy", "true");
       form.dataset.loadingLabel = submitterOperationLabel(submitter, form);
-      disableSubmitControls(form);
+      disableSubmitControl(form, submitter);
     }
 
     function handleDocumentClick(event: MouseEvent) {

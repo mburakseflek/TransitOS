@@ -15661,7 +15661,7 @@ body .modal-window > .section {
   box-shadow: 0 24px 64px rgba(17, 24, 39, 0.08);
 }
 
-.project-accordion[open] {
+.project-accordion.selected {
   border-color: rgba(81, 214, 255, 0.34);
 }
 
@@ -15713,7 +15713,7 @@ body .modal-window > .section {
     background 180ms ease;
 }
 
-.project-accordion[open] > .project-accordion-summary .project-accordion-toggle {
+.project-accordion.selected > .project-accordion-summary .project-accordion-toggle {
   transform: rotate(180deg);
   background: rgba(81, 214, 255, 0.16);
 }
@@ -19907,4 +19907,19 @@ body .modal-window > .section :is(.section, .stack, form) {
     opacity: 0 !important;
     pointer-events: none !important;
   }
+}
+
+/* Navigation remains responsive while the next server view streams in. */
+body[data-navigation-pending="true"] :is(a, button, input, select, textarea, summary, label[for], [role="button"]) {
+  pointer-events: auto !important;
+}
+
+body[data-navigation-pending="true"] .route-loader {
+  pointer-events: none !important;
+}
+
+.project-accordion-summary {
+  width: 100%;
+  cursor: pointer;
+  text-decoration: none;
 }

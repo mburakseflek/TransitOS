@@ -46,7 +46,7 @@ export function canSeeSubcontractorMoney(user?: SessionUser | null) {
 export function projectAccessWhere(user?: SessionUser | null) {
   if (!user || isManager(user)) return {};
   if (isServiceSupervisor(user)) return { serviceUsers: { some: { id: user.id } } };
-  if (isProjectOwner(user)) return { OR: [{ projectCompany: { ownerUsers: { some: { id: user.id } } } }, { ownerUsers: { some: { id: user.id } } }] };
+  if (isProjectOwner(user)) return { projectCompany: { ownerUsers: { some: { id: user.id } } } };
   if (isSubcontractor(user)) {
     return { assignments: { some: { vehicle: { subcontractorId: user.subcontractorId } } } };
   }
@@ -56,7 +56,7 @@ export function projectAccessWhere(user?: SessionUser | null) {
 export function routeAccessWhere(user?: SessionUser | null) {
   if (!user || isManager(user)) return {};
   if (isServiceSupervisor(user)) return { project: { serviceUsers: { some: { id: user.id } } } };
-  if (isProjectOwner(user)) return { project: { OR: [{ projectCompany: { ownerUsers: { some: { id: user.id } } } }, { ownerUsers: { some: { id: user.id } } }] } };
+  if (isProjectOwner(user)) return { project: { projectCompany: { ownerUsers: { some: { id: user.id } } } } };
   if (isSubcontractor(user)) return { assignments: { some: { vehicle: { subcontractorId: user.subcontractorId } } } };
   return { id: "__no_access__" };
 }
@@ -64,7 +64,7 @@ export function routeAccessWhere(user?: SessionUser | null) {
 export function assignmentAccessWhere(user?: SessionUser | null) {
   if (!user || isManager(user)) return {};
   if (isServiceSupervisor(user)) return { project: { serviceUsers: { some: { id: user.id } } } };
-  if (isProjectOwner(user)) return { project: { OR: [{ projectCompany: { ownerUsers: { some: { id: user.id } } } }, { ownerUsers: { some: { id: user.id } } }] } };
+  if (isProjectOwner(user)) return { project: { projectCompany: { ownerUsers: { some: { id: user.id } } } } };
   if (isSubcontractor(user)) return { vehicle: { subcontractorId: user.subcontractorId } };
   return { id: "__no_access__" };
 }
@@ -72,7 +72,7 @@ export function assignmentAccessWhere(user?: SessionUser | null) {
 export function vehicleAccessWhere(user?: SessionUser | null) {
   if (!user || isManager(user) || isServiceSupervisor(user)) return {};
   if (isProjectOwner(user)) {
-    return { assignments: { some: { project: { OR: [{ projectCompany: { ownerUsers: { some: { id: user.id } } } }, { ownerUsers: { some: { id: user.id } } }] } } } };
+    return { assignments: { some: { project: { projectCompany: { ownerUsers: { some: { id: user.id } } } } } } };
   }
   if (isSubcontractor(user)) return { subcontractorId: user.subcontractorId };
   return { id: "__no_access__" };

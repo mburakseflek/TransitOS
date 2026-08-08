@@ -69,7 +69,7 @@ export default async function SettingsPage() {
                 const projectNames = item.role === "SERVICE_SUPERVISOR"
                   ? item.serviceProjects.map((project) => project.name)
                   : item.role === "PROJECT_OWNER"
-                    ? [...item.ownerCompanies.map((company) => company.name), ...item.ownerProjects.map((project) => project.name)]
+                    ? item.ownerCompanies.map((company) => company.name)
                     : [];
                 return (
                   <tr key={item.id}>

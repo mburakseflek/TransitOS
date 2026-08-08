@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     projectIds: user.role === "SERVICE_SUPERVISOR"
       ? user.serviceProjects.map((project) => project.id)
       : user.role === "PROJECT_OWNER"
-        ? [...new Set([...user.ownerProjects.map((project) => project.id), ...user.ownerCompanies.flatMap((company) => company.projects.map((project) => project.id))])]
+        ? [...new Set(user.ownerCompanies.flatMap((company) => company.projects.map((project) => project.id)))]
         : undefined
   });
 

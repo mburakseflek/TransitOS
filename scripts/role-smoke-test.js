@@ -131,8 +131,7 @@ async function main() {
       clientCompany: "Musteri A",
       projectCompanyId: projectCompanyA.id,
       personnelCount: 25,
-      serviceUsers: { connect: [{ id: supervisor.id }] },
-      ownerUsers: { connect: [{ id: projectOwner.id }] }
+      serviceUsers: { connect: [{ id: supervisor.id }] }
     }
   });
   const projectB = await prisma.project.create({
@@ -306,20 +305,16 @@ async function main() {
     scopedSubcontractorProjects.flatMap((project) => project.routes).flatMap((route) => route.assignments).every((assignment) => assignment.vehicleId === vehicleA.id)
   );
 
-  const ownerProjects = await prisma.project.findMany({
-    where: { ownerUsers: { some: { id: projectOwner.id } }, name: { startsWith: prefix } }
-  });
   const ownerVehicles = await prisma.vehicle.findMany({
-    where: { assignments: { some: { project: { ownerUsers: { some: { id: projectOwner.id } } } } }, fleetNumber: { startsWith: prefix } }
+    where: { assignments: { some: { project: { projectCompany: { ownerUsers: { some: { id: projectOwner.id } } } } } }, fleetNumber: { startsWith: prefix } }
   });
   const ownerDocs = await prisma.financialDocument.findMany({
-    where: { type: "PROJECT_INVOICE", project: { ownerUsers: { some: { id: projectOwner.id } } }, notes: prefix }
+    where: { type: "PROJECT_INVOICE", project: { projectCompany: { ownerUsers: { some: { id: projectOwner.id } } } }, notes: prefix }
   });
-  ok("Proje sahibi sadece kendi projesini gorur", ownerProjects.length === 1 && ownerProjects[0].id === projectA.id);
   const companyOwnerProjects = await prisma.project.findMany({
     where: { projectCompany: { ownerUsers: { some: { id: projectOwner.id } } }, name: { startsWith: prefix } }
   });
-  ok("Proje sahibi sirketinin tum projelerini gorur", companyOwnerProjects.length === 2);
+  ok("Proje sahibi yalniz sirketinin tum projelerini gorur", companyOwnerProjects.length === 2);
   ok("Proje sahibi projesine tahsisli araclari gorur", ownerVehicles.length === 2);
   ok("Proje sahibi proje faturasini gorur", ownerDocs.length === 1);
 

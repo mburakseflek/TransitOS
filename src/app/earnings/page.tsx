@@ -199,17 +199,17 @@ export default async function EarningsPage({
         where: {
           type: FinancialDocumentType.PROJECT_INVOICE,
           periodStart: { gte: period.startDate, lte: period.endDate },
-          project: { OR: [{ projectCompany: { ownerUsers: { some: { id: userId } } } }, { ownerUsers: { some: { id: userId } } }] }
+          project: { projectCompany: { ownerUsers: { some: { id: userId } } } }
         },
-        include: { project: true, lines: { orderBy: { serviceDate: "asc" } } },
+        include: { project: { include: { projectCompany: true } }, lines: { orderBy: { serviceDate: "asc" } } },
         orderBy: { issuedAt: "desc" }
       }),
       prisma.serviceAssignment.findMany({
         where: {
           serviceDate: periodDateWhere(period),
-          project: { OR: [{ projectCompany: { ownerUsers: { some: { id: userId } } } }, { ownerUsers: { some: { id: userId } } }] }
+          project: { projectCompany: { ownerUsers: { some: { id: userId } } } }
         },
-        include: { route: true, project: true, vehicle: true },
+        include: { route: true, project: { include: { projectCompany: true } }, vehicle: true },
         orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
       })
     ]);
@@ -219,13 +219,18 @@ export default async function EarningsPage({
         <PeriodFilter searchParams={params} monthlyOnly />
         <section className="stack">
           {documents.map((document) => (
-            <DocumentCard key={document.id} document={document} title="Proje Fatura Belgesi" owner={`${document.project?.clientCompany ?? "-"} · ${document.project?.name ?? "-"}`} />
+            <DocumentCard
+              key={document.id}
+              document={document}
+              title={`${document.project?.projectCompany?.name ?? document.project?.clientCompany ?? "Proje Şirketi"} Faturası`}
+              owner={`Proje: ${document.project?.name ?? "-"}`}
+            />
           ))}
           {documents.length === 0 ? (
             <UnsignedServiceReport
               assignments={assignments}
               monthKey={period.month}
-              owner={user?.displayName ?? "Proje Servisleri"}
+              owner={[...new Set(assignments.map((item) => item.project?.projectCompany?.name ?? item.project?.clientCompany).filter(Boolean))].join(", ") || "Proje Şirketi"}
               targetId="unsigned-project-service-report"
               documentLabel="Fatura belgesi"
             />

@@ -50,6 +50,7 @@ export default async function FinancePage({
   const [projects, subcontractors] = await Promise.all([
     canManageFinance ? prisma.project.findMany({
       include: {
+        projectCompany: true,
         financialDocuments: {
           where: { type: FinancialDocumentType.PROJECT_INVOICE, monthKey: period.month },
           include: { lines: { orderBy: { serviceDate: "asc" } }, createdBy: true }
@@ -126,8 +127,8 @@ export default async function FinancePage({
         <section className="card section">
           <div className="record-head">
             <div>
-              <h2 style={{ marginTop: 0 }}>Proje Sahibi Faturaları</h2>
-              <p className="muted">Proje sahipleri yalnızca burada yönetici tarafından kesilen faturaları görüntüler.</p>
+              <h2 style={{ marginTop: 0 }}>Proje Şirketi Faturaları</h2>
+              <p className="muted">Faturalar proje şirketine kesilir; proje adı hizmet ayrıntısı olarak gösterilir.</p>
             </div>
             <span className="badge blue">{projects.length} proje</span>
           </div>
@@ -139,8 +140,8 @@ export default async function FinancePage({
                 <article className="card status-card" key={project.id}>
                   <div className="record-head">
                     <div>
-                      <h3 style={{ margin: 0 }}>{project.name}</h3>
-                      <p className="muted">{project.clientCompany} · {project.assignments.length} tamamlanan servis</p>
+                      <h3 style={{ margin: 0 }}>{project.projectCompany?.name ?? project.clientCompany}</h3>
+                      <p className="muted">Proje: {project.name} · {project.assignments.length} tamamlanan servis</p>
                       <div className="chip-row">
                         {document ? <span className="badge green">Kesildi · {formatTRY(Number(document.netAmount))}</span> : <span className="badge yellow">Bekliyor · {formatTRY(draftTotal)}</span>}
                         {document?.issuedAt ? <span className="badge gray">{document.issuedAt.toLocaleDateString("tr-TR")}</span> : null}
@@ -168,7 +169,7 @@ export default async function FinancePage({
                         </ModalAction>
                       </div>
                     ) : (
-                      <ModalAction label="Fatura Oluştur" title={`${project.name} Faturası`}>
+                      <ModalAction label="Fatura Oluştur" title={`${project.projectCompany?.name ?? project.clientCompany} Faturası`}>
                         <form className="stack" action={issueProjectInvoiceDocument}>
                           <input type="hidden" name="projectId" value={project.id} />
                           <input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />
@@ -189,8 +190,8 @@ export default async function FinancePage({
                   {document ? (
                     <FinancialDocumentReport
                       document={document}
-                      title="Proje Fatura Belgesi"
-                      owner={`${project.clientCompany} · ${project.name}`}
+                      title={`${project.projectCompany?.name ?? project.clientCompany} Faturası`}
+                      owner={`Proje: ${project.name}`}
                       targetId={`project-document-${document.id}`}
                     />
                   ) : null}

@@ -146,6 +146,7 @@ model ProjectCompany {
   name       String    @unique
   projects   Project[]
   ownerUsers User[]    @relation("ProjectCompanyOwners")
+  financialDocuments FinancialDocument[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }
@@ -280,6 +281,8 @@ model FinancialDocument {
   subcontractor   Subcontractor?          @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
   projectId       String?
   project         Project?                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectCompanyId String?
+  projectCompany   ProjectCompany?        @relation(fields: [projectCompanyId], references: [id], onDelete: SetNull)
   createdByUserId String?
   createdBy       User?                   @relation("FinancialDocumentCreator", fields: [createdByUserId], references: [id])
   issuedAt        DateTime                @default(now())
@@ -294,6 +297,7 @@ model FinancialDocument {
   @@index([type, monthKey])
   @@index([subcontractorId, monthKey])
   @@index([projectId, monthKey])
+  @@index([projectCompanyId, monthKey])
 }
 
 model FinancialDocumentLine {

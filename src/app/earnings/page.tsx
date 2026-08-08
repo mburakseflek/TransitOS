@@ -199,9 +199,9 @@ export default async function EarningsPage({
         where: {
           type: FinancialDocumentType.PROJECT_INVOICE,
           periodStart: { gte: period.startDate, lte: period.endDate },
-          project: { projectCompany: { ownerUsers: { some: { id: userId } } } }
+          projectCompany: { ownerUsers: { some: { id: userId } } }
         },
-        include: { project: { include: { projectCompany: true } }, lines: { orderBy: { serviceDate: "asc" } } },
+        include: { projectCompany: true, project: { include: { projectCompany: true } }, lines: { orderBy: { serviceDate: "asc" } } },
         orderBy: { issuedAt: "desc" }
       }),
       prisma.serviceAssignment.findMany({
@@ -222,8 +222,8 @@ export default async function EarningsPage({
             <DocumentCard
               key={document.id}
               document={document}
-              title={`${document.project?.projectCompany?.name ?? document.project?.clientCompany ?? "Proje Şirketi"} Faturası`}
-              owner={`Proje: ${document.project?.name ?? "-"}`}
+              title={`${document.projectCompany?.name ?? document.project?.projectCompany?.name ?? document.project?.clientCompany ?? "Proje Şirketi"} Toplu Faturası`}
+              owner={[...new Set(document.lines.map((line: any) => line.projectName).filter(Boolean))].join(", ") || "Proje işleri"}
             />
           ))}
           {documents.length === 0 ? (

@@ -47,18 +47,22 @@ export default async function FinancePage({
     );
   }
 
-  const [projects, subcontractors] = await Promise.all([
-    canManageFinance ? prisma.project.findMany({
+  const [projectCompanies, subcontractors] = await Promise.all([
+    canManageFinance ? prisma.projectCompany.findMany({
       include: {
-        projectCompany: true,
         financialDocuments: {
           where: { type: FinancialDocumentType.PROJECT_INVOICE, monthKey: period.month },
           include: { lines: { orderBy: { serviceDate: "asc" } }, createdBy: true }
         },
-        assignments: {
-          where: { serviceDate: { gte: period.startDate, lte: completedUntil } },
-          include: { route: true, vehicle: true },
-          orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
+        projects: {
+          include: {
+            assignments: {
+              where: { serviceDate: { gte: period.startDate, lte: completedUntil } },
+              include: { route: true, vehicle: true, project: true },
+              orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
+            }
+          },
+          orderBy: { name: "asc" }
         }
       },
       orderBy: { name: "asc" }
@@ -88,8 +92,11 @@ export default async function FinancePage({
     })
   ]);
 
-  const issuedIncome = projects.reduce((sum, project) => sum + Number(project.financialDocuments[0]?.netAmount ?? 0), 0);
-  const pendingIncome = projects.reduce((sum, project) => sum + (project.financialDocuments.length ? 0 : project.assignments.reduce((total, item) => total + Number(item.clientPricePerService) * item.serviceCount, 0)), 0);
+  const issuedIncome = projectCompanies.reduce((sum, company) => sum + company.financialDocuments.reduce((total, document) => total + Number(document.netAmount), 0), 0);
+  const pendingIncome = projectCompanies.reduce((sum, company) => {
+    if (company.financialDocuments.length) return sum;
+    return sum + company.projects.flatMap((project) => project.assignments).reduce((total, item) => total + Number(item.clientPricePerService) * item.serviceCount, 0);
+  }, 0);
   const issuedExpense = subcontractors.reduce((sum, subcontractor) => sum + Number(subcontractor.financialDocuments[0]?.netAmount ?? 0), 0);
   const pendingExpense = subcontractors.reduce((sum, subcontractor) => {
     if (subcontractor.financialDocuments.length) return sum;
@@ -130,53 +137,46 @@ export default async function FinancePage({
               <h2 style={{ marginTop: 0 }}>Proje Şirketi Faturaları</h2>
               <p className="muted">Faturalar proje şirketine kesilir; proje adı hizmet ayrıntısı olarak gösterilir.</p>
             </div>
-            <span className="badge blue">{projects.length} proje</span>
+            <span className="badge blue">{projectCompanies.length} şirket</span>
           </div>
           <div className="stack section">
-            {projects.map((project) => {
-              const document = project.financialDocuments[0] ?? null;
-              const draftTotal = project.assignments.reduce((sum, item) => sum + Number(item.clientPricePerService) * item.serviceCount, 0);
+            {projectCompanies.map((company) => {
+              const assignments = company.projects.flatMap((project) => project.assignments);
+              const documents = company.financialDocuments;
+              const draftTotal = assignments.reduce((sum, item) => sum + Number(item.clientPricePerService) * item.serviceCount, 0);
               return (
-                <article className="card status-card" key={project.id}>
+                <article className="card status-card" key={company.id}>
                   <div className="record-head">
                     <div>
-                      <h3 style={{ margin: 0 }}>{project.projectCompany?.name ?? project.clientCompany}</h3>
-                      <p className="muted">Proje: {project.name} · {project.assignments.length} tamamlanan servis</p>
+                      <h3 style={{ margin: 0 }}>{company.name}</h3>
+                      <p className="muted">{company.projects.length} proje · {assignments.length} tamamlanan servis</p>
+                      <div className="chip-row">{company.projects.map((project) => <span className="badge gray" key={project.id}>{project.name}</span>)}</div>
                       <div className="chip-row">
-                        {document ? <span className="badge green">Kesildi · {formatTRY(Number(document.netAmount))}</span> : <span className="badge yellow">Bekliyor · {formatTRY(draftTotal)}</span>}
-                        {document?.issuedAt ? <span className="badge gray">{document.issuedAt.toLocaleDateString("tr-TR")}</span> : null}
+                        {documents.length ? <span className="badge green">Kesildi · {formatTRY(documents.reduce((sum, document) => sum + Number(document.netAmount), 0))}</span> : <span className="badge yellow">Bekliyor · {formatTRY(draftTotal)}</span>}
                       </div>
                     </div>
-                    {document ? (
+                    {documents.length ? (
                       <div className="finance-document-actions">
-                        <PrintReportButton targetId={`project-document-${document.id}`} label="PDF / Yazdır" />
-                        <ModalAction
-                          label={<PencilLine size={17} aria-hidden="true" />}
-                          ariaLabel={`${project.name} faturasını iptal et ve düzenle`}
-                          buttonClassName="danger icon-button"
-                          title={`${project.name} faturası iptal edilsin mi?`}
-                          tone="danger"
-                        >
-                          <form className="stack" action={cancelProjectInvoiceDocument}>
-                            <input type="hidden" name="documentId" value={document.id} />
-                            <input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />
-                            <div className="confirm-panel danger-soft">
-                              <strong>Bu fatura iptal edilecek.</strong>
-                              <p>Servis kayıtları silinmez. Güzergah, servis veya ücret bilgilerini düzenledikten sonra aynı dönem için yeniden fatura oluşturabilirsiniz.</p>
-                            </div>
-                            <div className="actions"><SubmitButton>İptal et ve düzenlemeye aç</SubmitButton></div>
-                          </form>
-                        </ModalAction>
+                        {documents.map((document) => <div className="finance-document-actions" key={document.id}>
+                          <PrintReportButton targetId={`project-document-${document.id}`} label="PDF / Yazdır" />
+                          <ModalAction label={<PencilLine size={17} aria-hidden="true" />} ariaLabel={`${company.name} faturasını iptal et`} buttonClassName="danger icon-button" title={`${company.name} faturası iptal edilsin mi?`} tone="danger">
+                            <form className="stack" action={cancelProjectInvoiceDocument}>
+                              <input type="hidden" name="documentId" value={document.id} /><input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />
+                              <div className="confirm-panel danger-soft"><strong>Bu fatura iptal edilecek.</strong><p>Servis kayıtları silinmez; şirket faturası yeniden oluşturulabilir.</p></div>
+                              <div className="actions"><SubmitButton>İptal et</SubmitButton></div>
+                            </form>
+                          </ModalAction>
+                        </div>)}
                       </div>
                     ) : (
-                      <ModalAction label="Fatura Oluştur" title={`${project.projectCompany?.name ?? project.clientCompany} Faturası`}>
+                      <ModalAction label="Toplu Fatura Oluştur" title={`${company.name} Toplu Faturası`}>
                         <form className="stack" action={issueProjectInvoiceDocument}>
-                          <input type="hidden" name="projectId" value={project.id} />
+                          <input type="hidden" name="projectCompanyId" value={company.id} />
                           <input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />
                           <PeriodOptionField currentMonth={period.month} label="Kesim dönemi" hint="Fatura hangi ay için oluşturulacak?" />
                           <details className="document-preview-toggle">
                             <summary>Önizle</summary>
-                            <MonthlyServiceReviewCards assignments={project.assignments} mode="client" monthKey={period.month} />
+                            <MonthlyServiceReviewCards assignments={assignments} mode="client" monthKey={period.month} />
                           </details>
                           <label className="field-row">
                             <span><strong>Not</strong><small>Fatura iç notu.</small></span>
@@ -187,18 +187,11 @@ export default async function FinancePage({
                       </ModalAction>
                     )}
                   </div>
-                  {document ? (
-                    <FinancialDocumentReport
-                      document={document}
-                      title={`${project.projectCompany?.name ?? project.clientCompany} Faturası`}
-                      owner={`Proje: ${project.name}`}
-                      targetId={`project-document-${document.id}`}
-                    />
-                  ) : null}
+                  {documents.map((document) => <FinancialDocumentReport key={document.id} document={document} title={`${company.name} Toplu Faturası`} owner={`${company.projects.length} proje`} targetId={`project-document-${document.id}`} />)}
                 </article>
               );
             })}
-            {projects.length === 0 ? <p className="muted">Faturalandırılacak proje yok.</p> : null}
+            {projectCompanies.length === 0 ? <p className="muted">Faturalandırılacak proje şirketi yok.</p> : null}
           </div>
         </section>
       ) : null}

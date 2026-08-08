@@ -260,6 +260,7 @@ async function main() {
       periodStart: new Date(now.getFullYear(), now.getMonth(), 1),
       periodEnd: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999),
       projectId: projectA.id,
+      projectCompanyId: projectCompanyA.id,
       createdByUserId: manager.id,
       grossAmount: 2800,
       expenseAmount: 0,
@@ -272,6 +273,11 @@ async function main() {
   ok("Yonetici kullanici ekleme/guncelleme kaydi olusturabilir", Boolean(manager.id && supervisor.id && subcontractorUser.id && projectOwner.id));
   ok("Yonetici hakedis ve fatura belgesi olusturabilir", Boolean(earning.id && invoice.id));
   ok("Proje sirketi birden fazla projeye sahip olabilir", (await prisma.projectCompany.findUnique({ where: { id: projectCompanyA.id }, include: { projects: true } }))?.projects.length === 2);
+  const companyInvoiceAssignments = await prisma.serviceAssignment.findMany({
+    where: { project: { projectCompanyId: projectCompanyA.id } },
+    select: { projectId: true }
+  });
+  ok("Sirket faturasi tum bagli projelerin islerini toplar", new Set(companyInvoiceAssignments.map((item) => item.projectId)).size === 2);
 
   const supervisorProjects = await prisma.project.findMany({
     where: { serviceUsers: { some: { id: supervisor.id } }, name: { startsWith: prefix } }

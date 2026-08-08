@@ -853,26 +853,26 @@ export async function issueProjectInvoiceDocument(formData: FormData) {
     redirect("/transitos/earnings");
   }
 
-  const projectId = text(formData, "projectId");
+  const projectCompanyId = text(formData, "projectCompanyId");
   const period = periodFromMonthKey(text(formData, "monthKey"));
   const completedUntil = new Date(Math.min(period.endDate.getTime(), endOfToday().getTime()));
   const selectedAssignmentIds = ids(formData, "assignmentIds");
   const manualServiceSelection = text(formData, "serviceSelectionMode") === "manual";
 
-  const [project, assignments] = await Promise.all([
-    prisma.project.findUnique({ where: { id: projectId } }),
+  const [company, assignments] = await Promise.all([
+    prisma.projectCompany.findUnique({ where: { id: projectCompanyId } }),
     prisma.serviceAssignment.findMany({
       where: {
-        projectId,
+        project: { projectCompanyId },
         serviceDate: { gte: period.startDate, lte: completedUntil },
         ...(manualServiceSelection ? { id: { in: selectedAssignmentIds.length ? selectedAssignmentIds : ["__none__"] } } : {})
       },
-      include: { route: true, vehicle: true },
+      include: { route: true, vehicle: true, project: true },
       orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
     })
   ]);
 
-  if (!project) {
+  if (!company) {
     redirect(returnTo(formData, "/transitos/finance"));
   }
 
@@ -882,7 +882,10 @@ export async function issueProjectInvoiceDocument(formData: FormData) {
     where: {
       type: FinancialDocumentType.PROJECT_INVOICE,
       monthKey: period.monthKey,
-      projectId
+      OR: [
+        { projectCompanyId },
+        { project: { projectCompanyId } }
+      ]
     }
   });
 
@@ -892,7 +895,7 @@ export async function issueProjectInvoiceDocument(formData: FormData) {
       monthKey: period.monthKey,
       periodStart: period.startDate,
       periodEnd: period.endDate,
-      projectId,
+      projectCompanyId,
       createdByUserId: persistedUserId(user),
       grossAmount,
       expenseAmount: 0,
@@ -905,7 +908,7 @@ export async function issueProjectInvoiceDocument(formData: FormData) {
           serviceDate: item.serviceDate,
           title: `${item.route.name} · ${serviceDirectionTitle(item.direction)}`,
           description: `${item.vehicle.fleetNumber} · ${item.vehicle.plateNumber}`,
-          projectName: project.name,
+          projectName: item.project?.name ?? "Proje",
           routeName: item.route.name,
           vehicleName: `${item.vehicle.fleetNumber} · ${item.vehicle.plateNumber}`,
           serviceType: serviceDirectionTitle(item.direction),

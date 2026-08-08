@@ -56,7 +56,7 @@ export function FinancialDocumentReport({
           {Number(document.expenseAmount) > 0 ? <Metric label="Gider" value={formatTRY(Number(document.expenseAmount))} tone="orange" /> : null}
           <Metric label="Net" value={formatTRY(Number(document.netAmount))} tone="green" />
         </div>
-        <h2>{groupByVehicle ? "Araç Bazlı Hakediş Detayları" : "Güzergah Bazlı Fatura Detayları"}</h2>
+        <h2>{groupByVehicle ? "Araç Bazlı Hakediş Detayları" : "Proje Bazlı Fatura Detayları"}</h2>
         <ServiceLegend />
         <ServiceGroupList lines={serviceLines} monthKey={document.monthKey} groupByVehicle={groupByVehicle} />
         {expenseLines.length ? (
@@ -409,7 +409,7 @@ function groupServiceLines(lines: ServiceLine[], groupByVehicle: boolean) {
   }>();
 
   for (const line of lines) {
-    const groupTitle = groupByVehicle ? line.vehicleName || "Araç" : line.routeName || line.title || "Güzergah";
+    const groupTitle = groupByVehicle ? line.vehicleName || "Araç" : line.projectName || "Proje";
     const group = groups.get(groupTitle) ?? {
       key: groupTitle,
       title: groupTitle,

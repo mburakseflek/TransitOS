@@ -27,20 +27,21 @@ export default async function LoginPage({
             defaultValue="MANAGER"
             options={[
               { value: "MANAGER", label: "Yönetici", tone: "blue" },
+              { value: "SITE_MODERATOR", label: "Site Moderatörü", tone: "navy" },
               { value: "SERVICE_SUPERVISOR", label: "Servis Sorumlusu", tone: "green" },
               { value: "SUBCONTRACTOR", label: "Taşeron", tone: "yellow" },
               { value: "PROJECT_OWNER", label: "Proje Sahibi", tone: "gray" }
             ]}
           />
         ) : (
-          <input type="hidden" name="role" value="MANAGER" />
+          <input type="hidden" name="role" value="SITE_MODERATOR" />
         )}
 
         <div className="field">
           <FloatingInput
             name="loginId"
-            label={isSiteAdminLogin ? "Site yönetici ID" : "Kullanıcı ID"}
-            placeholder={isSiteAdminLogin ? "Site yönetici ID'nizi yazın" : "Kullanıcı ID'nizi yazın"}
+            label={isSiteAdminLogin ? "Moderatör ID" : "Kullanıcı ID"}
+            placeholder={isSiteAdminLogin ? "Moderatör ID'nizi yazın" : "Kullanıcı ID'nizi yazın"}
             required
             autoComplete="username"
           />
@@ -89,8 +90,8 @@ function SiteAdminLoginHeader() {
         <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
       </div>
       <Auth01Panel
-        title="Kurumsal Site Yönetimi"
-        body="Şeflek Tur web sitesi içerikleri, görselleri, formları ve yayın akışını düzenlemek için güvenli yönetim girişi."
+        title="Kurumsal Site Moderatör Girişi"
+        body="Şeflek Tur web sitesi içeriklerini düzenlemek ve gelen başvuruları görüntülemek için güvenli moderatör girişi."
         mode="site"
       />
     </>

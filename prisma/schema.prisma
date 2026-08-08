@@ -9,6 +9,7 @@ datasource db {
 
 enum UserRole {
   MANAGER
+  SITE_MODERATOR
   SERVICE_SUPERVISOR
   SUBCONTRACTOR
   PROJECT_OWNER

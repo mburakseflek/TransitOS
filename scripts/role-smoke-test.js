@@ -102,6 +102,9 @@ async function main() {
   const manager = await prisma.user.create({
     data: { loginId: `${prefix}-manager`, passwordHash: hash, displayName: "Test Yonetici", role: "MANAGER" }
   });
+  const siteModerator = await prisma.user.create({
+    data: { loginId: `${prefix}-moderator`, passwordHash: hash, displayName: "Test Site Moderatoru", role: "SITE_MODERATOR" }
+  });
   const supervisor = await prisma.user.create({
     data: { loginId: `${prefix}-supervisor`, passwordHash: hash, displayName: "Test Servis Sorumlusu", role: "SERVICE_SUPERVISOR" }
   });
@@ -270,7 +273,8 @@ async function main() {
   });
 
   ok("Yonetici tum projeleri gorebilir", (await prisma.project.count({ where: { name: { startsWith: prefix } } })) === 2);
-  ok("Yonetici kullanici ekleme/guncelleme kaydi olusturabilir", Boolean(manager.id && supervisor.id && subcontractorUser.id && projectOwner.id));
+  ok("Yonetici kullanici ekleme/guncelleme kaydi olusturabilir", Boolean(manager.id && siteModerator.id && supervisor.id && subcontractorUser.id && projectOwner.id));
+  ok("Site moderatoru ayri kullanici rolu olarak olusturulabilir", siteModerator.role === "SITE_MODERATOR");
   ok("Yonetici hakedis ve fatura belgesi olusturabilir", Boolean(earning.id && invoice.id));
   ok("Proje sirketi birden fazla projeye sahip olabilir", (await prisma.projectCompany.findUnique({ where: { id: projectCompanyA.id }, include: { projects: true } }))?.projects.length === 2);
   const companyInvoiceAssignments = await prisma.serviceAssignment.findMany({

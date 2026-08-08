@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { readSessionToken, isManager } from "@/lib/auth";
+import { canManageSite, readSessionToken } from "@/lib/auth";
 import { readJsonRecords, readSiteContent } from "@/lib/site-content";
 import { SiteEditorClient } from "@/app/site-admin/SiteEditorClient";
 
@@ -10,7 +10,7 @@ export default async function SiteAdminPage({ searchParams }: { searchParams?: P
   const token = cookieStore.get("transitos_session")?.value;
   const user = token ? await readSessionToken(token).catch(() => null) : null;
 
-  if (!isManager(user)) {
+  if (!canManageSite(user)) {
     redirect("/login?next=/site-admin");
   }
 

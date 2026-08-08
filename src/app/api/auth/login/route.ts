@@ -6,7 +6,7 @@ import { createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 const loginSchema = z.object({
-  role: z.enum(["MANAGER", "SERVICE_SUPERVISOR", "SUBCONTRACTOR", "PROJECT_OWNER"]),
+  role: z.enum(["MANAGER", "SITE_MODERATOR", "SERVICE_SUPERVISOR", "SUBCONTRACTOR", "PROJECT_OWNER"]),
   loginId: z.string().min(1),
   password: z.string().min(1),
   next: z.string().optional()
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const loginId = body.data.loginId.trim();
   const adminId = process.env.ADMIN_LOGIN_ID ?? "admin";
   const adminPassword = process.env.ADMIN_PASSWORD ?? "";
-  const successPath = safeNextPath(next);
+  const successPath = role === "SITE_MODERATOR" ? "/site-admin" : safeNextPath(next);
 
   if (role === "MANAGER") {
     const isBuiltInAdmin = adminPassword.length > 0 && loginId.trim().toLowerCase() === adminId.toLowerCase() && password === adminPassword;

@@ -55,6 +55,7 @@ export async function AppShell({
     const nextPath = active.startsWith("/transitos") ? active : `/transitos${active}`;
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
+  if (user.role === "SITE_MODERATOR") redirect("/site-admin");
   const displayName = user?.displayName ?? "Şeflek Tur";
   const currentRoleTitle = roleTitle(user?.role);
   const activePath = active.replace(/^\/transitos/, "");

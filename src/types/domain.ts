@@ -1,4 +1,4 @@
-export type UserRole = "MANAGER" | "SERVICE_SUPERVISOR" | "SUBCONTRACTOR" | "PROJECT_OWNER";
+export type UserRole = "MANAGER" | "SITE_MODERATOR" | "SERVICE_SUPERVISOR" | "SUBCONTRACTOR" | "PROJECT_OWNER";
 
 export type DashboardSummary = {
   subcontractors: number;

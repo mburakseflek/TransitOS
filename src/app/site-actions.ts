@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { canManageSite, readSessionToken } from "@/lib/auth";
 import {
   appendJsonRecord,
   CompanyDetail,
@@ -15,6 +17,12 @@ import {
 
 function text(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
+}
+
+async function requireSiteEditor() {
+  const token = (await cookies()).get("transitos_session")?.value;
+  const user = token ? await readSessionToken(token).catch(() => null) : null;
+  if (!canManageSite(user)) redirect("/login?next=/site-admin");
 }
 
 function lines(value: string) {
@@ -84,6 +92,7 @@ function parseCompanyDetails(value: string, fallback: CompanyDetail[]) {
 }
 
 export async function saveSiteContent(formData: FormData) {
+  await requireSiteEditor();
   const existing = await readSiteContent();
   await writeSiteContent({
     ...existing,

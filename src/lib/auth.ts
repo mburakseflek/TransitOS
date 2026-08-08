@@ -19,3 +19,7 @@ export async function readSessionToken(token: string) {
 export function isManager(user?: SessionUser | null) {
   return user?.role === "MANAGER";
 }
+
+export function canManageSite(user?: SessionUser | null) {
+  return user?.role === "MANAGER" || user?.role === "SITE_MODERATOR";
+}

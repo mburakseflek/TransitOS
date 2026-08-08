@@ -137,6 +137,7 @@ function UserFields({
       <Field label="Rol" hint="Kullanıcının TransitOS içindeki yetki modeli.">
         <select name="role" defaultValue={user?.role ?? "SERVICE_SUPERVISOR"}>
           <option value="MANAGER">Yönetici</option>
+          <option value="SITE_MODERATOR">Site Moderatörü</option>
           <option value="SERVICE_SUPERVISOR">Servis Sorumlusu</option>
           <option value="SUBCONTRACTOR">Taşeron</option>
           <option value="PROJECT_OWNER">Proje Sahibi</option>

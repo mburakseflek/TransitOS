@@ -2,6 +2,7 @@ import { SessionUser, UserRole } from "@/types/domain";
 
 export const roleLabels: Record<UserRole, string> = {
   MANAGER: "Yönetici",
+  SITE_MODERATOR: "Site Moderatörü",
   SERVICE_SUPERVISOR: "Servis Sorumlusu",
   SUBCONTRACTOR: "Taşeron",
   PROJECT_OWNER: "Proje Sahibi"
@@ -13,6 +14,10 @@ export function roleTitle(role?: UserRole | null) {
 
 export function isManager(user?: SessionUser | null) {
   return user?.role === "MANAGER";
+}
+
+export function isSiteModerator(user?: SessionUser | null) {
+  return user?.role === "SITE_MODERATOR";
 }
 
 export function isServiceSupervisor(user?: SessionUser | null) {

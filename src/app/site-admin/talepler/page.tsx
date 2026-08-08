@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { ArrowLeft, Building2, CarFront, FileText, Mail, Phone } from "lucide-react";
-import { isManager, readSessionToken } from "@/lib/auth";
+import { canManageSite, readSessionToken } from "@/lib/auth";
 import { readJsonRecords } from "@/lib/site-content";
 
 export default async function SiteRequestsPage() {
@@ -11,7 +11,7 @@ export default async function SiteRequestsPage() {
   const token = cookieStore.get("transitos_session")?.value;
   const user = token ? await readSessionToken(token).catch(() => null) : null;
 
-  if (!isManager(user)) {
+  if (!canManageSite(user)) {
     redirect("/login?next=/site-admin/talepler");
   }
 
@@ -33,7 +33,7 @@ export default async function SiteRequestsPage() {
       </header>
 
       <section className="admin-requests-hero">
-        <span className="new-eyebrow">Yönetici paneli</span>
+        <span className="new-eyebrow">Site moderatörü paneli</span>
         <h1>Hizmet ve taşımacı talepleri</h1>
         <p>Kurumsal siteden gelen tüm formlar burada listelenir. Yeni gelen başvurular en üstte görünür.</p>
         <div className="admin-request-stats">

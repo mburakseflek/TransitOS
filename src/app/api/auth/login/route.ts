@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     projectIds: user.role === "SERVICE_SUPERVISOR"
       ? user.serviceProjects.map((project) => project.id)
       : user.role === "PROJECT_OWNER"
-        ? user.ownerProjects.map((project) => project.id)
+        ? [...new Set([...user.ownerProjects.map((project) => project.id), ...user.ownerCompanies.flatMap((company) => company.projects.map((project) => project.id))])]
         : undefined
   });
 
@@ -122,7 +122,8 @@ async function findUserByLoginId(loginId: string) {
       subcontractorId: true,
       subcontractor: { select: { status: true } },
       serviceProjects: { select: { id: true } },
-      ownerProjects: { select: { id: true } }
+      ownerProjects: { select: { id: true } },
+      ownerCompanies: { select: { projects: { select: { id: true } } } }
     }
   });
 }

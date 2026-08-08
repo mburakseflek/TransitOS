@@ -5,25 +5,28 @@ import { ChevronDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import {
   AdaptiveSlider,
-  FloatingInput,
   FrequencySelector,
   InlineDisclosureMenu,
   QuickCreateCard,
   RegistryStatusPills
 } from "@/app/components/RegistryInterfaceKit";
+import { MoneyInput } from "@/app/components/MoneyInput";
 import {
   createAssignment,
   createBulkAssignments,
   createOneOffJob,
   createProject,
+  createProjectCompany,
   createRoute,
   deleteAssignment,
   deleteAssignmentGroup,
   deleteOneOffJob,
   deleteProject,
+  deleteProjectCompany,
   deleteRoute,
   updateAssignmentGroup,
   updateProject,
+  updateProjectCompany,
   updateOneOffJob,
   updateRoute
 } from "@/app/actions";
@@ -52,7 +55,7 @@ export default async function ProjectsPage({
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
   const defaultServiceDate = defaultDateForPeriod(period.month);
-  const [projects, vehicles, oneOffRoutes, projectOwners, requestedProject] = await Promise.all([
+  const [projects, vehicles, oneOffRoutes, projectCompanies, requestedProject] = await Promise.all([
     prisma.project.findMany({
       where: projectAccessWhere(user),
       select: {
@@ -79,15 +82,14 @@ export default async function ProjectsPage({
       },
       orderBy: { createdAt: "desc" }
     }),
-    canEdit ? prisma.user.findMany({
-      where: { role: "PROJECT_OWNER" },
-      select: { id: true, displayName: true, loginId: true },
-      orderBy: { displayName: "asc" }
+    canEdit ? prisma.projectCompany.findMany({
+      include: { _count: { select: { projects: true } } },
+      orderBy: { name: "asc" }
     }) : Promise.resolve([]),
     requestedProjectId ? prisma.project.findFirst({
       where: { AND: [{ id: requestedProjectId }, projectAccessWhere(user)] },
       include: {
-        ownerUsers: { select: { id: true, displayName: true, loginId: true } },
+        projectCompany: { include: { ownerUsers: { select: { id: true, displayName: true, loginId: true } } } },
         routes: {
           where: routeAccessWhere(user),
           include: {
@@ -120,11 +122,20 @@ export default async function ProjectsPage({
     >
       <PeriodFilter searchParams={params} hidden={{ project: initialProjectId, route: initialRouteId }} monthlyOnly />
       <div className="toolbar">
+        {canEdit ? <QuickCreateCard title="Proje şirketi" body="Bir şirkete birden fazla proje bağlayın.">
+          <ModalAction label="Şirket Ekle" title="Proje Şirketi Ekle">
+            <form className="stack" action={createProjectCompany}>
+              <input type="hidden" name="_returnTo" value="/transitos/projects" />
+              <Field label="Şirket adı" hint="Proje sahibi kurumun ticari adı."><input name="name" required /></Field>
+              <div className="actions"><SubmitButton>✓ Şirket Ekle</SubmitButton></div>
+            </form>
+          </ModalAction>
+        </QuickCreateCard> : null}
         {canEdit ? <QuickCreateCard title="Proje" body="Şirket, sahibi ve güzergah yapısını ekleyin.">
           <ModalAction label="Proje Ekle" title="Proje Ekle">
             <form className="stack" action={createProject}>
               <input type="hidden" name="_returnTo" value="/transitos/projects" />
-              <ProjectFields projectOwners={projectOwners} />
+              <ProjectFields projectCompanies={projectCompanies} />
               <div className="actions"><SubmitButton>✓ Proje Ekle</SubmitButton></div>
             </form>
           </ModalAction>
@@ -140,6 +151,18 @@ export default async function ProjectsPage({
           </ModalAction>
         </QuickCreateCard> : null}
       </div>
+      {canEdit && projectCompanies.length ? <section className="chip-row section" aria-label="Proje şirketleri">
+        {projectCompanies.map((company) => <ModalAction key={company.id} label={`${company.name} · ${company._count.projects} proje`} title={`${company.name} Şirketi`} buttonClassName="ghost compact-button">
+          <div className="stack">
+            <form className="stack" action={updateProjectCompany}>
+              <input type="hidden" name="id" value={company.id} /><input type="hidden" name="_returnTo" value="/transitos/projects" />
+              <Field label="Şirket adı" hint="Bağlı projelerde de güncellenir."><input name="name" defaultValue={company.name} required /></Field>
+              <div className="actions"><SubmitButton>✓ Güncelle</SubmitButton></div>
+            </form>
+            {company._count.projects === 0 ? <form action={deleteProjectCompany}><input type="hidden" name="id" value={company.id} /><DeleteButton>Şirketi Sil</DeleteButton></form> : null}
+          </div>
+        </ModalAction>)}
+      </section> : null}
       <section className="stack project-accordion-stack section">
         {projects.map((project) => {
           const selected = initialProjectId === project.id;
@@ -173,7 +196,7 @@ export default async function ProjectsPage({
               project={selectedProject}
               initialRouteId={initialProjectId === project.id ? initialRouteId : null}
               vehicles={vehicles}
-              projectOwners={projectOwners}
+              projectCompanies={projectCompanies}
               endOfToday={endOfToday}
               canEdit={canEdit}
               showMoney={canEdit}
@@ -191,7 +214,7 @@ export default async function ProjectsPage({
   );
 }
 
-function ProjectCard({ project, initialRouteId, vehicles, projectOwners, endOfToday, canEdit, showMoney, periodMonth, defaultServiceDate, periodQuery }: { project: any; initialRouteId: string | null; vehicles: any[]; projectOwners: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; defaultServiceDate: string; periodQuery: string }) {
+function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endOfToday, canEdit, showMoney, periodMonth, defaultServiceDate, periodQuery }: { project: any; initialRouteId: string | null; vehicles: any[]; projectCompanies: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; defaultServiceDate: string; periodQuery: string }) {
   const allAssignments = project.routes.flatMap((route: any) => route.assignments);
   const completedAssignments = allAssignments.filter((item: any) => item.serviceDate <= endOfToday);
   const totalServices = completedAssignments.reduce((sum: number, item: any) => sum + item.serviceCount, 0);
@@ -216,7 +239,7 @@ function ProjectCard({ project, initialRouteId, vehicles, projectOwners, endOfTo
               <form className="stack" action={updateProject}>
                 <input type="hidden" name="id" value={project.id} />
                 <input type="hidden" name="_returnTo" value={`/transitos/projects?project=${project.id}`} />
-                <ProjectFields project={project} projectOwners={projectOwners} />
+                <ProjectFields project={project} projectCompanies={projectCompanies} />
                 <div className="actions"><SubmitButton>✓ Güncelle</SubmitButton></div>
               </form>
               <form className="actions" action={deleteProject}>
@@ -247,7 +270,7 @@ function ProjectCard({ project, initialRouteId, vehicles, projectOwners, endOfTo
       />
       <div className="chip-row section">
         <span className="badge blue">Proje sahipleri</span>
-        {project.ownerUsers.length ? project.ownerUsers.map((owner: any) => (
+        {project.projectCompany?.ownerUsers.length ? project.projectCompany.ownerUsers.map((owner: any) => (
           <span className="badge gray" key={owner.id}>{owner.displayName} · {owner.loginId}</span>
         )) : <span className="badge yellow">Henüz proje sahibi atanmadı</span>}
       </div>
@@ -540,28 +563,22 @@ function ServiceGroupDetails({
   );
 }
 
-function ProjectFields({ project, projectOwners }: { project?: any; projectOwners: { id: string; displayName: string; loginId: string }[] }) {
-  const selectedOwnerIds = new Set((project?.ownerUsers ?? []).map((item: any) => item.id));
+function ProjectFields({ project, projectCompanies }: { project?: any; projectCompanies: { id: string; name: string }[] }) {
   return (
     <>
       <FormSection title="Proje bilgileri" description="Önce projeyi tanımlayan temel bilgileri girin.">
         <Field label="Proje adı" hint="İç takipte görünen ad."><input name="name" defaultValue={project?.name ?? ""} required /></Field>
-        <Field label="Proje şirketi" hint="Hizmet verilen şirket."><input name="clientCompany" defaultValue={project?.clientCompany ?? ""} required /></Field>
+        <Field label="Proje şirketi" hint="Projenin sahibi olan şirket. Aynı şirket birden fazla projede seçilebilir.">
+          <select name="projectCompanyId" defaultValue={project?.projectCompanyId ?? ""} required>
+            <option value="">Şirket seçin</option>
+            {projectCompanies.map((company) => <option value={company.id} key={company.id}>{company.name}</option>)}
+          </select>
+        </Field>
         <Field label="Personel" hint="Taşınacak toplam personel."><input name="personnelCount" type="number" defaultValue={project?.personnelCount ?? 0} /></Field>
         <Field label="Durum" hint="Planlama, aktif veya tamamlandı.">
           <select name="status" defaultValue={project?.status ?? "PLANNING"}>
             <option value="PLANNING">Planlama</option><option value="ACTIVE">Aktif</option><option value="COMPLETED">Tamamlandı</option><option value="PASSIVE">Pasif</option>
           </select>
-        </Field>
-      </FormSection>
-      <FormSection title="Görüntüleme yetkisi" description="Projeyi görebilecek proje sahibi kullanıcılarını seçin." optional>
-        <Field label="Proje sahibi" hint="Seçilen kişiler yalnız kendi proje ve fatura detaylarını görür.">
-          <div className="checkbox-grid">
-            {projectOwners.map((owner) => (
-              <label key={owner.id}><input type="checkbox" name="ownerUserIds" value={owner.id} defaultChecked={selectedOwnerIds.has(owner.id)} /><span>{owner.displayName}<small>{owner.loginId}</small></span></label>
-            ))}
-            {projectOwners.length === 0 ? <small className="muted">Önce Ayarlar panelinden Proje Sahibi kullanıcısı ekleyin.</small> : null}
-          </div>
         </Field>
       </FormSection>
     </>
@@ -600,8 +617,8 @@ function AssignmentOptions({ vehicles }: { vehicles: { id: string; fleetNumber: 
         <ServiceDirectionSelector />
       </Field>
       <Field label="Servis adedi" hint="O gün yapılacak servis sayısı."><AdaptiveSlider name="serviceCount" label="Servis sayısı" min={1} max={20} defaultValue={1} helper="Tek servis için 1, aynı gün tekrar için artırın." /></Field>
-      <Field label="Taşıyıcı hakedişi" hint="Bu servisin taşeron servis başı TL tutarı."><FloatingInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue="0" inputMode="decimal" /></Field>
-      <Field label="Proje fatura tutarı" hint="Bu servisin proje sahibine servis başı TL tutarı."><FloatingInput name="clientPricePerService" label="₺ Proje servis başı" defaultValue="0" inputMode="decimal" /></Field>
+      <Field label="Taşıyıcı hakedişi" hint="Bu servisin taşeron servis başı TL tutarı."><MoneyInput name="pricePerService" label="₺ Taşıyıcı servis başı" /></Field>
+      <Field label="Proje fatura tutarı" hint="Bu servisin proje sahibine servis başı TL tutarı."><MoneyInput name="clientPricePerService" label="₺ Proje servis başı" /></Field>
     </FormSection>
   );
 }
@@ -654,10 +671,10 @@ function BulkGroupEditFields({
           <AdaptiveSlider name="serviceCount" label="Servis sayısı" min={1} max={20} defaultValue={group.serviceCount} helper="Bu değer seçili günlerin tamamına uygulanır." />
         </Field>
         <Field label="Taşıyıcı hakedişi" hint="Taşerona servis başına yazılacak TL tutarı.">
-          <FloatingInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue={group.carrierUnitPrice} inputMode="decimal" />
+          <MoneyInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue={group.carrierUnitPrice} />
         </Field>
         <Field label="Proje fatura tutarı" hint="Proje sahibine servis başına yazılacak TL tutarı.">
-          <FloatingInput name="clientPricePerService" label="₺ Proje servis başı" defaultValue={group.clientUnitPrice} inputMode="decimal" />
+          <MoneyInput name="clientPricePerService" label="₺ Proje servis başı" defaultValue={group.clientUnitPrice} />
         </Field>
       </div>
     </>
@@ -688,8 +705,8 @@ function OneOffFields({
         <strong>Tek Seferlik İş Ücretleri</strong>
         <small>Bu iş kendi güzergah kartı gibi saklanır; servis kaydı bu fiyatları kullanır.</small>
       </div>
-      <Field label="Taşıyıcı hakediş fiyatı" hint="Servis başına TL."><FloatingInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue={assignment ? Number(assignment.pricePerService) : 0} inputMode="decimal" /></Field>
-      <Field label="Proje sahibi fatura fiyatı" hint="Müşteriye servis başı TL."><FloatingInput name="clientPricePerService" label="₺ Proje servis başı" defaultValue={assignment ? Number(assignment.clientPricePerService ?? 0) : 0} inputMode="decimal" /></Field>
+      <Field label="Taşıyıcı hakediş fiyatı" hint="Servis başına TL."><MoneyInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue={assignment ? Number(assignment.pricePerService) : 0} /></Field>
+      <Field label="Proje sahibi fatura fiyatı" hint="Müşteriye servis başı TL."><MoneyInput name="clientPricePerService" label="₺ Proje servis başı" defaultValue={assignment ? Number(assignment.clientPricePerService ?? 0) : 0} /></Field>
     </>
   );
 }

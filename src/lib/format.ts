@@ -2,8 +2,21 @@ export function formatTRY(value: number) {
   return new Intl.NumberFormat("tr-TR", {
     style: "currency",
     currency: "TRY",
-    maximumFractionDigits: 0
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
   }).format(value);
+}
+
+export function parseTurkishMoney(input: FormDataEntryValue | string | number | null | undefined) {
+  const raw = String(input ?? "").trim().replace(/[₺\s]/g, "");
+  if (!raw) return 0;
+  const normalized = raw.includes(",")
+    ? raw.replace(/\./g, "").replace(",", ".")
+    : /^-?\d{1,3}(\.\d{3})+$/.test(raw)
+      ? raw.replace(/\./g, "")
+      : raw;
+  const value = Number(normalized);
+  return Number.isFinite(value) ? Math.round((value + Number.EPSILON) * 100) / 100 : 0;
 }
 
 export function monthKey(date = new Date()) {

@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ExpenseCategory, FinancialDocumentLineKind, FinancialDocumentType, RecordStatus, ServiceDirection, UserRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { formatPhoneTR, monthKey, normalizePhoneDigitsTR } from "@/lib/format";
+import { formatPhoneTR, monthKey, normalizePhoneDigitsTR, parseTurkishMoney } from "@/lib/format";
 import { readSessionToken } from "@/lib/auth";
 import { expenseCategoryTitle, serviceDirectionTitle } from "@/lib/labels";
 import { canEditOperations, canManageSubcontractors, canManageUsers, isManager, isServiceSupervisor } from "@/lib/permissions";
@@ -16,6 +16,10 @@ function text(formData: FormData, key: string) {
 
 function numberValue(formData: FormData, key: string) {
   return Number(String(formData.get(key) ?? "0").replace(",", ".")) || 0;
+}
+
+function moneyValue(formData: FormData, key: string) {
+  return parseTurkishMoney(formData.get(key));
 }
 
 function ratingValue(formData: FormData, key: string) {
@@ -235,6 +239,7 @@ export async function createAccessUser(formData: FormData) {
   await requireUserManager();
   const role = userRole(formData);
   const projectIds = formData.getAll("projectIds").map(String).filter(Boolean);
+  const companyIds = ids(formData, "companyIds");
   const loginId = text(formData, "loginId");
   const passwordHash = await bcrypt.hash(text(formData, "password") || "1234", 10);
   await prisma.user.upsert({
@@ -248,9 +253,8 @@ export async function createAccessUser(formData: FormData) {
       serviceProjects: role === UserRole.SERVICE_SUPERVISOR
         ? { connect: projectIds.map((id) => ({ id })) }
         : undefined,
-      ownerProjects: role === UserRole.PROJECT_OWNER
-        ? { connect: projectIds.map((id) => ({ id })) }
-        : undefined
+      ownerProjects: undefined,
+      ownerCompanies: role === UserRole.PROJECT_OWNER ? { connect: companyIds.map((id) => ({ id })) } : undefined
     },
     update: {
       passwordHash,
@@ -258,7 +262,8 @@ export async function createAccessUser(formData: FormData) {
       role,
       subcontractorId: role === UserRole.SUBCONTRACTOR ? optionalId(formData, "subcontractorId") : null,
       serviceProjects: { set: role === UserRole.SERVICE_SUPERVISOR ? projectIds.map((id) => ({ id })) : [] },
-      ownerProjects: { set: role === UserRole.PROJECT_OWNER ? projectIds.map((id) => ({ id })) : [] }
+      ownerProjects: { set: [] },
+      ownerCompanies: { set: role === UserRole.PROJECT_OWNER ? companyIds.map((id) => ({ id })) : [] }
     }
   });
   redirect(returnTo(formData, "/transitos/settings"));
@@ -268,6 +273,7 @@ export async function updateAccessUser(formData: FormData) {
   await requireUserManager();
   const role = userRole(formData);
   const projectIds = formData.getAll("projectIds").map(String).filter(Boolean);
+  const companyIds = ids(formData, "companyIds");
   const password = text(formData, "password");
   await prisma.user.update({
     where: { id: text(formData, "id") },
@@ -278,7 +284,8 @@ export async function updateAccessUser(formData: FormData) {
       role,
       subcontractorId: role === UserRole.SUBCONTRACTOR ? optionalId(formData, "subcontractorId") : null,
       serviceProjects: { set: role === UserRole.SERVICE_SUPERVISOR ? projectIds.map((id) => ({ id })) : [] },
-      ownerProjects: { set: role === UserRole.PROJECT_OWNER ? projectIds.map((id) => ({ id })) : [] }
+      ownerProjects: { set: [] },
+      ownerCompanies: { set: role === UserRole.PROJECT_OWNER ? companyIds.map((id) => ({ id })) : [] }
     }
   });
   redirect(returnTo(formData, "/transitos/settings"));
@@ -356,14 +363,15 @@ export async function deleteVehicle(formData: FormData) {
 
 export async function createProject(formData: FormData) {
   await requireOperationsEditor();
-  const ownerUserIds = formData.getAll("ownerUserIds").map(String).filter(Boolean);
+  const company = await prisma.projectCompany.findUnique({ where: { id: text(formData, "projectCompanyId") } });
+  if (!company) redirect(returnTo(formData, "/transitos/projects"));
   await prisma.project.create({
     data: {
       name: text(formData, "name"),
-      clientCompany: text(formData, "clientCompany"),
+      clientCompany: company.name,
+      projectCompanyId: company.id,
       personnelCount: numberValue(formData, "personnelCount"),
-      status: recordStatus(formData, "status", RecordStatus.PLANNING),
-      ownerUsers: ownerUserIds.length ? { connect: ownerUserIds.map((id) => ({ id })) } : undefined
+      status: recordStatus(formData, "status", RecordStatus.PLANNING)
     }
   });
   redirect(returnTo(formData, "/transitos/projects"));
@@ -371,18 +379,43 @@ export async function createProject(formData: FormData) {
 
 export async function updateProject(formData: FormData) {
   await requireOperationsEditor();
-  const ownerUserIds = formData.getAll("ownerUserIds").map(String).filter(Boolean);
+  const company = await prisma.projectCompany.findUnique({ where: { id: text(formData, "projectCompanyId") } });
+  if (!company) redirect(returnTo(formData, "/transitos/projects"));
   await prisma.project.update({
     where: { id: text(formData, "id") },
     data: {
       name: text(formData, "name"),
-      clientCompany: text(formData, "clientCompany"),
+      clientCompany: company.name,
+      projectCompanyId: company.id,
       personnelCount: numberValue(formData, "personnelCount"),
-      status: recordStatus(formData, "status", RecordStatus.PLANNING),
-      ownerUsers: { set: ownerUserIds.map((id) => ({ id })) }
+      status: recordStatus(formData, "status", RecordStatus.PLANNING)
     }
   });
   redirect(returnTo(formData, `/transitos/projects?project=${text(formData, "id")}`));
+}
+
+export async function createProjectCompany(formData: FormData) {
+  await requireOperationsEditor();
+  const name = text(formData, "name");
+  if (name) await prisma.projectCompany.upsert({ where: { name }, create: { name }, update: {} });
+  redirect(returnTo(formData, "/transitos/projects"));
+}
+
+export async function updateProjectCompany(formData: FormData) {
+  await requireOperationsEditor();
+  const id = text(formData, "id");
+  const name = text(formData, "name");
+  if (name) await prisma.$transaction([
+    prisma.projectCompany.update({ where: { id }, data: { name } }),
+    prisma.project.updateMany({ where: { projectCompanyId: id }, data: { clientCompany: name } })
+  ]);
+  redirect(returnTo(formData, "/transitos/projects"));
+}
+
+export async function deleteProjectCompany(formData: FormData) {
+  await requireOperationsEditor();
+  await prisma.projectCompany.delete({ where: { id: text(formData, "id") } });
+  redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function deleteProject(formData: FormData) {
@@ -452,8 +485,8 @@ export async function createAssignment(formData: FormData) {
       direction: serviceDirection(formData),
       serviceCount: numberValue(formData, "serviceCount") || 1,
       kilometers: 0,
-      pricePerService: numberValue(formData, "pricePerService"),
-      clientPricePerService: numberValue(formData, "clientPricePerService"),
+      pricePerService: moneyValue(formData, "pricePerService"),
+      clientPricePerService: moneyValue(formData, "clientPricePerService"),
       monthKey: monthKey(serviceDate)
     }
   });
@@ -480,8 +513,8 @@ export async function updateAssignment(formData: FormData) {
       direction: serviceDirection(formData),
       serviceCount: numberValue(formData, "serviceCount") || 1,
       kilometers: 0,
-      pricePerService: numberValue(formData, "pricePerService"),
-      clientPricePerService: numberValue(formData, "clientPricePerService"),
+      pricePerService: moneyValue(formData, "pricePerService"),
+      clientPricePerService: moneyValue(formData, "clientPricePerService"),
       monthKey: monthKey(serviceDate)
     }
   });
@@ -525,8 +558,8 @@ export async function createBulkAssignments(formData: FormData) {
         direction: serviceDirection(formData),
         serviceCount: numberValue(formData, "serviceCount") || 1,
         kilometers: 0,
-        pricePerService: numberValue(formData, "pricePerService"),
-        clientPricePerService: numberValue(formData, "clientPricePerService"),
+        pricePerService: moneyValue(formData, "pricePerService"),
+        clientPricePerService: moneyValue(formData, "clientPricePerService"),
         monthKey: monthKey(serviceDate)
       });
   }
@@ -599,8 +632,8 @@ export async function updateAssignmentGroup(formData: FormData) {
         direction: serviceDirection(formData),
         serviceCount: numberValue(formData, "serviceCount") || 1,
         kilometers: 0,
-        pricePerService: numberValue(formData, "pricePerService"),
-        clientPricePerService: numberValue(formData, "clientPricePerService"),
+        pricePerService: moneyValue(formData, "pricePerService"),
+        clientPricePerService: moneyValue(formData, "clientPricePerService"),
         monthKey: monthKey(serviceDate)
       };
 
@@ -641,8 +674,8 @@ export async function createOneOffJob(formData: FormData) {
       averageKilometers: 0,
       mapDistanceKm: 0,
       standardWorkDays: 0,
-      defaultCarrierPricePerService: numberValue(formData, "pricePerService"),
-      defaultClientPricePerService: numberValue(formData, "clientPricePerService")
+      defaultCarrierPricePerService: moneyValue(formData, "pricePerService"),
+      defaultClientPricePerService: moneyValue(formData, "clientPricePerService")
     }
   });
 
@@ -656,8 +689,8 @@ export async function createOneOffJob(formData: FormData) {
       direction: ServiceDirection.ONE_OFF,
       serviceCount: numberValue(formData, "serviceCount") || 1,
       kilometers: 0,
-      pricePerService: numberValue(formData, "pricePerService"),
-      clientPricePerService: numberValue(formData, "clientPricePerService"),
+      pricePerService: moneyValue(formData, "pricePerService"),
+      clientPricePerService: moneyValue(formData, "clientPricePerService"),
       monthKey: monthKey(serviceDate)
     }
   });
@@ -679,8 +712,8 @@ export async function updateOneOffJob(formData: FormData) {
       averageKilometers: 0,
       mapDistanceKm: 0,
       standardWorkDays: 0,
-      defaultCarrierPricePerService: numberValue(formData, "pricePerService"),
-      defaultClientPricePerService: numberValue(formData, "clientPricePerService")
+      defaultCarrierPricePerService: moneyValue(formData, "pricePerService"),
+      defaultClientPricePerService: moneyValue(formData, "clientPricePerService")
     }
   });
 
@@ -695,8 +728,8 @@ export async function updateOneOffJob(formData: FormData) {
         direction: ServiceDirection.ONE_OFF,
         serviceCount: numberValue(formData, "serviceCount") || 1,
         kilometers: 0,
-        pricePerService: numberValue(formData, "pricePerService"),
-        clientPricePerService: numberValue(formData, "clientPricePerService"),
+        pricePerService: moneyValue(formData, "pricePerService"),
+        clientPricePerService: moneyValue(formData, "clientPricePerService"),
         monthKey: monthKey(serviceDate)
       }
     });
@@ -926,7 +959,7 @@ export async function createExpense(formData: FormData) {
       subcontractorId,
       vehicleId,
       category: expenseCategory(formData),
-      amount: numberValue(formData, "amount"),
+      amount: moneyValue(formData, "amount"),
       expenseDate,
       monthKey: monthKey(expenseDate),
       notes: optional(formData, "notes")
@@ -946,7 +979,7 @@ export async function updateExpense(formData: FormData) {
       subcontractorId,
       vehicleId,
       category: expenseCategory(formData),
-      amount: numberValue(formData, "amount"),
+      amount: moneyValue(formData, "amount"),
       expenseDate,
       monthKey: monthKey(expenseDate),
       notes: optional(formData, "notes")

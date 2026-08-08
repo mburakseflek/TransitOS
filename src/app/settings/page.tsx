@@ -12,16 +12,17 @@ export default async function SettingsPage() {
   const sessionCookie = (await cookies()).get("transitos_session")?.value;
   const user = sessionCookie ? await readSessionToken(sessionCookie).catch(() => null) : null;
   const canManage = canManageUsers(user);
-  const [users, subcontractors, projects] = canManage
+  const [users, subcontractors, projects, companies] = canManage
     ? await Promise.all([
       prisma.user.findMany({
-        include: { subcontractor: true, serviceProjects: true, ownerProjects: true },
+        include: { subcontractor: true, serviceProjects: true, ownerProjects: true, ownerCompanies: true },
         orderBy: [{ role: "asc" }, { displayName: "asc" }]
       }),
       prisma.subcontractor.findMany({ orderBy: { companyName: "asc" } }),
-      prisma.project.findMany({ orderBy: { name: "asc" } })
+      prisma.project.findMany({ orderBy: { name: "asc" } }),
+      prisma.projectCompany.findMany({ orderBy: { name: "asc" } })
     ])
-    : [[], [], []];
+    : [[], [], [], []];
 
   return (
     <AppShell active="/transitos/settings" title="Ayarlar" subtitle="Oturum, kullanıcı yetkileri ve panel erişimleri.">
@@ -55,7 +56,7 @@ export default async function SettingsPage() {
             <ModalAction label="Kullanıcı Ekle" title="Kullanıcı Ekle">
               <form className="stack" action={createAccessUser}>
                 <input type="hidden" name="_returnTo" value="/transitos/settings" />
-                <UserFields projects={projects} subcontractors={subcontractors} />
+                <UserFields projects={projects} companies={companies} subcontractors={subcontractors} />
                 <div className="actions"><SubmitButton>✓ Kullanıcı Ekle</SubmitButton></div>
               </form>
             </ModalAction>
@@ -68,7 +69,7 @@ export default async function SettingsPage() {
                 const projectNames = item.role === "SERVICE_SUPERVISOR"
                   ? item.serviceProjects.map((project) => project.name)
                   : item.role === "PROJECT_OWNER"
-                    ? item.ownerProjects.map((project) => project.name)
+                    ? [...item.ownerCompanies.map((company) => company.name), ...item.ownerProjects.map((project) => project.name)]
                     : [];
                 return (
                   <tr key={item.id}>
@@ -82,7 +83,7 @@ export default async function SettingsPage() {
                           <form className="stack" action={updateAccessUser}>
                             <input type="hidden" name="id" value={item.id} />
                             <input type="hidden" name="_returnTo" value="/transitos/settings" />
-                            <UserFields user={item} projects={projects} subcontractors={subcontractors} />
+                            <UserFields user={item} projects={projects} companies={companies} subcontractors={subcontractors} />
                             <div className="actions"><SubmitButton>✓ Güncelle</SubmitButton></div>
                           </form>
                           <form className="stack" action={deleteAccessUser}>
@@ -109,16 +110,18 @@ export default async function SettingsPage() {
 function UserFields({
   user,
   subcontractors,
-  projects
+  projects,
+  companies
 }: {
   user?: any;
   subcontractors: { id: string; companyName: string }[];
   projects: { id: string; name: string; clientCompany: string }[];
+  companies: { id: string; name: string }[];
 }) {
   const assignedProjectIds = new Set([
-    ...(user?.serviceProjects?.map((project: any) => project.id) ?? []),
-    ...(user?.ownerProjects?.map((project: any) => project.id) ?? [])
+    ...(user?.serviceProjects?.map((project: any) => project.id) ?? [])
   ]);
+  const assignedCompanyIds = new Set(user?.ownerCompanies?.map((company: any) => company.id) ?? []);
 
   return (
     <>
@@ -145,7 +148,7 @@ function UserFields({
           {subcontractors.map((item) => <option key={item.id} value={item.id}>{item.companyName}</option>)}
         </select>
       </Field>
-      <Field label="Proje yetkileri" hint="Servis sorumlusu ve proje sahibi için erişilebilir projeler.">
+      <Field label="Servis sorumlusu proje yetkileri" hint="Yalnız servis sorumlusu rolünde doğrudan proje erişimi verir.">
         <div className="checkbox-grid">
           {projects.map((project) => (
             <label key={project.id}>
@@ -154,6 +157,17 @@ function UserFields({
             </label>
           ))}
           {projects.length === 0 ? <p className="muted">Önce proje ekleyin.</p> : null}
+        </div>
+      </Field>
+      <Field label="Proje sahibi şirket yetkileri" hint="Proje sahibi, seçilen şirketin bugünkü ve daha sonra eklenecek tüm projelerini görür.">
+        <div className="checkbox-grid">
+          {companies.map((company) => (
+            <label key={company.id}>
+              <input name="companyIds" type="checkbox" value={company.id} defaultChecked={assignedCompanyIds.has(company.id)} />
+              <span>{company.name}</span>
+            </label>
+          ))}
+          {companies.length === 0 ? <p className="muted">Önce Projeler panelinden proje şirketi ekleyin.</p> : null}
         </div>
       </Field>
     </>

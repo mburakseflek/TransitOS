@@ -199,7 +199,7 @@ export default async function EarningsPage({
         where: {
           type: FinancialDocumentType.PROJECT_INVOICE,
           periodStart: { gte: period.startDate, lte: period.endDate },
-          project: { ownerUsers: { some: { id: userId } } }
+          project: { OR: [{ projectCompany: { ownerUsers: { some: { id: userId } } } }, { ownerUsers: { some: { id: userId } } }] }
         },
         include: { project: true, lines: { orderBy: { serviceDate: "asc" } } },
         orderBy: { issuedAt: "desc" }
@@ -207,7 +207,7 @@ export default async function EarningsPage({
       prisma.serviceAssignment.findMany({
         where: {
           serviceDate: periodDateWhere(period),
-          project: { ownerUsers: { some: { id: userId } } }
+          project: { OR: [{ projectCompany: { ownerUsers: { some: { id: userId } } } }, { ownerUsers: { some: { id: userId } } }] }
         },
         include: { route: true, project: true, vehicle: true },
         orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]

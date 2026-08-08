@@ -3,7 +3,8 @@ import { Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { ExpenseReport } from "@/app/components/FinancialDocumentView";
 import { ExpenseVehiclePicker } from "@/app/components/ExpenseVehiclePicker";
-import { AddCashDisclosure, FloatingInput } from "@/app/components/RegistryInterfaceKit";
+import { AddCashDisclosure } from "@/app/components/RegistryInterfaceKit";
+import { MoneyInput } from "@/app/components/MoneyInput";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { PrintReportButton } from "@/app/components/PrintReportButton";
 import { createExpense, deleteExpense, updateExpense } from "@/app/actions";
@@ -22,6 +23,7 @@ const categories = [
   ["SEAT_INSURANCE", "Koltuk sigortası"],
   ["FINE", "Ceza"],
   ["TAXI_FEE", "Taksi ücreti"],
+  ["VEHICLE_TRACKING_SUBSCRIPTION", "Araç Takip Sistemi Aboneliği"],
   ["OTHER", "Diğer"]
 ] as const;
 
@@ -149,7 +151,7 @@ function ExpenseFields({
         <select name="category" defaultValue={expense?.category ?? "ADVANCE"}>{categories.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
       </Field>
       <Field label="Tarih" hint="Giderin ait olduğu ay."><input name="expenseDate" type="date" defaultValue={dateInputValue(expense?.expenseDate)} required /></Field>
-      <Field label="Tutar" hint="Türk Lirası."><FloatingInput name="amount" label="₺ Gider tutarı" defaultValue={expense ? Number(expense.amount) : 0} inputMode="decimal" /></Field>
+      <Field label="Tutar" hint="Binlik ayırıcı otomatik nokta, kuruş için virgül kullanılır."><MoneyInput name="amount" label="₺ Gider tutarı" defaultValue={expense ? Number(expense.amount) : 0} required /></Field>
       <Field label="Açıklama" hint="Fiş, işlem veya not bilgisi."><textarea name="notes" defaultValue={expense?.notes ?? ""} rows={3} /></Field>
     </>
   );

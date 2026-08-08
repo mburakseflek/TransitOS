@@ -37,6 +37,7 @@ enum ExpenseCategory {
   SEAT_INSURANCE
   FINE
   TAXI_FEE
+  VEHICLE_TRACKING_SUBSCRIPTION
   OTHER
 }
 
@@ -64,6 +65,7 @@ model User {
   subcontractor   Subcontractor? @relation(fields: [subcontractorId], references: [id])
   serviceProjects Project[]      @relation("ServiceSupervisorProjects")
   ownerProjects   Project[]      @relation("ProjectOwnerProjects")
+  ownerCompanies  ProjectCompany[] @relation("ProjectCompanyOwners")
   financialDocuments FinancialDocument[] @relation("FinancialDocumentCreator")
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -123,6 +125,8 @@ model Project {
   id             String             @id @default(cuid())
   name           String
   clientCompany  String
+  projectCompanyId String?
+  projectCompany ProjectCompany? @relation(fields: [projectCompanyId], references: [id], onDelete: SetNull)
   personnelCount Int                @default(0)
   status         RecordStatus       @default(PLANNING)
   serviceUsers   User[]             @relation("ServiceSupervisorProjects")
@@ -133,6 +137,17 @@ model Project {
   financialDocuments FinancialDocument[]
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
+
+  @@index([projectCompanyId])
+}
+
+model ProjectCompany {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  projects   Project[]
+  ownerUsers User[]    @relation("ProjectCompanyOwners")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model ServiceRoute {

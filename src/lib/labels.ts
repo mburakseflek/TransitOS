@@ -29,6 +29,8 @@ export function expenseCategoryTitle(value: string) {
       return "Ceza";
     case "TAXI_FEE":
       return "Taksi ücreti";
+    case "VEHICLE_TRACKING_SUBSCRIPTION":
+      return "Araç Takip Sistemi Aboneliği";
     case "OTHER":
       return "Diğer";
     default:

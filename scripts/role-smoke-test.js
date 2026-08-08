@@ -50,6 +50,7 @@ async function cleanup() {
   });
   await prisma.serviceRoute.deleteMany({ where: { name: { startsWith: prefix } } });
   await prisma.project.deleteMany({ where: { name: { startsWith: prefix } } });
+  await prisma.projectCompany.deleteMany({ where: { name: { startsWith: prefix } } });
   await prisma.vehicle.deleteMany({ where: { fleetNumber: { startsWith: prefix } } });
   await prisma.user.deleteMany({ where: { loginId: { startsWith: prefix } } });
   await prisma.subcontractor.deleteMany({ where: { companyName: { startsWith: prefix } } });
@@ -117,10 +118,18 @@ async function main() {
     data: { loginId: `${prefix}-owner`, passwordHash: hash, displayName: "Test Proje Sahibi", role: "PROJECT_OWNER" }
   });
 
+  const projectCompanyA = await prisma.projectCompany.create({
+    data: {
+      name: `${prefix} musteri A`,
+      ownerUsers: { connect: [{ id: projectOwner.id }] }
+    }
+  });
+
   const projectA = await prisma.project.create({
     data: {
       name: `${prefix} proje A`,
       clientCompany: "Musteri A",
+      projectCompanyId: projectCompanyA.id,
       personnelCount: 25,
       serviceUsers: { connect: [{ id: supervisor.id }] },
       ownerUsers: { connect: [{ id: projectOwner.id }] }
@@ -130,6 +139,7 @@ async function main() {
     data: {
       name: `${prefix} proje B`,
       clientCompany: "Musteri B",
+      projectCompanyId: projectCompanyA.id,
       personnelCount: 15
     }
   });
@@ -262,6 +272,7 @@ async function main() {
   ok("Yonetici tum projeleri gorebilir", (await prisma.project.count({ where: { name: { startsWith: prefix } } })) === 2);
   ok("Yonetici kullanici ekleme/guncelleme kaydi olusturabilir", Boolean(manager.id && supervisor.id && subcontractorUser.id && projectOwner.id));
   ok("Yonetici hakedis ve fatura belgesi olusturabilir", Boolean(earning.id && invoice.id));
+  ok("Proje sirketi birden fazla projeye sahip olabilir", (await prisma.projectCompany.findUnique({ where: { id: projectCompanyA.id }, include: { projects: true } }))?.projects.length === 2);
 
   const supervisorProjects = await prisma.project.findMany({
     where: { serviceUsers: { some: { id: supervisor.id } }, name: { startsWith: prefix } }
@@ -305,6 +316,10 @@ async function main() {
     where: { type: "PROJECT_INVOICE", project: { ownerUsers: { some: { id: projectOwner.id } } }, notes: prefix }
   });
   ok("Proje sahibi sadece kendi projesini gorur", ownerProjects.length === 1 && ownerProjects[0].id === projectA.id);
+  const companyOwnerProjects = await prisma.project.findMany({
+    where: { projectCompany: { ownerUsers: { some: { id: projectOwner.id } } }, name: { startsWith: prefix } }
+  });
+  ok("Proje sahibi sirketinin tum projelerini gorur", companyOwnerProjects.length === 2);
   ok("Proje sahibi projesine tahsisli araclari gorur", ownerVehicles.length === 2);
   ok("Proje sahibi proje faturasini gorur", ownerDocs.length === 1);
 

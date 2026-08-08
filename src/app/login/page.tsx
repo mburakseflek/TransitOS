@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Auth01Panel, FloatingInput, FrequencySelector } from "@/app/components/RegistryInterfaceKit";
+import { Auth01Panel, FloatingInput } from "@/app/components/RegistryInterfaceKit";
 import { LoginFormShell, LoginSubmitButton } from "@/app/login/LoginFormShell";
 
 export default async function LoginPage({
@@ -21,18 +21,17 @@ export default async function LoginPage({
         {isSiteAdminLogin ? <SiteAdminLoginHeader /> : <TransitOSLoginHeader />}
 
         {!isSiteAdminLogin ? (
-          <FrequencySelector
-            name="role"
-            label="Giriş profili"
-            defaultValue="MANAGER"
-            options={[
-              { value: "MANAGER", label: "Yönetici", tone: "blue" },
-              { value: "SITE_MODERATOR", label: "Site Moderatörü", tone: "navy" },
-              { value: "SERVICE_SUPERVISOR", label: "Servis Sorumlusu", tone: "green" },
-              { value: "SUBCONTRACTOR", label: "Taşeron", tone: "yellow" },
-              { value: "PROJECT_OWNER", label: "Proje Sahibi", tone: "gray" }
-            ]}
-          />
+          <label className="field login-role-field">
+            <strong>Giriş profili</strong>
+            <select name="role" defaultValue="SUBCONTRACTOR" required>
+              <option value="SUBCONTRACTOR">Taşeron</option>
+              <option value="MANAGER">Yönetici</option>
+              <option value="SITE_MODERATOR">Site Moderatörü</option>
+              <option value="SERVICE_SUPERVISOR">Servis Sorumlusu</option>
+              <option value="PROJECT_OWNER">Proje Sahibi</option>
+            </select>
+            <small className="login-field-hint">Profilinizi seçtiğinizde cihazınızın yerel seçim listesi açılır.</small>
+          </label>
         ) : (
           <input type="hidden" name="role" value="SITE_MODERATOR" />
         )}

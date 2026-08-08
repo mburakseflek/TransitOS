@@ -19050,6 +19050,28 @@ body #transitos-login-screen .frequency-selector legend {
   -webkit-text-fill-color: #101827 !important;
 }
 
+body #transitos-login-screen .login-role-field {
+  display: grid;
+  gap: 8px;
+}
+
+body #transitos-login-screen .login-role-field > strong {
+  color: #0f1b33;
+  font-size: 0.96rem;
+}
+
+body #transitos-login-screen .login-role-field select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #fff;
+  color: #0f1b33;
+  font: inherit;
+  font-weight: 700;
+}
+
 body #transitos-login-screen .frequency-option {
   background: #f8fafc !important;
   color: #172033 !important;

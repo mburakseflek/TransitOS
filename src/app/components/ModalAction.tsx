@@ -45,7 +45,14 @@ export function ModalAction({
       return;
     }
     const timer = window.setTimeout(() => setShowSubmittingFeedback(true), 350);
-    return () => window.clearTimeout(timer);
+    const safetyTimer = window.setTimeout(() => {
+      setSubmitting(false);
+      setShowSubmittingFeedback(false);
+    }, 10000);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(safetyTimer);
+    };
   }, [submitting]);
 
   useEffect(() => {

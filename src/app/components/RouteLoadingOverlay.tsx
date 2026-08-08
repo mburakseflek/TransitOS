@@ -1,25 +1,29 @@
 "use client";
 
 import { CSSProperties, useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export function RouteLoadingOverlay() {
   const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(0);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const navigationKey = `${pathname}?${searchParams.toString()}`;
   const delayTimer = useRef<number | undefined>(undefined);
   const progressTimer = useRef<number | undefined>(undefined);
   const hideTimer = useRef<number | undefined>(undefined);
+  const safetyTimer = useRef<number | undefined>(undefined);
 
   function clearTimers() {
     window.clearTimeout(delayTimer.current);
     window.clearTimeout(hideTimer.current);
+    window.clearTimeout(safetyTimer.current);
     window.clearInterval(progressTimer.current);
   }
 
   function beginLoading() {
     clearTimers();
-    document.body.dataset.navigationPending = "true";
+    document.body.dataset.navigationPending = "false";
     setProgress(0);
     delayTimer.current = window.setTimeout(() => {
       setVisible(true);
@@ -27,24 +31,26 @@ export function RouteLoadingOverlay() {
       progressTimer.current = window.setInterval(() => {
         setProgress((current) => Math.min(88, current + Math.max(2, (92 - current) * 0.12)));
       }, 180);
-    }, 520);
+    }, 650);
+    safetyTimer.current = window.setTimeout(finishLoading, 7000);
   }
 
   function finishLoading() {
     window.clearTimeout(delayTimer.current);
+    window.clearTimeout(safetyTimer.current);
     window.clearInterval(progressTimer.current);
     document.body.dataset.navigationPending = "false";
     setProgress(100);
     hideTimer.current = window.setTimeout(() => {
       setVisible(false);
       setProgress(0);
-    }, visible ? 320 : 0);
+    }, visible ? 140 : 0);
   }
 
   useEffect(() => {
     finishLoading();
     return clearTimers;
-  }, [pathname]);
+  }, [navigationKey]);
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {

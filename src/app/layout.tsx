@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { CorporateTransitOSEntry } from "@/app/components/CorporateTransitOSEntry";
 import { InteractionGuards } from "@/app/components/InteractionGuards";
 import { InteractionEffects } from "@/app/components/InteractionEffects";
@@ -42,7 +43,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="tr" className="light" style={{ colorScheme: "light" }}>
       <body>
         <CorporateTransitOSEntry />
-        <RouteLoadingOverlay />
+        <Suspense fallback={null}>
+          <RouteLoadingOverlay />
+        </Suspense>
         <GlobalOperationOverlay />
         <InteractionGuards />
         <InteractionEffects />

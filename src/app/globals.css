@@ -19923,3 +19923,46 @@ body[data-navigation-pending="true"] .route-loader {
   cursor: pointer;
   text-decoration: none;
 }
+
+/* Fast, non-blocking feedback and an always-visible session exit. */
+.market-strip-track {
+  animation-duration: 34s !important;
+}
+
+.sidebar-logout-button,
+.mobile-drawer-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 46px;
+  width: 100%;
+  padding: 10px 14px;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+  border-radius: 14px;
+  background: #fff1f2;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.sidebar-logout-button {
+  margin-top: auto;
+}
+
+.mobile-drawer-logout {
+  margin-top: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .market-strip-track {
+    animation-duration: 70s !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar-logout-button {
+    display: none !important;
+  }
+}

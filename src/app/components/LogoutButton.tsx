@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { LogOut } from "lucide-react";
 
-export function LogoutButton() {
+export function LogoutButton({ className = "ghost compact-button" }: { className?: string }) {
   const [pending, setPending] = useState(false);
 
   async function logout() {
@@ -14,7 +14,7 @@ export function LogoutButton() {
   }
 
   return (
-    <button className="ghost compact-button" disabled={pending} type="button" onClick={logout}>
+    <button className={className} disabled={pending} type="button" onClick={logout} aria-label="TransitOS oturumunu kapat">
       <LogOut size={16} />
       {pending ? "Çıkılıyor" : "Çıkış"}
     </button>

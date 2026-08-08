@@ -49,7 +49,7 @@ export function GlobalOperationOverlay() {
         document.body.dataset.operationPending = "false";
         delete document.body.dataset.operationLabel;
         setVisible(false);
-      }, 22000);
+      }, 10000);
     }
 
     function hide() {

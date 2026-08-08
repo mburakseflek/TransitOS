@@ -44,6 +44,19 @@ export async function getTrafficSnapshot(): Promise<{ source: string; items: Tra
   };
 }
 
+export async function getFastTrafficSnapshot() {
+  return Promise.race([
+    getTrafficSnapshot(),
+    new Promise<{ source: string; items: TrafficItem[]; updatedAt: Date }>((resolve) => {
+      setTimeout(() => resolve({
+        source: "Canlı trafik haritası",
+        items: [],
+        updatedAt: new Date()
+      }), 350);
+    })
+  ]);
+}
+
 async function fetchTrafficEndpoint(liveUrl: string) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), trafficFetchTimeoutMs);

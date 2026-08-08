@@ -98,6 +98,7 @@ export async function AppShell({
             </Link>
           );
         })}
+        <LogoutButton className="mobile-drawer-logout" />
         <Link className="site-return-link mobile-site-return-link" href="/seflektur">
           <House size={17} />
           <span>Siteye dön</span>
@@ -121,6 +122,7 @@ export async function AppShell({
             </Link>
           );})}
         </nav>
+        <LogoutButton className="sidebar-logout-button" />
         <Link className="site-return-link" href="/seflektur" title="Şeflek Tur sitesine dön">
           <House size={17} />
           <span>Siteye dön</span>
@@ -134,6 +136,7 @@ export async function AppShell({
             <p className="muted">{subtitle}</p>
           </div>
           <div className="topbar-actions">
+            <LogoutButton className="ghost compact-button topbar-logout-button" />
             <Link className="ghost compact-button home-return-button" href="/">
               <House size={16} />
               Ana sayfaya dön
@@ -142,7 +145,6 @@ export async function AppShell({
               title={displayName}
               subtitle={currentRoleTitle}
               meta="Aktif oturum"
-              badge={<LogoutButton />}
               compact
             >
               <Link className="ghost compact-button" href="/transitos/settings">

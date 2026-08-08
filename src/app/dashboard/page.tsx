@@ -6,7 +6,7 @@ import { YandexTrafficMap } from "@/app/components/YandexTrafficMap";
 import { prisma } from "@/lib/db";
 import { formatTRY } from "@/lib/format";
 import { serviceDirectionTitle } from "@/lib/labels";
-import { getTrafficSnapshot, getYandexMapKitApiKey, istanbulTrafficMapEmbedUrl } from "@/lib/traffic";
+import { getFastTrafficSnapshot, getYandexMapKitApiKey, istanbulTrafficMapEmbedUrl } from "@/lib/traffic";
 import { cookies } from "next/headers";
 import { readSessionToken } from "@/lib/auth";
 import {
@@ -52,7 +52,7 @@ export default async function DashboardPage() {
       orderBy: { serviceDate: "desc" },
       take: 12
     }),
-    getTrafficSnapshot(),
+    getFastTrafficSnapshot(),
     isManager(user) ? prisma.subcontractor.findMany({
       where: {
         vehicles: { some: { assignments: { some: { serviceDate: { gte: previousMonthStart, lte: previousMonthEnd } } } } },

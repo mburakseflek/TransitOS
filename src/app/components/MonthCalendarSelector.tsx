@@ -10,13 +10,15 @@ export function MonthCalendarSelector({
   mode = "multiple",
   defaultDate,
   defaultMonth,
-  defaultDates
+  defaultDates,
+  occupiedDays = []
 }: {
   name: string;
   mode?: "single" | "multiple";
   defaultDate?: string;
   defaultMonth?: string;
   defaultDates?: string[];
+  occupiedDays?: { date: string; vehicleName: string }[];
 }) {
   const todayValue = localDateValue(new Date());
   const initialDates = defaultDates?.filter(Boolean) ?? [];
@@ -30,6 +32,11 @@ export function MonthCalendarSelector({
   const inMonthDays = days.filter((day) => day.inMonth).map((day) => day.value);
   const selectedSet = new Set(selected);
   const monthLabel = monthTitle(month);
+  const occupiedByDate = useMemo(() => {
+    const values = new Map<string, string[]>();
+    for (const item of occupiedDays) values.set(item.date, Array.from(new Set([...(values.get(item.date) ?? []), item.vehicleName])));
+    return values;
+  }, [occupiedDays]);
 
   function clearHoldTimer() {
     if (holdTimerRef.current) {
@@ -135,34 +142,41 @@ export function MonthCalendarSelector({
       </div>
       <div className="calendar-grid">
         {dayNames.map((day) => <strong className="calendar-head" key={day}>{day}</strong>)}
-        {days.map((day) => (
-          <button
-            className={[
-              "calendar-day",
-              day.inMonth ? "" : "muted-day",
-              selectedSet.has(day.value) ? "selected" : ""
-            ].join(" ")}
-            disabled={!day.inMonth}
-            key={day.value}
-            type="button"
-            data-calendar-day="true"
-            data-date={day.value}
-            onPointerDown={(event) => handlePointerDown(event, day.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                toggleDay(day.value);
-              }
-            }}
-            onPointerUp={(event) => {
-              event.stopPropagation();
-              handlePointerUp(day.value);
-            }}
-          >
-            <span>{day.label}</span>
-          </button>
-        ))}
+        {days.map((day) => {
+          const occupiedVehicles = occupiedByDate.get(day.value) ?? [];
+          return (
+            <button
+              className={[
+                "calendar-day",
+                day.inMonth ? "" : "muted-day",
+                selectedSet.has(day.value) ? "selected" : "",
+                occupiedVehicles.length ? "occupied" : ""
+              ].join(" ")}
+              disabled={!day.inMonth}
+              key={day.value}
+              type="button"
+              data-calendar-day="true"
+              data-date={day.value}
+              aria-label={`${day.label} ${monthLabel}${occupiedVehicles.length ? `, mevcut araçlar: ${occupiedVehicles.join(", ")}` : ""}`}
+              onPointerDown={(event) => handlePointerDown(event, day.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  toggleDay(day.value);
+                }
+              }}
+              onPointerUp={(event) => {
+                event.stopPropagation();
+                handlePointerUp(day.value);
+              }}
+            >
+              <span>{day.label}</span>
+              {occupiedVehicles.length ? <small title={occupiedVehicles.join(", ")}>{occupiedVehicles.join(", ")}</small> : null}
+            </button>
+          );
+        })}
       </div>
+      {occupiedDays.length ? <div className="calendar-occupied-legend"><span aria-hidden="true" /> <small>Soluk mavi günlerde mevcut servis vardır; aynı güne başka araç da eklenebilir.</small></div> : null}
       {selected.map((value) => <input key={value} name={name} type="hidden" value={value} />)}
     </div>
   );

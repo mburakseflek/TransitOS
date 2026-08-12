@@ -1,6 +1,4 @@
 import { cookies } from "next/headers";
-import type { Route } from "next";
-import Link from "next/link";
 import { ChevronDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import {
@@ -12,27 +10,25 @@ import {
 } from "@/app/components/RegistryInterfaceKit";
 import { MoneyInput } from "@/app/components/MoneyInput";
 import {
-  createAssignment,
   createBulkAssignments,
   createOneOffJob,
   createProject,
-  createProjectCompany,
   createRoute,
   deleteAssignment,
   deleteAssignmentGroup,
   deleteOneOffJob,
   deleteProject,
-  deleteProjectCompany,
   deleteRoute,
   updateAssignmentGroup,
   updateProject,
-  updateProjectCompany,
   updateOneOffJob,
   updateRoute
 } from "@/app/actions";
 import { prisma } from "@/lib/db";
 import { serviceDirectionTitle } from "@/lib/labels";
 import { MonthCalendarSelector } from "@/app/components/MonthCalendarSelector";
+import { ServiceCalendarForm } from "@/app/components/ServiceCalendarForm";
+import { LocalAccordion } from "@/app/components/LocalAccordion";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { readSessionToken } from "@/lib/auth";
 import { formatTRY } from "@/lib/format";
@@ -54,19 +50,21 @@ export default async function ProjectsPage({
   const requestedProjectId = params?.project ?? null;
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
-  const defaultServiceDate = defaultDateForPeriod(period.month);
-  const [projects, vehicles, oneOffRoutes, projectCompanies, requestedProject] = await Promise.all([
+  const [projects, vehicles, oneOffRoutes, projectCompanies] = await Promise.all([
     prisma.project.findMany({
       where: projectAccessWhere(user),
-      select: {
-        id: true,
-        name: true,
-        clientCompany: true,
-        personnelCount: true,
-        status: true,
+      include: {
+        projectCompany: { include: { ownerUsers: { select: { id: true, displayName: true, loginId: true } } } },
         routes: {
           where: routeAccessWhere(user),
-          select: { id: true }
+          include: {
+            assignments: {
+              where: { AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)] },
+              include: { vehicle: true },
+              orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
+            }
+          },
+          orderBy: { name: "asc" }
         }
       },
       orderBy: { createdAt: "desc" }
@@ -85,30 +83,12 @@ export default async function ProjectsPage({
     canEdit ? prisma.projectCompany.findMany({
       include: { _count: { select: { projects: true } } },
       orderBy: { name: "asc" }
-    }) : Promise.resolve([]),
-    requestedProjectId ? prisma.project.findFirst({
-      where: { AND: [{ id: requestedProjectId }, projectAccessWhere(user)] },
-      include: {
-        projectCompany: { include: { ownerUsers: { select: { id: true, displayName: true, loginId: true } } } },
-        routes: {
-          where: routeAccessWhere(user),
-          include: {
-            assignments: {
-              where: { AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)] },
-              include: { vehicle: true },
-              orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
-            }
-          },
-          orderBy: { name: "asc" }
-        }
-      }
-    }) : Promise.resolve(null)
+    }) : Promise.resolve([])
   ]);
-  const initialProjectId = requestedProject && projects.some((project) => project.id === requestedProjectId)
+  const initialProjectId = projects.some((project) => project.id === requestedProjectId)
     ? requestedProjectId
     : null;
   const initialRouteId = initialProjectId ? params?.route ?? null : null;
-  const selectedProject = initialProjectId ? requestedProject : null;
 
   return (
     <AppShell
@@ -122,15 +102,6 @@ export default async function ProjectsPage({
     >
       <PeriodFilter searchParams={params} hidden={{ project: initialProjectId, route: initialRouteId }} monthlyOnly />
       <div className="toolbar">
-        {canEdit ? <QuickCreateCard title="Proje şirketi" body="Bir şirkete birden fazla proje bağlayın.">
-          <ModalAction label="Şirket Ekle" title="Proje Şirketi Ekle">
-            <form className="stack" action={createProjectCompany}>
-              <input type="hidden" name="_returnTo" value="/transitos/projects" />
-              <Field label="Şirket adı" hint="Proje sahibi kurumun ticari adı."><input name="name" required /></Field>
-              <div className="actions"><SubmitButton>✓ Şirket Ekle</SubmitButton></div>
-            </form>
-          </ModalAction>
-        </QuickCreateCard> : null}
         {canEdit ? <QuickCreateCard title="Proje" body="Şirket, sahibi ve güzergah yapısını ekleyin.">
           <ModalAction label="Proje Ekle" title="Proje Ekle">
             <form className="stack" action={createProject}>
@@ -151,32 +122,16 @@ export default async function ProjectsPage({
           </ModalAction>
         </QuickCreateCard> : null}
       </div>
-      {canEdit && projectCompanies.length ? <section className="chip-row section" aria-label="Proje şirketleri">
-        {projectCompanies.map((company) => <ModalAction key={company.id} label={`${company.name} · ${company._count.projects} proje`} title={`${company.name} Şirketi`} buttonClassName="ghost compact-button">
-          <div className="stack">
-            <form className="stack" action={updateProjectCompany}>
-              <input type="hidden" name="id" value={company.id} /><input type="hidden" name="_returnTo" value="/transitos/projects" />
-              <Field label="Şirket adı" hint="Bağlı projelerde de güncellenir."><input name="name" defaultValue={company.name} required /></Field>
-              <div className="actions"><SubmitButton>✓ Güncelle</SubmitButton></div>
-            </form>
-            {company._count.projects === 0 ? <form action={deleteProjectCompany}><input type="hidden" name="id" value={company.id} /><DeleteButton>Şirketi Sil</DeleteButton></form> : null}
-          </div>
-        </ModalAction>)}
-      </section> : null}
       <section className="stack project-accordion-stack section">
         {projects.map((project) => {
           const selected = initialProjectId === project.id;
-          const projectHref = `/transitos/projects?project=${project.id}&month=${period.month}&range=${period.range}`;
-          return <section
-            className={`project-accordion${selected ? " selected" : ""}`}
+          return <LocalAccordion
+            className="project-accordion"
             id={`project-${project.id}`}
             key={project.id}
-          >
-            <Link
-              className="project-accordion-summary"
-              href={(selected ? `/transitos/projects?month=${period.month}&range=${period.range}` : projectHref) as Route}
-              aria-expanded={selected}
-            >
+            defaultOpen={selected}
+            summaryClassName="project-accordion-summary"
+            summary={<>
               <div className="project-accordion-copy">
                 <div className="record-head">
                   <h2>{project.name}</h2>
@@ -191,9 +146,10 @@ export default async function ProjectsPage({
               <span className="project-accordion-toggle" aria-hidden="true">
                 <ChevronDown size={20} />
               </span>
-            </Link>
-            {selected && selectedProject ? <ProjectCard
-              project={selectedProject}
+            </>}
+          >
+            <ProjectCard
+              project={project}
               initialRouteId={initialProjectId === project.id ? initialRouteId : null}
               vehicles={vehicles}
               projectCompanies={projectCompanies}
@@ -201,10 +157,9 @@ export default async function ProjectsPage({
               canEdit={canEdit}
               showMoney={canEdit}
               periodMonth={period.month}
-              defaultServiceDate={defaultServiceDate}
               periodQuery={`month=${period.month}&range=${period.range}`}
-            /> : null}
-          </section>;
+            />
+          </LocalAccordion>;
         })}
         {projects.length === 0 ? <section className="card muted">Başlamak için Proje Ekle penceresini kullanın.</section> : null}
       </section>
@@ -214,7 +169,7 @@ export default async function ProjectsPage({
   );
 }
 
-function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endOfToday, canEdit, showMoney, periodMonth, defaultServiceDate, periodQuery }: { project: any; initialRouteId: string | null; vehicles: any[]; projectCompanies: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; defaultServiceDate: string; periodQuery: string }) {
+function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endOfToday, canEdit, showMoney, periodMonth, periodQuery }: { project: any; initialRouteId: string | null; vehicles: any[]; projectCompanies: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; periodQuery: string }) {
   const allAssignments = project.routes.flatMap((route: any) => route.assignments);
   const completedAssignments = allAssignments.filter((item: any) => item.serviceDate <= endOfToday);
   const totalServices = completedAssignments.reduce((sum: number, item: any) => sum + item.serviceCount, 0);
@@ -289,7 +244,7 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
 
       <div className="stack section">
         {project.routes.map((route: any) => (
-          <RouteCard route={route} project={project} defaultOpen={initialRouteId === route.id} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} periodMonth={periodMonth} defaultServiceDate={defaultServiceDate} periodQuery={periodQuery} key={route.id} />
+          <RouteCard route={route} project={project} defaultOpen={initialRouteId === route.id} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} periodMonth={periodMonth} periodQuery={periodQuery} key={route.id} />
         ))}
         {project.routes.length === 0 ? <p className="muted">Bu projeye henüz güzergah eklenmemiş.</p> : null}
       </div>
@@ -301,10 +256,15 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
   );
 }
 
-function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit, showMoney, periodMonth, defaultServiceDate, periodQuery }: { route: any; project: any; defaultOpen: boolean; vehicles: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; defaultServiceDate: string; periodQuery: string }) {
+function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit, showMoney, periodMonth, periodQuery }: { route: any; project: any; defaultOpen: boolean; vehicles: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; periodQuery: string }) {
   const vehiclesText = Array.from(new Set(route.assignments.map((assignment: any) => assignment.vehicle.fleetNumber))).join(", ");
   const completedCount = route.assignments.filter((assignment: any) => assignment.serviceDate <= endOfToday).length;
   const returnTo = `/transitos/projects?project=${project.id}&route=${route.id}&${periodQuery}`;
+  const occupiedDays = route.assignments.map((assignment: any) => ({
+    date: dateInputValue(assignment.serviceDate)!,
+    vehicleId: assignment.vehicle.id,
+    vehicleName: `${assignment.vehicle.fleetNumber} · ${assignment.vehicle.plateNumber}`
+  }));
   return (
     <details className="route-card route-accordion selectable-card" open={defaultOpen}>
       <summary className="route-card-link route-summary">
@@ -356,33 +316,16 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
           <div>
             <span className="badge blue">Seçili güzergah</span>
             <h3>Servis planı ve ücretlendirme</h3>
-            <p className="muted">Her servis kendi gününü, aracını, servis türünü ve iki ayrı ücretini saklar. Böylece proje faturası ve taşıyıcı hakedişi karışmadan hesaplanır.</p>
+            <p className="muted">Takvimden günleri seçin. Soluk mavi günler, bu güzergâhta daha önce planlanmış araçları gösterir.</p>
           </div>
           {canEdit ? (
-            <div className="service-action-grid">
-              <QuickCreateCard title="Tek gün servis" body="Seçili güne tek servis veya aynı gün tekrar ekleyin.">
-                <ModalAction label="Servis Ekle" title="Servis Ekle">
-                  <form className="stack service-form" action={createAssignment}>
-                    <input type="hidden" name="projectId" value={project.id} />
-                    <input type="hidden" name="routeId" value={route.id} />
-                    <input type="hidden" name="_returnTo" value={returnTo} />
-                    <AssignmentFields vehicles={vehicles} defaultDate={defaultServiceDate} />
-                    <div className="actions"><SubmitButton>✓ Servis Ekle</SubmitButton></div>
-                  </form>
-                </ModalAction>
-              </QuickCreateCard>
-              <QuickCreateCard title="Çoklu gün planı" body="Ay tablosundan birden fazla günü seçerek plan oluşturun.">
-                <ModalAction label="Toplu Planla" title="Çoklu Servis Planla">
-                  <form className="stack service-form" action={createBulkAssignments}>
-                    <input type="hidden" name="projectId" value={project.id} />
-                    <input type="hidden" name="routeId" value={route.id} />
-                    <input type="hidden" name="_returnTo" value={returnTo} />
-                    <BulkAssignmentFields vehicles={vehicles} defaultMonth={periodMonth} />
-                    <div className="actions"><SubmitButton>✓ Servisleri Planla</SubmitButton></div>
-                  </form>
-                </ModalAction>
-              </QuickCreateCard>
-            </div>
+            <ServiceCalendarForm className="stack service-form fixed-calendar-form" action={createBulkAssignments} occupiedDays={occupiedDays}>
+              <input type="hidden" name="projectId" value={project.id} />
+              <input type="hidden" name="routeId" value={route.id} />
+              <input type="hidden" name="_returnTo" value={returnTo} />
+              <BulkAssignmentFields vehicles={vehicles} defaultMonth={periodMonth} occupiedDays={occupiedDays} />
+              <div className="actions"><SubmitButton>✓ Seçili Günleri Planla</SubmitButton></div>
+            </ServiceCalendarForm>
           ) : null}
         </section>
 
@@ -591,19 +534,10 @@ function RouteFields({ route }: { route?: any }) {
       <Field label="Güzergah adı" hint="Kartlarda ve raporlarda görünen ad."><input name="name" defaultValue={route?.name ?? ""} required /></Field>
       <Field label="Başlangıç" hint="Çıkış noktası."><input name="startPoint" defaultValue={route?.startPoint ?? ""} required /></Field>
       <Field label="Bitiş" hint="Varış noktası."><input name="endPoint" defaultValue={route?.endPoint ?? ""} required /></Field>
+      <Field label="Proje sahibi servis ücreti" hint="Bu güzergâhta proje sahibine kesilecek servis başı TL tutarı. Yeni planlanan servislere otomatik uygulanır.">
+        <MoneyInput name="defaultClientPricePerService" label="₺ Proje sahibi servis başı" defaultValue={Number(route?.defaultClientPricePerService ?? 0)} />
+      </Field>
     </FormSection>
-  );
-}
-
-function AssignmentFields({ vehicles, defaultDate }: { vehicles: { id: string; fleetNumber: string; plateNumber: string }[]; defaultDate: string }) {
-  return (
-    <>
-      <FormSection title="Tarih ve saat" description="Servisin yapılacağı günü ve başlangıç saatini seçin.">
-        <Field label="Gün" hint="Cihazınızın tarih seçicisi açılır."><input name="serviceDate" type="date" defaultValue={defaultDate} required /></Field>
-        <Field label="Saat" hint="Cihazınızın saat seçicisi açılır."><input name="serviceTime" type="time" defaultValue="07:30" required /></Field>
-      </FormSection>
-      <AssignmentOptions vehicles={vehicles} />
-    </>
   );
 }
 
@@ -618,17 +552,16 @@ function AssignmentOptions({ vehicles }: { vehicles: { id: string; fleetNumber: 
       </Field>
       <Field label="Servis adedi" hint="O gün yapılacak servis sayısı."><AdaptiveSlider name="serviceCount" label="Servis sayısı" min={1} max={20} defaultValue={1} helper="Tek servis için 1, aynı gün tekrar için artırın." /></Field>
       <Field label="Taşıyıcı hakedişi" hint="Bu servisin taşeron servis başı TL tutarı."><MoneyInput name="pricePerService" label="₺ Taşıyıcı servis başı" /></Field>
-      <Field label="Proje fatura tutarı" hint="Bu servisin proje sahibine servis başı TL tutarı."><MoneyInput name="clientPricePerService" label="₺ Proje servis başı" /></Field>
     </FormSection>
   );
 }
 
-function BulkAssignmentFields({ vehicles, defaultMonth }: { vehicles: { id: string; fleetNumber: string; plateNumber: string }[]; defaultMonth: string }) {
+function BulkAssignmentFields({ vehicles, defaultMonth, occupiedDays = [] }: { vehicles: { id: string; fleetNumber: string; plateNumber: string }[]; defaultMonth: string; occupiedDays?: { date: string; vehicleName: string }[] }) {
   return (
     <>
       <p className="muted">Ay tablosunda tıkladığınız günler planlanır; sürükleyerek aralık seçebilirsiniz. Hakediş ve fatura yalnızca tarihi gelen taşınmış servislerden hesaplanır.</p>
       <Field label="Aylık tablo" hint="Seçilen her gün için servis kaydı oluşturulur.">
-        <MonthCalendarSelector name="serviceDates" mode="multiple" defaultMonth={defaultMonth} />
+        <MonthCalendarSelector name="serviceDates" mode="multiple" defaultMonth={defaultMonth} occupiedDays={occupiedDays} />
       </Field>
       <Field label="Saat" hint="Oluşturulacak servislerin saati."><input name="serviceTime" type="time" defaultValue="07:30" required /></Field>
       <AssignmentOptions vehicles={vehicles} />
@@ -672,9 +605,6 @@ function BulkGroupEditFields({
         </Field>
         <Field label="Taşıyıcı hakedişi" hint="Taşerona servis başına yazılacak TL tutarı.">
           <MoneyInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue={group.carrierUnitPrice} />
-        </Field>
-        <Field label="Proje fatura tutarı" hint="Proje sahibine servis başına yazılacak TL tutarı.">
-          <MoneyInput name="clientPricePerService" label="₺ Proje servis başı" defaultValue={group.clientUnitPrice} />
         </Field>
       </div>
     </>
@@ -776,13 +706,6 @@ function OneOffJobsPanel({ routes, vehicles, canEdit }: { routes: any[]; vehicle
       )}
     </section>
   );
-}
-
-function defaultDateForPeriod(month: string) {
-  const today = new Date();
-  const todayMonth = today.toISOString().slice(0, 7);
-  if (month === todayMonth) return today.toISOString().slice(0, 10);
-  return `${month}-01`;
 }
 
 function dateInputValue(date?: Date) {

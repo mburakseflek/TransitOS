@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
@@ -23,7 +24,7 @@ export function RouteLoadingOverlay() {
 
   function beginLoading() {
     clearTimers();
-    document.body.dataset.navigationPending = "false";
+    document.body.dataset.navigationPending = "true";
     setProgress(0);
     delayTimer.current = window.setTimeout(() => {
       setVisible(true);
@@ -31,8 +32,8 @@ export function RouteLoadingOverlay() {
       progressTimer.current = window.setInterval(() => {
         setProgress((current) => Math.min(88, current + Math.max(2, (92 - current) * 0.12)));
       }, 180);
-    }, 650);
-    safetyTimer.current = window.setTimeout(finishLoading, 7000);
+    }, 450);
+    safetyTimer.current = window.setTimeout(finishLoading, 4500);
   }
 
   function finishLoading() {
@@ -44,7 +45,7 @@ export function RouteLoadingOverlay() {
     hideTimer.current = window.setTimeout(() => {
       setVisible(false);
       setProgress(0);
-    }, visible ? 140 : 0);
+    }, 120);
   }
 
   useEffect(() => {
@@ -54,9 +55,10 @@ export function RouteLoadingOverlay() {
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
       const link = target?.closest("a[href]") as HTMLAnchorElement | null;
-      if (!link || link.target || link.href.startsWith("mailto:") || link.href.startsWith("tel:")) return;
+      if (!link || link.target || link.hasAttribute("download") || link.href.startsWith("mailto:") || link.href.startsWith("tel:")) return;
       if (link.origin !== window.location.origin) return;
       if (link.pathname === window.location.pathname && link.search === window.location.search) return;
       beginLoading();
@@ -77,7 +79,7 @@ export function RouteLoadingOverlay() {
       aria-hidden={!visible}
     >
       <div className="route-loader-card" role="status" aria-live="polite">
-        <img src="/brand/seflek-logo-navy.png" alt="" />
+        <Image className="loading-service-vehicle" src="/brand/transitos-service-vehicle.png" width={6001} height={2334} sizes="112px" priority alt="" />
         <div>
           <strong>TransitOS hazırlanıyor</strong>
           <span>İşleminiz güvenle tamamlanıyor.</span>

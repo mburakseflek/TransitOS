@@ -414,7 +414,9 @@ export async function updateProjectCompany(formData: FormData) {
 
 export async function deleteProjectCompany(formData: FormData) {
   await requireOperationsEditor();
-  await prisma.projectCompany.delete({ where: { id: text(formData, "id") } });
+  await prisma.projectCompany.deleteMany({
+    where: { id: text(formData, "id"), projects: { none: {} } }
+  });
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -436,7 +438,7 @@ export async function createRoute(formData: FormData) {
       mapDistanceKm: 0,
       standardWorkDays: 0,
       defaultCarrierPricePerService: 0,
-      defaultClientPricePerService: 0
+      defaultClientPricePerService: moneyValue(formData, "defaultClientPricePerService")
     }
   });
   redirect(returnTo(formData, `/transitos/projects?project=${optionalId(formData, "projectId") ?? ""}&route=${route.id}`));
@@ -453,7 +455,8 @@ export async function updateRoute(formData: FormData) {
       endPoint: text(formData, "endPoint"),
       averageKilometers: 0,
       mapDistanceKm: 0,
-      standardWorkDays: 0
+      standardWorkDays: 0,
+      defaultClientPricePerService: moneyValue(formData, "defaultClientPricePerService")
     }
   });
   redirect(returnTo(formData, `/transitos/projects?route=${routeId}`));
@@ -471,9 +474,7 @@ export async function createAssignment(formData: FormData) {
   const routeId = text(formData, "routeId");
   const route = await prisma.serviceRoute.findUnique({
     where: { id: routeId },
-    select: {
-      projectId: true
-    }
+    select: { projectId: true, defaultClientPricePerService: true }
   });
   await prisma.serviceAssignment.create({
     data: {
@@ -486,7 +487,7 @@ export async function createAssignment(formData: FormData) {
       serviceCount: numberValue(formData, "serviceCount") || 1,
       kilometers: 0,
       pricePerService: moneyValue(formData, "pricePerService"),
-      clientPricePerService: moneyValue(formData, "clientPricePerService"),
+      clientPricePerService: route?.defaultClientPricePerService ?? 0,
       monthKey: monthKey(serviceDate)
     }
   });
@@ -499,7 +500,7 @@ export async function updateAssignment(formData: FormData) {
   const routeId = text(formData, "routeId");
   const route = await prisma.serviceRoute.findUnique({
     where: { id: routeId },
-    select: { projectId: true }
+    select: { projectId: true, defaultClientPricePerService: true }
   });
 
   await prisma.serviceAssignment.update({
@@ -514,7 +515,7 @@ export async function updateAssignment(formData: FormData) {
       serviceCount: numberValue(formData, "serviceCount") || 1,
       kilometers: 0,
       pricePerService: moneyValue(formData, "pricePerService"),
-      clientPricePerService: moneyValue(formData, "clientPricePerService"),
+      clientPricePerService: route?.defaultClientPricePerService ?? 0,
       monthKey: monthKey(serviceDate)
     }
   });
@@ -532,9 +533,7 @@ export async function createBulkAssignments(formData: FormData) {
   const routeId = text(formData, "routeId");
   const route = await prisma.serviceRoute.findUnique({
     where: { id: routeId },
-    select: {
-      projectId: true
-    }
+    select: { projectId: true, defaultClientPricePerService: true }
   });
 
   if (!dates.length) {
@@ -559,7 +558,7 @@ export async function createBulkAssignments(formData: FormData) {
         serviceCount: numberValue(formData, "serviceCount") || 1,
         kilometers: 0,
         pricePerService: moneyValue(formData, "pricePerService"),
-        clientPricePerService: moneyValue(formData, "clientPricePerService"),
+        clientPricePerService: route?.defaultClientPricePerService ?? 0,
         monthKey: monthKey(serviceDate)
       });
   }
@@ -582,7 +581,7 @@ export async function updateAssignmentGroup(formData: FormData) {
 
   const route = await prisma.serviceRoute.findUnique({
     where: { id: routeId },
-    select: { projectId: true }
+    select: { projectId: true, defaultClientPricePerService: true }
   });
   const existingAssignments = await prisma.serviceAssignment.findMany({
     where: {
@@ -633,7 +632,7 @@ export async function updateAssignmentGroup(formData: FormData) {
         serviceCount: numberValue(formData, "serviceCount") || 1,
         kilometers: 0,
         pricePerService: moneyValue(formData, "pricePerService"),
-        clientPricePerService: moneyValue(formData, "clientPricePerService"),
+        clientPricePerService: current?.clientPricePerService ?? route?.defaultClientPricePerService ?? 0,
         monthKey: monthKey(serviceDate)
       };
 

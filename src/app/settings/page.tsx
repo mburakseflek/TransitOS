@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
-import { createAccessUser, deleteAccessUser, updateAccessUser } from "@/app/actions";
+import {
+  createAccessUser,
+  createProjectCompany,
+  deleteAccessUser,
+  deleteProjectCompany,
+  updateAccessUser,
+  updateProjectCompany
+} from "@/app/actions";
 import { readSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { canManageUsers, roleTitle } from "@/lib/permissions";
@@ -20,7 +27,10 @@ export default async function SettingsPage() {
       }),
       prisma.subcontractor.findMany({ orderBy: { companyName: "asc" } }),
       prisma.project.findMany({ orderBy: { name: "asc" } }),
-      prisma.projectCompany.findMany({ orderBy: { name: "asc" } })
+      prisma.projectCompany.findMany({
+        include: { _count: { select: { projects: true } } },
+        orderBy: { name: "asc" }
+      })
     ])
     : [[], [], [], []];
 
@@ -45,6 +55,52 @@ export default async function SettingsPage() {
           <p className="muted">Yönetici tam yetkili, servis sorumlusu atanmış projelerde düzenleyebilir, taşeron ve proje sahibi kendi verilerini sadece görüntüler.</p>
         </article>
       </section>
+
+      {canManage ? (
+        <section className="card section company-settings-card">
+          <div className="record-head">
+            <div>
+              <h2 style={{ marginTop: 0 }}>Proje Şirketleri</h2>
+              <p className="muted">Proje sahibi şirketleri burada ekleyin, düzenleyin veya kullanılmayan kayıtları silin.</p>
+            </div>
+            <ModalAction label="Şirket Ekle" title="Proje Şirketi Ekle">
+              <form className="stack" action={createProjectCompany}>
+                <input type="hidden" name="_returnTo" value="/transitos/settings" />
+                <Field label="Şirket adı" hint="Aynı şirkete birden fazla proje bağlanabilir."><input name="name" required /></Field>
+                <div className="actions"><SubmitButton>✓ Şirket Ekle</SubmitButton></div>
+              </form>
+            </ModalAction>
+          </div>
+          <div className="company-settings-grid section">
+            {companies.map((company) => (
+              <article className="company-settings-item" key={company.id}>
+                <div>
+                  <strong>{company.name}</strong>
+                  <p className="muted">{company._count.projects} bağlı proje</p>
+                </div>
+                <ModalAction label="Düzenle" title={`${company.name} Şirketi`} buttonClassName="ghost compact-button">
+                  <div className="stack">
+                    <form className="stack" action={updateProjectCompany}>
+                      <input type="hidden" name="id" value={company.id} />
+                      <input type="hidden" name="_returnTo" value="/transitos/settings" />
+                      <Field label="Şirket adı" hint="Bağlı projelerdeki şirket adı da güncellenir."><input name="name" defaultValue={company.name} required /></Field>
+                      <div className="actions"><SubmitButton>✓ Güncelle</SubmitButton></div>
+                    </form>
+                    {company._count.projects === 0 ? (
+                      <form action={deleteProjectCompany}>
+                        <input type="hidden" name="id" value={company.id} />
+                        <input type="hidden" name="_returnTo" value="/transitos/settings" />
+                        <DeleteButton>Şirketi Sil</DeleteButton>
+                      </form>
+                    ) : <p className="muted">Bağlı projesi bulunan şirket silinemez.</p>}
+                  </div>
+                </ModalAction>
+              </article>
+            ))}
+            {companies.length === 0 ? <p className="muted">Henüz proje şirketi eklenmemiş.</p> : null}
+          </div>
+        </section>
+      ) : null}
 
       {canManage ? (
         <section className="card section">
@@ -168,7 +224,7 @@ function UserFields({
               <span>{company.name}</span>
             </label>
           ))}
-          {companies.length === 0 ? <p className="muted">Önce Projeler panelinden proje şirketi ekleyin.</p> : null}
+          {companies.length === 0 ? <p className="muted">Önce Ayarlar panelinden proje şirketi ekleyin.</p> : null}
         </div>
       </Field>
     </>

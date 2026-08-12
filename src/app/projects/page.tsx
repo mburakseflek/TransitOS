@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { ChevronDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import {
   AdaptiveSlider,
@@ -312,24 +312,34 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
       </div>
 
       <div className="route-expand-body">
-        <section className="service-planner section">
-          <div>
-            <span className="badge blue">Seçili güzergah</span>
-            <h3>Servis planı ve ücretlendirme</h3>
-            <p className="muted">Takvimden günleri seçin. Soluk mavi günler, bu güzergâhta daha önce planlanmış araçları gösterir.</p>
-          </div>
-          {canEdit ? (
-            <ServiceCalendarForm className="stack service-form fixed-calendar-form" action={createBulkAssignments} occupiedDays={occupiedDays}>
-              <input type="hidden" name="projectId" value={project.id} />
-              <input type="hidden" name="routeId" value={route.id} />
-              <input type="hidden" name="_returnTo" value={returnTo} />
-              <BulkAssignmentFields vehicles={vehicles} defaultMonth={periodMonth} occupiedDays={occupiedDays} />
-              <div className="actions"><SubmitButton>✓ Seçili Günleri Planla</SubmitButton></div>
-            </ServiceCalendarForm>
-          ) : null}
-        </section>
-
         <ServiceLedger assignments={route.assignments} projectId={project.id} routeId={route.id} returnTo={returnTo} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} />
+
+        {canEdit ? (
+          <details className="service-planner-disclosure">
+            <summary>
+              <span className="service-planner-disclosure-icon" aria-hidden="true"><Plus size={20} /></span>
+              <span>
+                <strong>Servis Ekle</strong>
+                <small>Takvimden gün, araç, saat ve servis ücretini planlayın.</small>
+              </span>
+              <ChevronDown className="service-planner-disclosure-chevron" size={20} aria-hidden="true" />
+            </summary>
+            <section className="service-planner section">
+              <div>
+                <span className="badge blue">Yeni servis planı</span>
+                <h3>Takvim ve ücretlendirme</h3>
+                <p className="muted">Takvimden günleri seçin. Soluk mavi günler, bu güzergâhta daha önce planlanmış araçları gösterir.</p>
+              </div>
+              <ServiceCalendarForm className="stack service-form fixed-calendar-form" action={createBulkAssignments} occupiedDays={occupiedDays}>
+                <input type="hidden" name="projectId" value={project.id} />
+                <input type="hidden" name="routeId" value={route.id} />
+                <input type="hidden" name="_returnTo" value={returnTo} />
+                <BulkAssignmentFields vehicles={vehicles} defaultMonth={periodMonth} occupiedDays={occupiedDays} />
+                <div className="actions"><SubmitButton>✓ Seçili Günleri Planla</SubmitButton></div>
+              </ServiceCalendarForm>
+            </section>
+          </details>
+        ) : null}
       </div>
     </details>
   );

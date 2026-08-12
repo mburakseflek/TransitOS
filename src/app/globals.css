@@ -13649,6 +13649,69 @@ form[data-dirty="true"] :is(input, select, textarea):not([type="hidden"]) {
   margin: 8px 0 6px;
 }
 
+.service-planner-disclosure {
+  min-width: 0;
+  overflow: clip;
+  border: 1px solid rgba(23, 56, 95, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.service-planner-disclosure > summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 52px;
+  padding: 12px 14px;
+  list-style: none;
+  color: var(--tos-readable-text, #101827);
+  cursor: pointer;
+}
+
+.service-planner-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.service-planner-disclosure > summary:focus-visible {
+  outline: 3px solid rgba(18, 164, 204, 0.45);
+  outline-offset: -3px;
+}
+
+.service-planner-disclosure > summary > span:nth-child(2) {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.service-planner-disclosure > summary small {
+  color: var(--tos-readable-muted, #667085);
+  line-height: 1.35;
+}
+
+.service-planner-disclosure-icon {
+  display: inline-grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  color: #ffffff;
+  background: var(--clarity-blue, #1877f2);
+}
+
+.service-planner-disclosure-chevron {
+  transition: transform 180ms ease;
+}
+
+.service-planner-disclosure[open] .service-planner-disclosure-chevron {
+  transform: rotate(180deg);
+}
+
+.service-planner-disclosure > .service-planner {
+  margin: 0 12px 12px;
+  animation: project-accordion-reveal 180ms ease-out both;
+}
+
 .service-action-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -13703,6 +13766,31 @@ form[data-dirty="true"] :is(input, select, textarea):not([type="hidden"]) {
 
 .company-settings-item p {
   margin: 4px 0 0;
+}
+
+.project-company-accounts {
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(23, 56, 95, 0.12);
+}
+
+.project-company-accounts h3 {
+  margin: 0;
+}
+
+.project-company-account {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(23, 56, 95, 0.12);
+  border-radius: 16px;
+  background: rgba(247, 250, 253, 0.78);
+}
+
+.project-company-account.account-create {
+  border-style: dashed;
+  background: rgba(235, 247, 255, 0.64);
 }
 
 .fixed-calendar-form .field-row:has(.calendar-picker) {

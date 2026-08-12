@@ -568,11 +568,21 @@ function BulkAssignmentFields({ vehicles, defaultMonth, occupiedDays = [] }: { v
   return (
     <>
       <p className="muted">Ay tablosunda tıkladığınız günler planlanır; sürükleyerek aralık seçebilirsiniz. Hakediş ve fatura yalnızca tarihi gelen taşınmış servislerden hesaplanır.</p>
-      <Field label="Aylık tablo" hint="Seçilen her gün için servis kaydı oluşturulur.">
-        <MonthCalendarSelector name="serviceDates" mode="multiple" defaultMonth={defaultMonth} occupiedDays={occupiedDays} />
-      </Field>
-      <Field label="Saat" hint="Oluşturulacak servislerin saati."><input name="serviceTime" type="time" defaultValue="07:30" required /></Field>
-      <AssignmentOptions vehicles={vehicles} />
+      <div className="service-create-layout">
+        <div className="service-create-calendar-panel">
+          <Field label="Servis günleri" hint="Seçilen her gün için bir servis kaydı oluşturulur.">
+            <MonthCalendarSelector name="serviceDates" mode="multiple" defaultMonth={defaultMonth} occupiedDays={occupiedDays} />
+          </Field>
+        </div>
+        <aside className="service-create-settings-panel" aria-label="Yeni servis ayarları">
+          <div className="service-group-settings-copy">
+            <strong>Servis ayarları</strong>
+            <small>Seçtiğiniz günlerin tamamına uygulanır.</small>
+          </div>
+          <Field label="Saat" hint="Oluşturulacak servislerin saati."><input name="serviceTime" type="time" defaultValue="07:30" required /></Field>
+          <AssignmentOptions vehicles={vehicles} />
+        </aside>
+      </div>
     </>
   );
 }
@@ -587,16 +597,23 @@ function BulkGroupEditFields({
   selectedDates: string[];
 }) {
   return (
-    <>
-      <Field label="Çalışma takvimi" hint="Seçili günler bu servis grubuna ait kabul edilir. Çıkardığınız günler kayıttan silinir; eklediğiniz günler gruba eklenir.">
-        <MonthCalendarSelector
-          name="serviceDates"
-          mode="multiple"
-          defaultMonth={dateInputValue(group.firstDate)?.slice(0, 7)}
-          defaultDates={selectedDates}
-        />
-      </Field>
-      <div className="service-group-edit-grid">
+    <div className="service-group-editor-layout">
+      <div className="service-group-calendar-panel">
+        <Field label="Çalışma takvimi" hint="Gün eklemek veya kaldırmak için takvimden seçim yapın.">
+          <MonthCalendarSelector
+            name="serviceDates"
+            mode="multiple"
+            defaultMonth={dateInputValue(group.firstDate)?.slice(0, 7)}
+            defaultDates={selectedDates}
+          />
+        </Field>
+      </div>
+      <aside className="service-group-settings-panel" aria-label="Servis ayarları">
+        <div className="service-group-settings-copy">
+          <strong>Servis ayarları</strong>
+          <small>Seçili günlerin tamamına uygulanır.</small>
+        </div>
+        <div className="service-group-edit-grid">
         <Field label="Servis saati" hint="Seçili tüm günlerde kullanılacak saat.">
           <input name="serviceTime" type="time" defaultValue={timeInputValue(group.serviceTime) ?? "07:30"} required />
         </Field>
@@ -611,8 +628,9 @@ function BulkGroupEditFields({
         <Field label="Taşıyıcı hakedişi" hint="Taşerona servis başına yazılacak TL tutarı.">
           <MoneyInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue={group.carrierUnitPrice} />
         </Field>
+        </div>
+      </aside>
       </div>
-    </>
   );
 }
 

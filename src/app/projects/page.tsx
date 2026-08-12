@@ -2,7 +2,6 @@ import { cookies } from "next/headers";
 import { ChevronDown, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import {
-  AdaptiveSlider,
   FrequencySelector,
   InlineDisclosureMenu,
   QuickCreateCard,
@@ -54,7 +53,7 @@ export default async function ProjectsPage({
     prisma.project.findMany({
       where: projectAccessWhere(user),
       include: {
-        projectCompany: { include: { ownerUsers: { select: { id: true, displayName: true, loginId: true } } } },
+        projectCompany: { include: { ownerUsers: { select: { id: true, displayName: true } } } },
         routes: {
           where: routeAccessWhere(user),
           include: {
@@ -226,7 +225,7 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
       <div className="chip-row section">
         <span className="badge blue">Proje sahipleri</span>
         {project.projectCompany?.ownerUsers.length ? project.projectCompany.ownerUsers.map((owner: any) => (
-          <span className="badge gray" key={owner.id}>{owner.displayName} · {owner.loginId}</span>
+          <span className="badge gray" key={owner.id}>{owner.displayName}</span>
         )) : <span className="badge yellow">Henüz proje sahibi atanmadı</span>}
       </div>
 
@@ -560,7 +559,6 @@ function AssignmentOptions({ vehicles }: { vehicles: { id: string; fleetNumber: 
       <Field label="İş türü" hint="Proje güzergahları için sabah, akşam, gece veya mesai seçilir. Tek seferlik işler ayrı panelden eklenir.">
         <ServiceDirectionSelector />
       </Field>
-      <Field label="Servis adedi" hint="O gün yapılacak servis sayısı."><AdaptiveSlider name="serviceCount" label="Servis sayısı" min={1} max={20} defaultValue={1} helper="Tek servis için 1, aynı gün tekrar için artırın." /></Field>
       <Field label="Taşıyıcı hakedişi" hint="Bu servisin taşeron servis başı TL tutarı."><MoneyInput name="pricePerService" label="₺ Taşıyıcı servis başı" /></Field>
     </FormSection>
   );
@@ -610,9 +608,6 @@ function BulkGroupEditFields({
         <Field label="İş türü" hint="Sabah, akşam, gece veya mesai ayrımı.">
           <ServiceDirectionSelector defaultValue={group.direction} />
         </Field>
-        <Field label="Servis adedi" hint="Seçili her gün için yapılacak servis sayısı.">
-          <AdaptiveSlider name="serviceCount" label="Servis sayısı" min={1} max={20} defaultValue={group.serviceCount} helper="Bu değer seçili günlerin tamamına uygulanır." />
-        </Field>
         <Field label="Taşıyıcı hakedişi" hint="Taşerona servis başına yazılacak TL tutarı.">
           <MoneyInput name="pricePerService" label="₺ Taşıyıcı servis başı" defaultValue={group.carrierUnitPrice} />
         </Field>
@@ -640,7 +635,6 @@ function OneOffFields({
       <Field label="Araç" hint="Bu işe yönlendirilecek araç.">
         <select name="vehicleId" defaultValue={assignment?.vehicleId} required>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.fleetNumber} · {vehicle.plateNumber}</option>)}</select>
       </Field>
-      <Field label="Servis adedi" hint="Bu işte yapılacak servis sayısı."><AdaptiveSlider name="serviceCount" label="Servis sayısı" min={1} max={20} defaultValue={assignment?.serviceCount ?? 1} /></Field>
       <div className="form-section-title">
         <strong>Tek Seferlik İş Ücretleri</strong>
         <small>Bu iş kendi güzergah kartı gibi saklanır; servis kaydı bu fiyatları kullanır.</small>

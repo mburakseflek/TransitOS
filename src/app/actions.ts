@@ -3,7 +3,7 @@
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { ExpenseCategory, FinancialDocumentLineKind, FinancialDocumentType, RecordStatus, ServiceDirection, UserRole } from "@prisma/client";
+import { ExpenseCategory, FinancialDocumentLineKind, FinancialDocumentType, Prisma, RecordStatus, ServiceDirection, UserRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { formatPhoneTR, monthKey, normalizePhoneDigitsTR, parseTurkishMoney } from "@/lib/format";
 import { readSessionToken } from "@/lib/auth";
@@ -573,7 +573,7 @@ export async function createAssignment(formData: FormData) {
       serviceDate,
       serviceTime: timeValue(serviceDate, text(formData, "serviceTime") || "07:30"),
       direction: serviceDirection(formData),
-      serviceCount: numberValue(formData, "serviceCount") || 1,
+      serviceCount: 1,
       kilometers: 0,
       pricePerService: moneyValue(formData, "pricePerService"),
       clientPricePerService: route?.defaultClientPricePerService ?? 0,
@@ -601,7 +601,7 @@ export async function updateAssignment(formData: FormData) {
       serviceDate,
       serviceTime: timeValue(serviceDate, text(formData, "serviceTime") || "07:30"),
       direction: serviceDirection(formData),
-      serviceCount: numberValue(formData, "serviceCount") || 1,
+      serviceCount: 1,
       kilometers: 0,
       pricePerService: moneyValue(formData, "pricePerService"),
       clientPricePerService: route?.defaultClientPricePerService ?? 0,
@@ -644,7 +644,7 @@ export async function createBulkAssignments(formData: FormData) {
         serviceDate,
         serviceTime: timeValue(serviceDate, text(formData, "serviceTime") || "07:30"),
         direction: serviceDirection(formData),
-        serviceCount: numberValue(formData, "serviceCount") || 1,
+        serviceCount: 1,
         kilometers: 0,
         pricePerService: moneyValue(formData, "pricePerService"),
         clientPricePerService: route?.defaultClientPricePerService ?? 0,
@@ -700,15 +700,13 @@ export async function updateAssignmentGroup(formData: FormData) {
     }
   }
 
-  await prisma.$transaction(async (tx) => {
-    for (const assignment of existingAssignments) {
-      const key = dateKey(assignment.serviceDate);
-      if (!targetDateSet.has(key) || duplicateIds.has(assignment.id)) {
-        await tx.serviceAssignment.delete({ where: { id: assignment.id } });
-      }
-    }
+  const deleteIds = existingAssignments
+    .filter((assignment) => !targetDateSet.has(dateKey(assignment.serviceDate)) || duplicateIds.has(assignment.id))
+    .map((assignment) => assignment.id);
+  const updates: Prisma.PrismaPromise<unknown>[] = [];
+  const creates: Prisma.ServiceAssignmentCreateManyInput[] = [];
 
-    for (const value of dateValues) {
+  for (const value of dateValues) {
       const serviceDate = new Date(`${value}T12:00:00`);
       const current = existingByDate.get(value);
       const data = {
@@ -718,7 +716,7 @@ export async function updateAssignmentGroup(formData: FormData) {
         serviceDate,
         serviceTime: timeValue(serviceDate, text(formData, "serviceTime") || "07:30"),
         direction: serviceDirection(formData),
-        serviceCount: numberValue(formData, "serviceCount") || 1,
+        serviceCount: 1,
         kilometers: 0,
         pricePerService: moneyValue(formData, "pricePerService"),
         clientPricePerService: current?.clientPricePerService ?? route?.defaultClientPricePerService ?? 0,
@@ -726,15 +724,20 @@ export async function updateAssignmentGroup(formData: FormData) {
       };
 
       if (current && targetDateSet.has(value) && !duplicateIds.has(current.id)) {
-        await tx.serviceAssignment.update({
+        updates.push(prisma.serviceAssignment.update({
           where: { id: current.id },
           data
-        });
+        }));
       } else {
-        await tx.serviceAssignment.create({ data });
+        creates.push(data);
       }
-    }
-  });
+  }
+
+  await prisma.$transaction([
+    ...(deleteIds.length ? [prisma.serviceAssignment.deleteMany({ where: { id: { in: deleteIds } } })] : []),
+    ...updates,
+    ...(creates.length ? [prisma.serviceAssignment.createMany({ data: creates })] : [])
+  ]);
   redirect(returnTo(formData, fallbackUrl));
 }
 
@@ -775,7 +778,7 @@ export async function createOneOffJob(formData: FormData) {
       serviceDate,
       serviceTime: timeValue(serviceDate, text(formData, "serviceTime") || "07:30"),
       direction: ServiceDirection.ONE_OFF,
-      serviceCount: numberValue(formData, "serviceCount") || 1,
+      serviceCount: 1,
       kilometers: 0,
       pricePerService: moneyValue(formData, "pricePerService"),
       clientPricePerService: moneyValue(formData, "clientPricePerService"),
@@ -814,7 +817,7 @@ export async function updateOneOffJob(formData: FormData) {
         serviceDate,
         serviceTime: timeValue(serviceDate, text(formData, "serviceTime") || "07:30"),
         direction: ServiceDirection.ONE_OFF,
-        serviceCount: numberValue(formData, "serviceCount") || 1,
+        serviceCount: 1,
         kilometers: 0,
         pricePerService: moneyValue(formData, "pricePerService"),
         clientPricePerService: moneyValue(formData, "clientPricePerService"),

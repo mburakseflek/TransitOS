@@ -33,18 +33,23 @@ export function GlobalOperationOverlay() {
 
   useEffect(() => {
     let safetyTimer: number | undefined;
+    let revealTimer: number | undefined;
 
     function clearSafetyTimer() {
       if (safetyTimer) {
         window.clearTimeout(safetyTimer);
         safetyTimer = undefined;
       }
+      if (revealTimer) {
+        window.clearTimeout(revealTimer);
+        revealTimer = undefined;
+      }
     }
 
     function show(nextLabel = bodyOperationLabel()) {
       clearSafetyTimer();
       setLabel(nextLabel || defaultLabel);
-      setVisible(true);
+      revealTimer = window.setTimeout(() => setVisible(true), 280);
       safetyTimer = window.setTimeout(() => {
         document.body.dataset.operationPending = "false";
         delete document.body.dataset.operationLabel;

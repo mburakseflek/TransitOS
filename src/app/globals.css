@@ -20156,3 +20156,135 @@ body[data-navigation-pending="true"] .route-loader {
     display: none !important;
   }
 }
+
+/* TransitOS clarity pass: calmer surfaces, clearer hierarchy and faster-feeling controls. */
+.transitos-shell {
+  --tos-ink: #10233d;
+  --tos-muted: #607086;
+  --tos-line: rgba(15, 45, 78, 0.11);
+  --tos-surface: rgba(255, 255, 255, 0.94);
+  --tos-primary: #0b64d8;
+  --tos-primary-strong: #074ea9;
+}
+
+.transitos-shell .content {
+  background:
+    radial-gradient(circle at 92% 4%, rgba(40, 142, 255, 0.09), transparent 28%),
+    linear-gradient(180deg, #f7faff 0%, #f2f6fb 100%) !important;
+}
+
+.transitos-shell .topbar {
+  margin-bottom: 20px !important;
+  padding: 18px 20px !important;
+  border: 1px solid var(--tos-line) !important;
+  border-radius: 20px !important;
+  background: var(--tos-surface) !important;
+  box-shadow: 0 12px 34px rgba(20, 47, 76, 0.07) !important;
+}
+
+.transitos-shell .title {
+  color: var(--tos-ink) !important;
+  letter-spacing: -0.035em !important;
+}
+
+.transitos-shell :is(.card, .project-accordion, .project-detail-panel, .route-expand-card, .service-planner-disclosure) {
+  border-color: var(--tos-line) !important;
+  background: var(--tos-surface) !important;
+  box-shadow: 0 10px 28px rgba(20, 47, 76, 0.055) !important;
+}
+
+.transitos-shell :is(.project-accordion, .route-expand-card, .service-planner-disclosure) {
+  border-radius: 18px !important;
+}
+
+.transitos-shell :is(input, select, textarea) {
+  min-height: 48px;
+  color: var(--tos-ink) !important;
+  border-color: rgba(15, 45, 78, 0.16) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: inset 0 1px 2px rgba(20, 47, 76, 0.025) !important;
+}
+
+.transitos-shell :is(input, select, textarea):focus {
+  border-color: #2e8df4 !important;
+  outline: 3px solid rgba(46, 141, 244, 0.16) !important;
+  outline-offset: 1px;
+}
+
+.transitos-shell :is(button, .primary, .ghost, .compact-button, summary) {
+  touch-action: manipulation;
+}
+
+.transitos-shell .primary {
+  border-color: var(--tos-primary) !important;
+  background: linear-gradient(180deg, #1675e5, var(--tos-primary)) !important;
+  box-shadow: 0 8px 18px rgba(11, 100, 216, 0.19) !important;
+}
+
+.transitos-shell .primary:hover {
+  background: var(--tos-primary-strong) !important;
+  transform: translateY(-1px);
+}
+
+.transitos-shell .ghost {
+  color: #24415f !important;
+  border-color: rgba(15, 45, 78, 0.14) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+}
+
+.transitos-shell .muted {
+  color: var(--tos-muted) !important;
+}
+
+.transitos-shell .project-accordion-summary,
+.transitos-shell .route-expand-summary {
+  min-height: 64px;
+  padding: 16px 18px !important;
+}
+
+.transitos-shell .project-accordion-stack,
+.transitos-shell .service-ledger {
+  gap: 14px !important;
+}
+
+.transitos-shell .badge {
+  min-height: 28px;
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  font-weight: 720 !important;
+}
+
+.global-operation-overlay[data-visible="false"] {
+  pointer-events: none !important;
+}
+
+@media (max-width: 720px) {
+  .transitos-shell .content {
+    padding-inline: 12px !important;
+  }
+
+  .transitos-shell .topbar {
+    margin-bottom: 14px !important;
+    padding: 16px !important;
+  }
+
+  .transitos-shell :is(.card, .project-detail-panel) {
+    border-radius: 18px !important;
+  }
+
+  .transitos-shell .project-accordion-summary,
+  .transitos-shell .route-expand-summary {
+    padding: 14px !important;
+  }
+
+  .transitos-shell :is(button, .primary, .ghost, .compact-button, summary, label[for]) {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transitos-shell .primary:hover {
+    transform: none;
+  }
+}

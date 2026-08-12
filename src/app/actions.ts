@@ -395,14 +395,31 @@ export async function updateProject(formData: FormData) {
 }
 
 export async function createProjectCompany(formData: FormData) {
-  await requireOperationsEditor();
+  await requireUserManager();
   const name = text(formData, "name");
-  if (name) await prisma.projectCompany.upsert({ where: { name }, create: { name }, update: {} });
+  const loginId = text(formData, "loginId");
+  const password = text(formData, "password");
+  const displayName = text(formData, "displayName") || name;
+  if (name && loginId && password) {
+    const passwordHash = await bcrypt.hash(password, 10);
+    await prisma.$transaction(async (tx) => {
+      const company = await tx.projectCompany.create({ data: { name } });
+      await tx.user.create({
+        data: {
+          loginId,
+          passwordHash,
+          displayName,
+          role: UserRole.PROJECT_OWNER,
+          ownerCompanies: { connect: { id: company.id } }
+        }
+      });
+    });
+  }
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function updateProjectCompany(formData: FormData) {
-  await requireOperationsEditor();
+  await requireUserManager();
   const id = text(formData, "id");
   const name = text(formData, "name");
   if (name) await prisma.$transaction([
@@ -413,11 +430,83 @@ export async function updateProjectCompany(formData: FormData) {
 }
 
 export async function deleteProjectCompany(formData: FormData) {
-  await requireOperationsEditor();
-  await prisma.projectCompany.deleteMany({
-    where: { id: text(formData, "id"), projects: { none: {} } }
+  await requireUserManager();
+  const companyId = text(formData, "id");
+  const company = await prisma.projectCompany.findUnique({
+    where: { id: companyId },
+    select: {
+      _count: { select: { projects: true } },
+      ownerUsers: { select: { id: true, _count: { select: { ownerCompanies: true } } } }
+    }
   });
+  if (company && company._count.projects === 0) {
+    await prisma.$transaction(async (tx) => {
+      for (const owner of company.ownerUsers) {
+        if (owner._count.ownerCompanies <= 1) await tx.user.delete({ where: { id: owner.id } });
+        else await tx.user.update({ where: { id: owner.id }, data: { ownerCompanies: { disconnect: { id: companyId } } } });
+      }
+      await tx.projectCompany.delete({ where: { id: companyId } });
+    });
+  }
   redirect(returnTo(formData, "/transitos/projects"));
+}
+
+export async function createProjectCompanyUser(formData: FormData) {
+  await requireUserManager();
+  const companyId = text(formData, "companyId");
+  const loginId = text(formData, "loginId");
+  const password = text(formData, "password");
+  const displayName = text(formData, "displayName");
+  if (companyId && loginId && password && displayName) {
+    await prisma.user.create({
+      data: {
+        loginId,
+        passwordHash: await bcrypt.hash(password, 10),
+        displayName,
+        role: UserRole.PROJECT_OWNER,
+        ownerCompanies: { connect: { id: companyId } }
+      }
+    });
+  }
+  redirect(returnTo(formData, "/transitos/settings"));
+}
+
+export async function updateProjectCompanyUser(formData: FormData) {
+  await requireUserManager();
+  const id = text(formData, "id");
+  const companyId = text(formData, "companyId");
+  const password = text(formData, "password");
+  const account = await prisma.user.findFirst({
+    where: { id, role: UserRole.PROJECT_OWNER, ownerCompanies: { some: { id: companyId } } },
+    select: { id: true }
+  });
+  if (account) {
+    await prisma.user.update({
+      where: { id },
+      data: {
+        loginId: text(formData, "loginId"),
+        displayName: text(formData, "displayName"),
+        role: UserRole.PROJECT_OWNER,
+        ...(password ? { passwordHash: await bcrypt.hash(password, 10) } : {})
+      }
+    });
+  }
+  redirect(returnTo(formData, "/transitos/settings"));
+}
+
+export async function deleteProjectCompanyUser(formData: FormData) {
+  await requireUserManager();
+  const id = text(formData, "id");
+  const companyId = text(formData, "companyId");
+  const account = await prisma.user.findFirst({
+    where: { id, role: UserRole.PROJECT_OWNER, ownerCompanies: { some: { id: companyId } } },
+    select: { id: true, _count: { select: { ownerCompanies: true } } }
+  });
+  if (account) {
+    if (account._count.ownerCompanies <= 1) await prisma.user.delete({ where: { id } });
+    else await prisma.user.update({ where: { id }, data: { ownerCompanies: { disconnect: { id: companyId } } } });
+  }
+  redirect(returnTo(formData, "/transitos/settings"));
 }
 
 export async function deleteProject(formData: FormData) {

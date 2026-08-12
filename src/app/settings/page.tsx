@@ -4,10 +4,13 @@ import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/
 import {
   createAccessUser,
   createProjectCompany,
+  createProjectCompanyUser,
   deleteAccessUser,
   deleteProjectCompany,
+  deleteProjectCompanyUser,
   updateAccessUser,
-  updateProjectCompany
+  updateProjectCompany,
+  updateProjectCompanyUser
 } from "@/app/actions";
 import { readSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -28,7 +31,14 @@ export default async function SettingsPage() {
       prisma.subcontractor.findMany({ orderBy: { companyName: "asc" } }),
       prisma.project.findMany({ orderBy: { name: "asc" } }),
       prisma.projectCompany.findMany({
-        include: { _count: { select: { projects: true } } },
+        include: {
+          _count: { select: { projects: true } },
+          ownerUsers: {
+            where: { role: "PROJECT_OWNER" },
+            select: { id: true, displayName: true, loginId: true },
+            orderBy: { displayName: "asc" }
+          }
+        },
         orderBy: { name: "asc" }
       })
     ])
@@ -61,13 +71,14 @@ export default async function SettingsPage() {
           <div className="record-head">
             <div>
               <h2 style={{ marginTop: 0 }}>Proje Şirketleri</h2>
-              <p className="muted">Proje sahibi şirketleri burada ekleyin, düzenleyin veya kullanılmayan kayıtları silin.</p>
+              <p className="muted">Şirketleri ve bu şirketlerin Proje Sahibi giriş hesaplarını tek yerden yönetin.</p>
             </div>
             <ModalAction label="Şirket Ekle" title="Proje Şirketi Ekle">
               <form className="stack" action={createProjectCompany}>
                 <input type="hidden" name="_returnTo" value="/transitos/settings" />
                 <Field label="Şirket adı" hint="Aynı şirkete birden fazla proje bağlanabilir."><input name="name" required /></Field>
-                <div className="actions"><SubmitButton>✓ Şirket Ekle</SubmitButton></div>
+                <ProjectCompanyAccountFields requirePassword />
+                <div className="actions"><SubmitButton>✓ Şirket ve Hesap Ekle</SubmitButton></div>
               </form>
             </ModalAction>
           </div>
@@ -76,7 +87,7 @@ export default async function SettingsPage() {
               <article className="company-settings-item" key={company.id}>
                 <div>
                   <strong>{company.name}</strong>
-                  <p className="muted">{company._count.projects} bağlı proje</p>
+                  <p className="muted">{company._count.projects} bağlı proje · {company.ownerUsers.length} giriş hesabı</p>
                 </div>
                 <ModalAction label="Düzenle" title={`${company.name} Şirketi`} buttonClassName="ghost compact-button">
                   <div className="stack">
@@ -86,6 +97,36 @@ export default async function SettingsPage() {
                       <Field label="Şirket adı" hint="Bağlı projelerdeki şirket adı da güncellenir."><input name="name" defaultValue={company.name} required /></Field>
                       <div className="actions"><SubmitButton>✓ Güncelle</SubmitButton></div>
                     </form>
+                    <div className="project-company-accounts">
+                      <div>
+                        <h3>Proje sahibi giriş hesapları</h3>
+                        <p className="muted">Bu hesaplar şirketin tüm mevcut ve gelecekte eklenecek projelerini görüntüler.</p>
+                      </div>
+                      {company.ownerUsers.map((account) => (
+                        <article className="project-company-account" key={account.id}>
+                          <form className="stack" action={updateProjectCompanyUser}>
+                            <input type="hidden" name="id" value={account.id} />
+                            <input type="hidden" name="companyId" value={company.id} />
+                            <input type="hidden" name="_returnTo" value="/transitos/settings" />
+                            <ProjectCompanyAccountFields account={account} />
+                            <div className="actions"><SubmitButton>✓ Hesabı Güncelle</SubmitButton></div>
+                          </form>
+                          <form action={deleteProjectCompanyUser}>
+                            <input type="hidden" name="id" value={account.id} />
+                            <input type="hidden" name="companyId" value={company.id} />
+                            <input type="hidden" name="_returnTo" value="/transitos/settings" />
+                            <DeleteButton>Giriş Hesabını Sil</DeleteButton>
+                          </form>
+                        </article>
+                      ))}
+                      <form className="stack project-company-account account-create" action={createProjectCompanyUser}>
+                        <input type="hidden" name="companyId" value={company.id} />
+                        <input type="hidden" name="_returnTo" value="/transitos/settings" />
+                        <h3>Yeni giriş hesabı</h3>
+                        <ProjectCompanyAccountFields requirePassword />
+                        <div className="actions"><SubmitButton>＋ Hesap Ekle</SubmitButton></div>
+                      </form>
+                    </div>
                     {company._count.projects === 0 ? (
                       <form action={deleteProjectCompany}>
                         <input type="hidden" name="id" value={company.id} />
@@ -160,6 +201,28 @@ export default async function SettingsPage() {
         </section>
       ) : null}
     </AppShell>
+  );
+}
+
+function ProjectCompanyAccountFields({
+  account,
+  requirePassword = false
+}: {
+  account?: { displayName: string; loginId: string };
+  requirePassword?: boolean;
+}) {
+  return (
+    <>
+      <Field label="Hesap adı / ünvan" hint="Panelde görünecek kullanıcı adı.">
+        <input name="displayName" defaultValue={account?.displayName ?? ""} required />
+      </Field>
+      <Field label="Giriş ID" hint="Proje sahibinin giriş ekranında kullanacağı benzersiz ID.">
+        <input name="loginId" autoCapitalize="none" autoCorrect="off" defaultValue={account?.loginId ?? ""} required />
+      </Field>
+      <Field label="Şifre" hint={account ? "Boş bırakırsanız mevcut şifre korunur." : "En az 4 karakter belirleyin."}>
+        <input name="password" type="password" minLength={4} required={requirePassword} autoComplete="new-password" />
+      </Field>
+    </>
   );
 }
 

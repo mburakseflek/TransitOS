@@ -20384,6 +20384,23 @@ body .modal-window .service-group-calendar-panel .calendar-day {
   font-variant-numeric: tabular-nums;
 }
 
+/* Calendar dates must stay on one line even when global mobile text wrapping is active. */
+.calendar-day > span,
+.service-create-calendar-panel .calendar-day > span,
+.service-group-calendar-panel .calendar-day > span {
+  display: inline-block !important;
+  width: auto !important;
+  min-width: 2ch !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  font-variant-numeric: tabular-nums;
+}
+
 .service-group-settings-panel {
   display: grid;
   gap: 14px;
@@ -20504,6 +20521,19 @@ body .modal-window .service-group-calendar-panel .calendar-day {
   .service-create-calendar-panel .calendar-day {
     min-height: 44px !important;
     height: 44px !important;
+    padding: 2px !important;
+  }
+
+  .service-create-calendar-panel .calendar-grid,
+  .service-group-calendar-panel .calendar-grid {
+    grid-template-columns: repeat(7, minmax(36px, 1fr)) !important;
+    gap: 4px !important;
+  }
+
+  .service-create-calendar-panel .calendar-day > span,
+  .service-group-calendar-panel .calendar-day > span {
+    min-width: 0 !important;
+    font-size: clamp(0.78rem, 3.7vw, 1rem) !important;
   }
 
   .service-summary-detail .service-group-edit-actions button,

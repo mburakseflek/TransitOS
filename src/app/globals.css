@@ -5716,6 +5716,311 @@ button.company-info-item {
   }
 }
 
+/* Android/mobile stability and soft UI pass. Keeps zoom support while preventing WebView text inflation. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.transitos-shell,
+.transitos-shell * ,
+.modal-window,
+.modal-window * {
+  box-sizing: border-box;
+}
+
+.transitos-shell :is(.card, .topbar, .period-filter, .project-accordion, .project-detail-panel, .route-expand-card, .service-planner-disclosure),
+.modal-window :is(.card, .section, .service-group-edit-form, .service-group-calendar-panel, .service-group-settings-panel, .service-create-calendar-panel, .service-create-settings-panel) {
+  background-image: none !important;
+  background-color: rgba(255, 255, 255, 0.97) !important;
+  border-color: rgba(30, 58, 90, 0.11) !important;
+  box-shadow: 0 5px 18px rgba(22, 42, 68, 0.055) !important;
+}
+
+.transitos-shell :is(.primary, button.primary),
+.modal-window :is(.primary, button.primary) {
+  background-image: none !important;
+  background-color: #1769c2 !important;
+  box-shadow: none !important;
+}
+
+.transitos-shell :is(.ghost, .compact-button),
+.modal-window :is(.ghost, .compact-button) {
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 760px) {
+  .transitos-shell {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: clip !important;
+  }
+
+  .transitos-shell .content {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding-inline: 10px !important;
+  }
+
+  .transitos-shell :is(.topbar, .card, .period-filter, .project-accordion, .project-detail-panel, .route-expand-card, .service-planner-disclosure, .toolbar, .grid, .stack),
+  .modal-window :is(.modal-body, .section, form, .stack, .grid, .field-row, .form-section, .form-flow-section) {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .transitos-shell :is(.card, .project-detail-panel, .route-expand-card),
+  .modal-window :is(.service-group-edit-form, .service-group-calendar-panel, .service-group-settings-panel, .service-create-calendar-panel, .service-create-settings-panel) {
+    padding: 12px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 3px 12px rgba(22, 42, 68, 0.045) !important;
+  }
+
+  body .modal-backdrop {
+    width: 100dvw !important;
+    max-width: 100dvw !important;
+    padding: 6px !important;
+    overflow-x: hidden !important;
+  }
+
+  body .modal-window,
+  body .modal-window:has(.service-group-edit-form) {
+    width: calc(100dvw - 12px) !important;
+    max-width: calc(100dvw - 12px) !important;
+    min-width: 0 !important;
+    max-height: calc(100dvh - 12px) !important;
+    margin: 0 !important;
+    border-radius: 16px !important;
+  }
+
+  body .modal-window > .modal-head {
+    min-width: 0 !important;
+    padding: 12px 14px !important;
+  }
+
+  body .modal-window > .modal-head h2 {
+    min-width: 0 !important;
+    font-size: clamp(1rem, 5vw, 1.25rem) !important;
+    overflow-wrap: anywhere;
+  }
+
+  body .modal-window > .modal-body,
+  body .modal-window:has(.service-group-edit-form) > .modal-body {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 10px !important;
+    overflow-x: hidden !important;
+  }
+
+  .service-create-layout,
+  .service-group-editor-layout,
+  .service-group-edit-grid,
+  .form-flow-fields,
+  .form-section-fields {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .calendar-picker,
+  .service-create-calendar-panel .calendar-picker,
+  .service-group-calendar-panel .calendar-picker {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    gap: 10px !important;
+  }
+
+  .calendar-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    justify-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .calendar-month-control,
+  .calendar-toolbar-actions {
+    display: grid !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .calendar-month-control {
+    grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+    padding: 3px !important;
+  }
+
+  .calendar-month-control strong {
+    min-width: 0 !important;
+    font-size: 0.9rem !important;
+    white-space: nowrap !important;
+  }
+
+  .calendar-toolbar-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .calendar-toolbar-actions button {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding-inline: 7px !important;
+    font-size: 0.82rem !important;
+    white-space: normal !important;
+  }
+
+  .calendar-toolbar > .badge {
+    width: fit-content !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .calendar-grid,
+  .service-create-calendar-panel .calendar-grid,
+  .service-group-calendar-panel .calendar-grid,
+  body .modal-window .calendar-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    gap: 3px !important;
+  }
+
+  .calendar-head {
+    min-width: 0 !important;
+    font-size: clamp(0.62rem, 2.9vw, 0.78rem) !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+  }
+
+  .calendar-day,
+  .service-create-calendar-panel .calendar-day,
+  body .modal-window .service-group-calendar-panel .calendar-day {
+    display: grid !important;
+    place-items: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    padding: 2px !important;
+    border-radius: 9px !important;
+    overflow: hidden !important;
+  }
+
+  .calendar-day > span,
+  .service-create-calendar-panel .calendar-day > span,
+  .service-group-calendar-panel .calendar-day > span {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    font-size: clamp(0.72rem, 3.5vw, 0.94rem) !important;
+    line-height: 1 !important;
+    letter-spacing: -0.02em !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+
+  .calendar-day.occupied small {
+    display: none !important;
+  }
+
+  .calendar-occupied-legend {
+    align-items: flex-start !important;
+    min-width: 0 !important;
+  }
+
+  .calendar-occupied-legend small {
+    min-width: 0 !important;
+    font-size: 0.75rem !important;
+    overflow-wrap: anywhere;
+  }
+
+  .modal-window :is(input, select, textarea),
+  .transitos-shell :is(input, select, textarea) {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 48px !important;
+    font-size: 16px !important;
+  }
+
+  .modal-window select,
+  .transitos-shell select {
+    text-overflow: ellipsis;
+  }
+
+  .modal-window .frequency-selector > div,
+  .frequency-selector > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .modal-window .frequency-option,
+  .frequency-option {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .transitos-shell .table,
+  .modal-window .table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .market-strip,
+  .market-strip-app,
+  .market-strip-viewport {
+    width: calc(100dvw - 16px) !important;
+    max-width: calc(100dvw - 16px) !important;
+    overflow: hidden !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .transitos-shell .content {
+    padding-inline: 6px !important;
+  }
+
+  body .modal-window > .modal-body,
+  body .modal-window:has(.service-group-edit-form) > .modal-body,
+  .modal-window :is(.service-group-edit-form, .service-group-calendar-panel, .service-group-settings-panel, .service-create-calendar-panel, .service-create-settings-panel) {
+    padding: 8px !important;
+  }
+
+  .calendar-grid,
+  .service-create-calendar-panel .calendar-grid,
+  .service-group-calendar-panel .calendar-grid {
+    gap: 2px !important;
+  }
+
+  .calendar-day,
+  .service-create-calendar-panel .calendar-day,
+  body .modal-window .service-group-calendar-panel .calendar-day {
+    min-height: 38px !important;
+    height: 38px !important;
+    border-radius: 8px !important;
+  }
+
+  .calendar-toolbar-actions button {
+    font-size: 0.76rem !important;
+  }
+}
+
 @media print {
   .sidebar,
   .topbar,

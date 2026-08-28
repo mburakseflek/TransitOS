@@ -20847,3 +20847,151 @@ body .modal-window .service-group-calendar-panel .calendar-day {
     min-width: 0;
   }
 }
+
+/* Service group editor must remain a vertical document. Generic modal form
+   rules use two columns, which previously placed the heading beside the
+   calendar and compressed the calendar/settings workspace until they
+   overlapped. */
+body .modal-window .service-group-edit-form {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-auto-flow: row !important;
+  align-items: stretch !important;
+}
+
+body .modal-window .service-group-edit-form > * {
+  grid-column: 1 / -1 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+body .modal-window .service-group-editor-layout {
+  width: 100% !important;
+  overflow: clip !important;
+}
+
+body .modal-window .service-group-calendar-panel,
+body .modal-window .service-group-settings-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+body .modal-window .service-group-settings-panel :is(.field-row, input, select, textarea, .frequency-selector) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+body .modal-window .service-group-settings-panel .frequency-selector > div,
+body .modal-window .service-group-settings-panel .frequency-option,
+body .modal-window .service-group-settings-panel .frequency-option > span {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+body .modal-window .service-group-settings-panel .frequency-selector > div {
+  overflow: hidden !important;
+}
+
+body .modal-window .service-group-settings-panel .frequency-option {
+  overflow: hidden !important;
+}
+
+body .modal-window .service-group-settings-panel .frequency-option:has(input:checked) > span,
+body .modal-window .service-group-settings-panel .frequency-option input:checked + span {
+  box-shadow: inset 0 0 0 2px #23b9e5 !important;
+}
+
+body .modal-window .service-summary-detail .service-group-edit-actions,
+body .modal-window .service-summary-detail .service-group-danger {
+  position: static !important;
+  inset: auto !important;
+  z-index: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body .modal-window .service-summary-detail .service-group-edit-actions {
+  padding: 4px 0 0 !important;
+  border: 0 !important;
+}
+
+body .modal-window .service-summary-detail .service-group-danger {
+  margin-top: 14px !important;
+  padding: 14px 0 0 !important;
+}
+
+@media (min-width: 641px) {
+  body .modal-backdrop:has(.service-group-edit-form) {
+    align-items: flex-start !important;
+  }
+
+  body .modal-window:has(.service-group-edit-form) {
+    max-height: calc(100dvh - 116px) !important;
+  }
+}
+
+@media (max-width: 1080px) {
+  body .modal-window .service-group-editor-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  body .modal-window .service-group-settings-panel {
+    position: static !important;
+  }
+}
+
+@media (max-width: 560px) {
+  body .modal-window .service-group-edit-head {
+    display: flex !important;
+    flex-wrap: wrap !important;
+  }
+
+  body .modal-window .service-group-calendar-panel .calendar-grid,
+  body .modal-window .service-create-calendar-panel .calendar-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    width: 100% !important;
+  }
+
+  body .modal-window .calendar-toolbar-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    width: 100% !important;
+  }
+
+  body .modal-window .calendar-toolbar-actions button {
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+  }
+}
+
+@media (max-width: 380px) {
+  body .modal-window:has(.service-group-edit-form) > .modal-body {
+    padding-inline: 8px !important;
+  }
+
+  body .modal-window .service-group-edit-form,
+  body .modal-window .service-group-calendar-panel,
+  body .modal-window .service-group-settings-panel {
+    padding-inline: 8px !important;
+  }
+
+  body .modal-window .service-group-calendar-panel .calendar-grid,
+  body .modal-window .service-create-calendar-panel .calendar-grid {
+    gap: 3px !important;
+  }
+
+  body .modal-window .service-group-calendar-panel .calendar-day,
+  body .modal-window .service-create-calendar-panel .calendar-day {
+    padding-inline: 1px !important;
+  }
+}

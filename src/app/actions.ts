@@ -1,6 +1,7 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ExpenseCategory, FinancialDocumentLineKind, FinancialDocumentType, Prisma, RecordStatus, ServiceDirection, UserRole } from "@prisma/client";
@@ -567,6 +568,7 @@ export async function createAssignment(formData: FormData) {
   });
   await prisma.serviceAssignment.create({
     data: {
+      seriesId: randomUUID(),
       projectId: optionalId(formData, "projectId") ?? route?.projectId ?? null,
       routeId,
       vehicleId: text(formData, "vehicleId"),
@@ -618,6 +620,7 @@ export async function createBulkAssignments(formData: FormData) {
   const endDate = dateValue(formData, "endDate");
   const weekdays = new Set(formData.getAll("weekdays").map(String));
   const records = [];
+  const seriesId = randomUUID();
   const dates = selectedDates.length ? selectedDates.map((value) => new Date(`${value}T12:00:00`)) : [];
   const routeId = text(formData, "routeId");
   const route = await prisma.serviceRoute.findUnique({
@@ -638,6 +641,7 @@ export async function createBulkAssignments(formData: FormData) {
 
   for (const serviceDate of dates) {
       records.push({
+        seriesId,
         projectId: optionalId(formData, "projectId") ?? route?.projectId ?? null,
         routeId,
         vehicleId: text(formData, "vehicleId"),
@@ -705,11 +709,14 @@ export async function updateAssignmentGroup(formData: FormData) {
     .map((assignment) => assignment.id);
   const updates: Prisma.PrismaPromise<unknown>[] = [];
   const creates: Prisma.ServiceAssignmentCreateManyInput[] = [];
+  const seriesId = existingAssignments.find((assignment) => assignment.seriesId)?.seriesId ?? randomUUID();
+  const clientPricePerService = existingAssignments[0]?.clientPricePerService ?? route?.defaultClientPricePerService ?? 0;
 
   for (const value of dateValues) {
       const serviceDate = new Date(`${value}T12:00:00`);
       const current = existingByDate.get(value);
       const data = {
+        seriesId,
         projectId: optionalId(formData, "projectId") ?? route?.projectId ?? null,
         routeId,
         vehicleId: text(formData, "vehicleId"),
@@ -719,7 +726,7 @@ export async function updateAssignmentGroup(formData: FormData) {
         serviceCount: 1,
         kilometers: 0,
         pricePerService: moneyValue(formData, "pricePerService"),
-        clientPricePerService: current?.clientPricePerService ?? route?.defaultClientPricePerService ?? 0,
+        clientPricePerService,
         monthKey: monthKey(serviceDate)
       };
 
@@ -772,6 +779,7 @@ export async function createOneOffJob(formData: FormData) {
 
   await prisma.serviceAssignment.create({
     data: {
+      seriesId: randomUUID(),
       projectId: null,
       routeId: route.id,
       vehicleId: text(formData, "vehicleId"),

@@ -6,7 +6,7 @@ import { YandexTrafficMap } from "@/app/components/YandexTrafficMap";
 import { prisma } from "@/lib/db";
 import { formatTRY } from "@/lib/format";
 import { serviceDirectionTitle } from "@/lib/labels";
-import { getFastTrafficSnapshot, getYandexMapKitApiKey, istanbulTrafficMapEmbedUrl } from "@/lib/traffic";
+import { getFastTrafficSnapshot, istanbulTrafficMapEmbedUrl } from "@/lib/traffic";
 import { cookies } from "next/headers";
 import { readSessionToken } from "@/lib/auth";
 import {
@@ -78,7 +78,6 @@ export default async function DashboardPage() {
     }) : Promise.resolve([])
   ]);
   const trafficItems = trafficSnapshot.items;
-  const yandexApiKey = getYandexMapKitApiKey();
   const pendingPreviousEarningTotal = pendingPreviousEarnings.reduce((total, subcontractor) => {
     const gross = subcontractor.vehicles.flatMap((vehicle) => vehicle.assignments)
       .reduce((sum, assignment) => sum + Number(assignment.pricePerService) * assignment.serviceCount, 0);
@@ -194,7 +193,6 @@ export default async function DashboardPage() {
             </a>
           </div>
           <YandexTrafficMap
-            apiKey={yandexApiKey}
             title="İstanbul canlı trafik haritası"
             center={[41.0438, 28.7768]}
             zoom={10}

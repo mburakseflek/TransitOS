@@ -792,7 +792,7 @@ function groupServiceAssignments(assignments: any[], endOfToday: Date): ServiceA
     const carrierUnitPrice = Number(assignment.pricePerService ?? 0);
     const clientUnitPrice = Number(assignment.clientPricePerService ?? 0);
     const serviceCount = Number(assignment.serviceCount ?? 1);
-    const key = [
+    const legacyKey = [
       assignment.vehicleId,
       assignment.direction,
       timeInputValue(assignment.serviceTime) ?? "",
@@ -800,6 +800,7 @@ function groupServiceAssignments(assignments: any[], endOfToday: Date): ServiceA
       carrierUnitPrice,
       clientUnitPrice
     ].join("|");
+    const key = assignment.seriesId ? `series:${assignment.seriesId}` : `legacy:${legacyKey}`;
     const completed = assignment.serviceDate <= endOfToday;
     const carrierValue = carrierUnitPrice * serviceCount;
     const clientValue = clientUnitPrice * serviceCount;

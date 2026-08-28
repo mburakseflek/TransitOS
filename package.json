@@ -23,7 +23,8 @@
     "db:sync:mac": "npm run db:local:setup && prisma migrate deploy && npm run db:import:mac",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "test:roles": "node scripts/role-smoke-test.js"
+    "test:roles": "node scripts/role-smoke-test.js",
+    "test:http": "node scripts/http-smoke-test.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

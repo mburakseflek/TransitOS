@@ -49,7 +49,8 @@ export function canSeeSubcontractorMoney(user?: SessionUser | null) {
 }
 
 export function projectAccessWhere(user?: SessionUser | null) {
-  if (!user || isManager(user)) return {};
+  if (!user) return { id: "__no_access__" };
+  if (isManager(user)) return {};
   if (isServiceSupervisor(user)) return { serviceUsers: { some: { id: user.id } } };
   if (isProjectOwner(user)) return { projectCompany: { ownerUsers: { some: { id: user.id } } } };
   if (isSubcontractor(user)) {
@@ -59,7 +60,8 @@ export function projectAccessWhere(user?: SessionUser | null) {
 }
 
 export function routeAccessWhere(user?: SessionUser | null) {
-  if (!user || isManager(user)) return {};
+  if (!user) return { id: "__no_access__" };
+  if (isManager(user)) return {};
   if (isServiceSupervisor(user)) return { project: { serviceUsers: { some: { id: user.id } } } };
   if (isProjectOwner(user)) return { project: { projectCompany: { ownerUsers: { some: { id: user.id } } } } };
   if (isSubcontractor(user)) return { assignments: { some: { vehicle: { subcontractorId: user.subcontractorId } } } };
@@ -67,7 +69,8 @@ export function routeAccessWhere(user?: SessionUser | null) {
 }
 
 export function assignmentAccessWhere(user?: SessionUser | null) {
-  if (!user || isManager(user)) return {};
+  if (!user) return { id: "__no_access__" };
+  if (isManager(user)) return {};
   if (isServiceSupervisor(user)) return { project: { serviceUsers: { some: { id: user.id } } } };
   if (isProjectOwner(user)) return { project: { projectCompany: { ownerUsers: { some: { id: user.id } } } } };
   if (isSubcontractor(user)) return { vehicle: { subcontractorId: user.subcontractorId } };
@@ -75,7 +78,8 @@ export function assignmentAccessWhere(user?: SessionUser | null) {
 }
 
 export function vehicleAccessWhere(user?: SessionUser | null) {
-  if (!user || isManager(user) || isServiceSupervisor(user)) return {};
+  if (!user) return { id: "__no_access__" };
+  if (isManager(user) || isServiceSupervisor(user)) return {};
   if (isProjectOwner(user)) {
     return { assignments: { some: { project: { projectCompany: { ownerUsers: { some: { id: user.id } } } } } } };
   }

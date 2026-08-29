@@ -47,6 +47,17 @@ function hasPendingInteraction() {
   return document.body.dataset.operationPending === "true" || document.body.dataset.navigationPending === "true";
 }
 
+function resetFormLocks() {
+  document.querySelectorAll<HTMLFormElement>("form[data-submitting='true'], form[aria-busy='true']").forEach((form) => {
+    form.dataset.submitting = "false";
+    form.removeAttribute("aria-busy");
+    form.querySelectorAll<HTMLButtonElement | HTMLInputElement>("button[aria-disabled='true'], input[aria-disabled='true']").forEach((control) => {
+      control.disabled = false;
+      control.removeAttribute("aria-disabled");
+    });
+  });
+}
+
 function isLockSurface(target: EventTarget | null) {
   return target instanceof HTMLElement && Boolean(target.closest(".global-operation-overlay, .modal-operation-lock, .route-loader"));
 }
@@ -176,6 +187,12 @@ export function InteractionGuards() {
     function resetInteractionLock() {
       document.body.dataset.operationPending = "false";
       document.body.dataset.navigationPending = "false";
+      delete document.body.dataset.operationLabel;
+      resetFormLocks();
+    }
+
+    function resetVisiblePage() {
+      if (document.visibilityState === "visible") resetInteractionLock();
     }
 
     document.addEventListener("input", markDirty, true);
@@ -184,6 +201,10 @@ export function InteractionGuards() {
     document.addEventListener("click", handleDocumentClick, true);
     window.addEventListener("beforeunload", handleBeforeUnload);
     window.addEventListener("pageshow", resetInteractionLock);
+    window.addEventListener("focus", resetInteractionLock);
+    document.addEventListener("visibilitychange", resetVisiblePage);
+
+    resetInteractionLock();
 
     return () => {
       document.removeEventListener("input", markDirty, true);
@@ -192,6 +213,8 @@ export function InteractionGuards() {
       document.removeEventListener("click", handleDocumentClick, true);
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("pageshow", resetInteractionLock);
+      window.removeEventListener("focus", resetInteractionLock);
+      document.removeEventListener("visibilitychange", resetVisiblePage);
     };
   }, []);
 

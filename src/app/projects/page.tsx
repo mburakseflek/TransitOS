@@ -47,6 +47,9 @@ export default async function ProjectsPage({
   const user = sessionCookie ? await readSessionToken(sessionCookie).catch(() => null) : null;
   const canEdit = canEditOperations(user);
   const requestedProjectId = params?.project ?? null;
+  const visibleAssignmentWhere = {
+    AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)]
+  };
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
   const [projects, vehicles, oneOffRoutes, projectCompanies] = await Promise.all([
@@ -58,7 +61,7 @@ export default async function ProjectsPage({
           where: routeAccessWhere(user),
           include: {
             assignments: {
-              where: { AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)] },
+              where: visibleAssignmentWhere,
               include: { vehicle: true },
               orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
             }
@@ -70,10 +73,16 @@ export default async function ProjectsPage({
     }),
     prisma.vehicle.findMany({ where: vehicleAccessWhere(user), orderBy: { fleetNumber: "asc" } }),
     prisma.serviceRoute.findMany({
-      where: { AND: [{ projectId: null }, routeAccessWhere(user)] },
+      where: {
+        AND: [
+          { projectId: null },
+          routeAccessWhere(user),
+          { assignments: { some: visibleAssignmentWhere } }
+        ]
+      },
       include: {
         assignments: {
-          where: { AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)] },
+          where: visibleAssignmentWhere,
           include: { vehicle: true }
         }
       },
@@ -664,6 +673,8 @@ function OneOffFields({
 }
 
 function OneOffJobsPanel({ routes, vehicles, canEdit }: { routes: any[]; vehicles: { id: string; fleetNumber: string; plateNumber: string }[]; canEdit: boolean }) {
+  const visibleRoutes = routes.filter((route) => route.assignments.length > 0);
+
   return (
     <section className="card section">
       <div className="record-head">
@@ -671,14 +682,14 @@ function OneOffJobsPanel({ routes, vehicles, canEdit }: { routes: any[]; vehicle
           <h2 style={{ marginTop: 0 }}>Tek Seferlik İşler</h2>
           <p className="muted">Projeye bağlı olmayan bağımsız işler burada görüntülenir.</p>
         </div>
-        <span className="badge gray">{routes.length} iş</span>
+        <span className="badge gray">{visibleRoutes.length} iş</span>
       </div>
 
-      {routes.length === 0 ? (
-        <p className="muted">Henüz tek seferlik iş eklenmedi.</p>
+      {visibleRoutes.length === 0 ? (
+        <p className="muted">Seçili ayda tek seferlik iş bulunmuyor.</p>
       ) : (
         <div className="grid section">
-          {routes.map((route) => {
+          {visibleRoutes.map((route) => {
             const assignment = route.assignments[0];
             return (
               <article className="card one-off-row" key={route.id}>

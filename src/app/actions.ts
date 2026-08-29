@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { ExpenseCategory, FinancialDocumentLineKind, FinancialDocumentType, Prisma, RecordStatus, ServiceDirection, UserRole } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { formatPhoneTR, monthKey, normalizePhoneDigitsTR, parseTurkishMoney } from "@/lib/format";
@@ -582,6 +583,7 @@ export async function createAssignment(formData: FormData) {
       monthKey: monthKey(serviceDate)
     }
   });
+  revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, `/transitos/projects?project=${optionalId(formData, "projectId") ?? ""}&route=${text(formData, "routeId")}`));
 }
 
@@ -610,6 +612,7 @@ export async function updateAssignment(formData: FormData) {
       monthKey: monthKey(serviceDate)
     }
   });
+  revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, `/transitos/projects?project=${optionalId(formData, "projectId") ?? ""}&route=${routeId}`));
 }
 
@@ -659,6 +662,7 @@ export async function createBulkAssignments(formData: FormData) {
   if (records.length) {
     await prisma.serviceAssignment.createMany({ data: records });
   }
+  revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, `/transitos/projects?project=${text(formData, "projectId")}&route=${text(formData, "routeId")}`));
 }
 
@@ -745,6 +749,7 @@ export async function updateAssignmentGroup(formData: FormData) {
     ...updates,
     ...(creates.length ? [prisma.serviceAssignment.createMany({ data: creates })] : [])
   ]);
+  revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, fallbackUrl));
 }
 
@@ -757,6 +762,7 @@ export async function deleteAssignmentGroup(formData: FormData) {
       where: { id: { in: assignmentIds } }
     });
   }
+  revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -793,6 +799,7 @@ export async function createOneOffJob(formData: FormData) {
       monthKey: monthKey(serviceDate)
     }
   });
+  revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -833,18 +840,21 @@ export async function updateOneOffJob(formData: FormData) {
       }
     });
   }
+  revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function deleteOneOffJob(formData: FormData) {
   await requireOperationsEditor();
   await prisma.serviceRoute.delete({ where: { id: text(formData, "routeId") } });
+  revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
 export async function deleteAssignment(formData: FormData) {
   await requireOperationsEditor();
   await prisma.serviceAssignment.delete({ where: { id: text(formData, "id") } });
+  revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, "/transitos/projects"));
 }
 

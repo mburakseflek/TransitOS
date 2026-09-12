@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
@@ -76,9 +75,9 @@ export async function AppShell({
     <main className="shell transitos-shell" data-user-role={user.role}>
       <input className="mobile-drawer-check" id="transitos-mobile-drawer" type="checkbox" aria-hidden="true" />
       <div className="transitos-mobile-chrome" aria-label="TransitOS mobil hızlı menü">
-        <Link className="transitos-mobile-logo" href="/transitos/dashboard" aria-label="TransitOS ana panele dön">
+        <a className="transitos-mobile-logo" href="/transitos/dashboard" aria-label="TransitOS ana panele dön">
           <img src="/brand/seflek-logo-navy.png" alt="Seflek Tur" />
-        </Link>
+        </a>
         <label className="mobile-drawer-open" htmlFor="transitos-mobile-drawer" aria-label="TransitOS menüsünü aç">
           <Menu size={22} />
           <span>{activeNavLabel}</span>
@@ -94,17 +93,17 @@ export async function AppShell({
           const Icon = item.icon;
           const isActive = activePath === item.path;
           return (
-            <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}` as never}>
+            <a key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}`}>
               <Icon size={19} />
               <span>{item.label}</span>
-            </Link>
+            </a>
           );
         })}
         <LogoutButton className="mobile-drawer-logout" />
-        <Link className="site-return-link mobile-site-return-link" href="/seflektur">
+        <a className="site-return-link mobile-site-return-link" href="/seflektur">
           <House size={17} />
           <span>Siteye dön</span>
-        </Link>
+        </a>
       </nav>
       <aside className="sidebar aceternity-sidebar" aria-label="TransitOS ana menüsü" data-collapsible="auto">
         <span className="aceternity-sidebar-glow" aria-hidden="true" />
@@ -118,17 +117,17 @@ export async function AppShell({
             const Icon = item.icon;
             const isActive = activePath === item.path;
             return (
-            <Link key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}` as never}>
+            <a key={item.path} className={`${isActive ? "active" : ""} aceternity-sidebar-link`} href={`/transitos${item.path}`}>
               <Icon size={18} />
               <span>{item.label}</span>
-            </Link>
+            </a>
           );})}
         </nav>
         <LogoutButton className="sidebar-logout-button" />
-        <Link className="site-return-link" href="/seflektur" title="Şeflek Tur sitesine dön">
+        <a className="site-return-link" href="/seflektur" title="Şeflek Tur sitesine dön">
           <House size={17} />
           <span>Siteye dön</span>
-        </Link>
+        </a>
       </aside>
 
       <section className="content magic-bento-surface">
@@ -139,20 +138,20 @@ export async function AppShell({
           </div>
           <div className="topbar-actions">
             <LogoutButton className="ghost compact-button topbar-logout-button" />
-            <Link className="ghost compact-button home-return-button" href="/">
+            <a className="ghost compact-button home-return-button" href="/">
               <House size={16} />
               Ana sayfaya dön
-            </Link>
+            </a>
             <ExpandableProfileCard
               title={displayName}
               subtitle={currentRoleTitle}
               meta="Aktif oturum"
               compact
             >
-              <Link className="ghost compact-button" href="/transitos/settings">
+              <a className="ghost compact-button" href="/transitos/settings">
                 <Settings size={15} />
                 Ayarlar
-              </Link>
+              </a>
             </ExpandableProfileCard>
           </div>
         </div>
@@ -162,7 +161,7 @@ export async function AppShell({
             <strong>{guide.title}</strong>
             <span>{guide.body}</span>
           </div>
-          <Link href={guide.href as never}>{guide.action}</Link>
+          <a href={guide.href}>{guide.action}</a>
         </section>
         {children}
         <MarketTicker fallbackItems={tickerItems} placement="app" />

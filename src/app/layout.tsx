@@ -5,6 +5,7 @@ import { InteractionGuards } from "@/app/components/InteractionGuards";
 import { InteractionEffects } from "@/app/components/InteractionEffects";
 import { GlobalOperationOverlay } from "@/app/components/GlobalOperationOverlay";
 import { RouteLoadingOverlay } from "@/app/components/RouteLoadingOverlay";
+import { RuntimeRecovery } from "@/app/components/RuntimeRecovery";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="tr" className="light" style={{ colorScheme: "light" }}>
       <body>
+        <RuntimeRecovery />
         <CorporateTransitOSEntry />
         <Suspense fallback={null}>
           <RouteLoadingOverlay />

@@ -20250,6 +20250,47 @@ body .modal-window > .section :is(.section, .stack, form) {
 .opening-pulse i:nth-child(3) { animation-delay: 300ms; }
 @keyframes opening-pulse { to { opacity: 0.3; transform: translateY(-4px); } }
 
+.runtime-recovery-fallback {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  z-index: 2147483600;
+  display: grid;
+  gap: 10px;
+  width: min(430px, calc(100vw - 32px));
+  padding: 24px;
+  visibility: hidden;
+  opacity: 0;
+  color: #182230;
+  border: 1px solid #dfe4ec;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+  transform: translate(-50%, -50%);
+  animation: reveal-runtime-recovery 0s 10s forwards;
+}
+
+.runtime-ready .runtime-recovery-fallback {
+  display: none;
+  animation: none;
+}
+
+.runtime-recovery-fallback strong { font-size: 1.25rem; }
+.runtime-recovery-fallback span { color: #667085; line-height: 1.5; }
+.runtime-recovery-fallback div { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.runtime-recovery-fallback a {
+  min-height: 44px;
+  padding: 11px 16px;
+  color: #fff;
+  border-radius: 12px;
+  background: #0b2a4b;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+@keyframes reveal-runtime-recovery {
+  to { visibility: visible; opacity: 1; }
+}
+
 .transitos-shell[data-user-role="SUBCONTRACTOR"] .project-accordion-metrics .badge.gray {
   display: none !important;
 }

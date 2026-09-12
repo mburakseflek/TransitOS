@@ -624,6 +624,7 @@ export async function createBulkAssignments(formData: FormData) {
   const weekdays = new Set(formData.getAll("weekdays").map(String));
   const records = [];
   const seriesId = randomUUID();
+  const submissionKey = text(formData, "submissionKey") || randomUUID();
   const dates = selectedDates.length ? selectedDates.map((value) => new Date(`${value}T12:00:00`)) : [];
   const routeId = text(formData, "routeId");
   const route = await prisma.serviceRoute.findUnique({
@@ -645,6 +646,7 @@ export async function createBulkAssignments(formData: FormData) {
   for (const serviceDate of dates) {
       records.push({
         seriesId,
+        submissionKey,
         projectId: optionalId(formData, "projectId") ?? route?.projectId ?? null,
         routeId,
         vehicleId: text(formData, "vehicleId"),
@@ -660,7 +662,7 @@ export async function createBulkAssignments(formData: FormData) {
   }
 
   if (records.length) {
-    await prisma.serviceAssignment.createMany({ data: records });
+    await prisma.serviceAssignment.createMany({ data: records, skipDuplicates: true });
   }
   revalidatePath("/transitos/projects", "page");
   redirect(returnTo(formData, `/transitos/projects?project=${text(formData, "projectId")}&route=${text(formData, "routeId")}`));

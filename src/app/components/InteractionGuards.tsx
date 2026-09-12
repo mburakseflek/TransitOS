@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { notifyOperationStart } from "@/app/components/GlobalOperationOverlay";
 
 const editableSelector = [
   "input:not([type='hidden']):not([type='button']):not([type='submit']):not([type='reset'])",
@@ -63,7 +64,7 @@ function isLockSurface(target: EventTarget | null) {
 }
 
 function isDestructiveSubmitter(submitter: HTMLElement | null, form: HTMLFormElement) {
-  const label = `${submitter?.textContent ?? ""} ${submitter?.getAttribute("aria-label") ?? ""} ${form.textContent ?? ""}`.toLocaleLowerCase("tr-TR");
+  const label = `${submitter?.textContent ?? ""} ${submitter?.getAttribute("aria-label") ?? ""}`.toLocaleLowerCase("tr-TR");
   return (
     submitter?.classList.contains("danger") ||
     submitter?.hasAttribute("data-confirm-danger") ||
@@ -98,21 +99,6 @@ function submitterOperationLabel(submitter: HTMLElement | null, form: HTMLFormEl
 
   const formLabel = cleanLabel(form.getAttribute("aria-label"));
   return formLabel ? `${formLabel} işlemi yapılıyor` : "İşlem tamamlanıyor";
-}
-
-function disableSubmitControl(form: HTMLFormElement, submitter: HTMLElement | null) {
-  window.requestAnimationFrame(() => {
-    if (!submitter || !("disabled" in submitter)) return;
-    (submitter as HTMLButtonElement | HTMLInputElement).disabled = true;
-    submitter.setAttribute("aria-disabled", "true");
-    window.setTimeout(() => {
-      if (!submitter.isConnected) return;
-      (submitter as HTMLButtonElement | HTMLInputElement).disabled = false;
-      submitter.removeAttribute("aria-disabled");
-      form.dataset.submitting = "false";
-      form.removeAttribute("aria-busy");
-    }, 8000);
-  });
 }
 
 export function confirmDirtyFormExit(root: ParentNode = document) {
@@ -155,7 +141,7 @@ export function InteractionGuards() {
       form.dataset.dirty = "false";
       form.setAttribute("aria-busy", "true");
       form.dataset.loadingLabel = submitterOperationLabel(submitter, form);
-      disableSubmitControl(form, submitter);
+      notifyOperationStart(form.dataset.loadingLabel);
     }
 
     function handleDocumentClick(event: MouseEvent) {

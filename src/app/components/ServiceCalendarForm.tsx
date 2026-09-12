@@ -1,6 +1,6 @@
 "use client";
 
-import type { FormEvent, ReactNode } from "react";
+import { useRef, type FormEvent, type ReactNode } from "react";
 
 export function ServiceCalendarForm({
   action,
@@ -13,7 +13,12 @@ export function ServiceCalendarForm({
   className?: string;
   children: ReactNode;
 }) {
+  const submissionKeyRef = useRef<HTMLInputElement>(null);
+
   function confirmVehicleConflict(event: FormEvent<HTMLFormElement>) {
+    if (submissionKeyRef.current && !submissionKeyRef.current.value) {
+      submissionKeyRef.current.value = crypto.randomUUID();
+    }
     const formData = new FormData(event.currentTarget);
     const selectedVehicleId = String(formData.get("vehicleId") ?? "");
     const selectedDates = new Set(formData.getAll("serviceDates").map(String));
@@ -25,7 +30,10 @@ export function ServiceCalendarForm({
     if (!approved) event.preventDefault();
   }
 
-  return <form className={className} action={action} onSubmit={confirmVehicleConflict}>{children}</form>;
+  return <form className={className} action={action} onSubmit={confirmVehicleConflict}>
+    <input ref={submissionKeyRef} type="hidden" name="submissionKey" />
+    {children}
+  </form>;
 }
 
 function formatDate(value: string) {

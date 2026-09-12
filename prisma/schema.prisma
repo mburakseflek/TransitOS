@@ -185,6 +185,7 @@ model RouteStop {
 model ServiceAssignment {
   id              String           @id @default(cuid())
   seriesId        String?
+  submissionKey   String?
   projectId       String?
   routeId         String
   vehicleId       String
@@ -205,6 +206,7 @@ model ServiceAssignment {
 
   @@index([serviceDate])
   @@index([seriesId])
+  @@unique([submissionKey, serviceDate])
   @@index([monthKey])
   @@index([projectId, serviceDate])
   @@index([routeId, serviceDate])

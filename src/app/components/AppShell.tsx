@@ -22,6 +22,7 @@ import { roleTitle } from "@/lib/permissions";
 import { ExpandableProfileCard } from "@/app/components/RegistryInterfaceKit";
 import { MarketTicker } from "@/app/components/MarketTicker";
 import { LogoutButton } from "@/app/components/LogoutButton";
+export { SubmitButton } from "@/app/components/SubmitButton";
 export { ModalAction } from "@/app/components/ModalAction";
 
 const navItems = [
@@ -242,14 +243,6 @@ export function FormSection({
       <p>{description}</p>
       <div className="form-flow-fields">{children}</div>
     </fieldset>
-  );
-}
-
-export function SubmitButton({ children = "Kaydet" }: { children?: React.ReactNode }) {
-  return (
-    <button className="primary compact" type="submit">
-      {children}
-    </button>
   );
 }
 

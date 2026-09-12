@@ -20995,3 +20995,53 @@ body .modal-window .service-summary-detail .service-group-danger {
     padding-inline: 1px !important;
   }
 }
+
+/* Stable service creation workspace: the intro and form use full rows. The
+   nested calendar/settings grid is allowed to choose its own breakpoint. */
+.transitos-shell .service-planner {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.transitos-shell .fixed-calendar-form,
+.transitos-shell .service-create-layout,
+.transitos-shell .service-create-calendar-panel,
+.transitos-shell .service-create-settings-panel {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+@media (max-width: 1080px) {
+  .transitos-shell .service-create-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .transitos-shell .service-create-settings-panel {
+    position: static !important;
+  }
+}
+
+.submit-button[disabled] {
+  cursor: wait !important;
+  opacity: 0.72 !important;
+  pointer-events: none !important;
+}
+
+.submit-button-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: submit-button-spin 700ms linear infinite;
+}
+
+@keyframes submit-button-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submit-button-spinner { animation: none; }
+}

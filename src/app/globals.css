@@ -21045,3 +21045,44 @@ body .modal-window .service-summary-detail .service-group-danger {
 @media (prefers-reduced-motion: reduce) {
   .submit-button-spinner { animation: none; }
 }
+
+/* Keep the market strip aligned with the responsive TransitOS chrome. The
+   sidebar collapses before the old 900px ticker breakpoint, which otherwise
+   leaves a large empty offset on compact Safari windows. */
+@media (max-width: 1080px) {
+  .market-strip-app {
+    left: max(10px, env(safe-area-inset-left)) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    height: 48px !important;
+    border-radius: 14px !important;
+  }
+
+  .transitos-shell .content {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .market-strip-group {
+    gap: 28px !important;
+    padding-right: 28px !important;
+  }
+
+  .market-strip-item {
+    gap: 8px !important;
+    font-size: 0.82rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .market-strip-app {
+    left: max(6px, env(safe-area-inset-left)) !important;
+    right: max(6px, env(safe-area-inset-right)) !important;
+    bottom: max(6px, env(safe-area-inset-bottom)) !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+  }
+
+  .transitos-shell .content {
+    padding-bottom: calc(70px + env(safe-area-inset-bottom)) !important;
+  }
+}

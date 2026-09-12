@@ -665,7 +665,6 @@ export async function createBulkAssignments(formData: FormData) {
     await prisma.serviceAssignment.createMany({ data: records, skipDuplicates: true });
   }
   revalidatePath("/transitos/projects", "page");
-  redirect(returnTo(formData, `/transitos/projects?project=${text(formData, "projectId")}&route=${text(formData, "routeId")}`));
 }
 
 export async function updateAssignmentGroup(formData: FormData) {

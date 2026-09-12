@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const dayNames = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
@@ -27,6 +27,7 @@ export function MonthCalendarSelector({
   const [selected, setSelected] = useState<string[]>(defaultDate ? [defaultDate] : mode === "single" ? [todayValue] : Array.from(new Set(initialDates)).sort());
   const [dragState, setDragState] = useState<{ start: string; active: boolean; pointerType: string } | null>(null);
   const holdTimerRef = useRef<number | null>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
 
   const days = useMemo(() => buildMonthDays(month), [month]);
   const inMonthDays = days.filter((day) => day.inMonth).map((day) => day.value);
@@ -37,6 +38,21 @@ export function MonthCalendarSelector({
     for (const item of occupiedDays) values.set(item.date, Array.from(new Set([...(values.get(item.date) ?? []), item.vehicleName])));
     return values;
   }, [occupiedDays]);
+
+  useEffect(() => {
+    const form = pickerRef.current?.closest("form");
+    if (!form) return;
+
+    function resetSelection() {
+      setMonth(initialMonth);
+      setSelected(defaultDate ? [defaultDate] : mode === "single" ? [todayValue] : Array.from(new Set(initialDates)).sort());
+      setDragState(null);
+      clearHoldTimer();
+    }
+
+    form.addEventListener("reset", resetSelection);
+    return () => form.removeEventListener("reset", resetSelection);
+  }, [defaultDate, defaultDates, initialMonth, mode, todayValue]);
 
   function clearHoldTimer() {
     if (holdTimerRef.current) {
@@ -121,7 +137,7 @@ export function MonthCalendarSelector({
   }
 
   return (
-    <div className="calendar-picker" onPointerCancel={() => handlePointerUp()} onPointerLeave={() => handlePointerUp()} onPointerMove={handlePointerMove} onPointerUp={() => handlePointerUp()}>
+    <div ref={pickerRef} className="calendar-picker" onPointerCancel={() => handlePointerUp()} onPointerLeave={() => handlePointerUp()} onPointerMove={handlePointerMove} onPointerUp={() => handlePointerUp()}>
       <div className="calendar-toolbar">
         <div className="calendar-month-control" aria-label="Ay seçimi">
           <button type="button" onClick={() => shiftMonth(-1)} aria-label="Önceki ay">‹</button>

@@ -13,7 +13,13 @@ export function ServiceCalendarForm({
   className?: string;
   children: ReactNode;
 }) {
+  const formRef = useRef<HTMLFormElement>(null);
   const submissionKeyRef = useRef<HTMLInputElement>(null);
+
+  async function submit(formData: FormData) {
+    await action(formData);
+    formRef.current?.reset();
+  }
 
   function confirmVehicleConflict(event: FormEvent<HTMLFormElement>) {
     if (submissionKeyRef.current && !submissionKeyRef.current.value) {
@@ -30,7 +36,7 @@ export function ServiceCalendarForm({
     if (!approved) event.preventDefault();
   }
 
-  return <form className={className} action={action} onSubmit={confirmVehicleConflict}>
+  return <form ref={formRef} className={className} action={submit} onSubmit={confirmVehicleConflict}>
     <input ref={submissionKeyRef} type="hidden" name="submissionKey" />
     {children}
   </form>;

@@ -21087,6 +21087,150 @@ body .modal-window .service-summary-detail .service-group-danger {
   .submit-button-spinner { animation: none; }
 }
 
+/* Service creation is a focused modal workflow. Keeping the calendar in a
+   dedicated surface prevents project cards from growing and eliminates the
+   narrow inline calendar that was clipped on Android browsers. */
+.service-planner-trigger {
+  display: grid !important;
+  grid-template-columns: 48px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 72px !important;
+  padding: 12px 14px !important;
+  color: #10233d !important;
+  border: 1px solid rgba(23, 56, 95, 0.14) !important;
+  border-radius: 16px !important;
+  background: #f7fbff !important;
+  box-shadow: none !important;
+  text-align: left !important;
+}
+
+.service-planner-trigger:hover {
+  border-color: rgba(18, 164, 204, 0.42) !important;
+  background: #eef9fd !important;
+}
+
+.service-planner-trigger:focus-visible {
+  outline: 3px solid rgba(18, 164, 204, 0.34) !important;
+  outline-offset: 2px !important;
+}
+
+.service-planner-trigger > span:nth-child(2) {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.service-planner-trigger strong,
+.service-planner-trigger small {
+  display: block;
+  color: inherit !important;
+  overflow-wrap: anywhere;
+}
+
+.service-planner-trigger small {
+  color: #607086 !important;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.service-create-modal-content {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 16px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body .modal-window:has(.service-create-modal-content) {
+  width: min(1120px, calc(100dvw - 32px)) !important;
+  max-width: min(1120px, calc(100dvw - 32px)) !important;
+  max-height: calc(100dvh - 32px) !important;
+}
+
+body .modal-window:has(.service-create-modal-content) > .modal-body {
+  padding: 18px 20px 24px !important;
+  overflow-x: hidden !important;
+}
+
+body .modal-window .service-create-modal-content .fixed-calendar-form {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+body .modal-window .service-create-modal-content .fixed-calendar-form > * {
+  grid-column: 1 / -1 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+@media (max-width: 760px) {
+  body .modal-backdrop:has(.service-create-modal-content) {
+    align-items: flex-end !important;
+    padding: 6px !important;
+  }
+
+  body .modal-window:has(.service-create-modal-content) {
+    width: calc(100dvw - 12px) !important;
+    max-width: calc(100dvw - 12px) !important;
+    max-height: calc(100dvh - 12px) !important;
+    border-radius: 18px 18px 12px 12px !important;
+  }
+
+  body .modal-window:has(.service-create-modal-content) > .modal-body {
+    padding: 10px 10px calc(18px + env(safe-area-inset-bottom)) !important;
+  }
+
+  body .modal-window .service-create-modal-content,
+  body .modal-window .service-create-layout,
+  body .modal-window .service-create-calendar-panel,
+  body .modal-window .service-create-settings-panel,
+  body .modal-window .service-create-calendar-panel .calendar-picker {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  body .modal-window .service-create-calendar-panel,
+  body .modal-window .service-create-settings-panel {
+    padding: 10px !important;
+  }
+
+  body .modal-window .service-create-calendar-panel .calendar-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+  }
+
+  body .modal-window .service-create-calendar-panel .calendar-day {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    padding: 3px 1px !important;
+  }
+
+  body .modal-window .service-create-calendar-panel .calendar-day small {
+    display: none !important;
+  }
+}
+
+@media (max-width: 380px) {
+  body .modal-window .service-create-calendar-panel .calendar-grid {
+    gap: 2px !important;
+  }
+
+  body .modal-window .service-create-calendar-panel .calendar-day > span {
+    font-size: 0.82rem !important;
+  }
+}
+
 /* Keep the market strip aligned with the responsive TransitOS chrome. The
    sidebar collapses before the old 900px ticker breakpoint, which otherwise
    leaves a large empty offset on compact Safari windows. */

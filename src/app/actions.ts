@@ -751,7 +751,6 @@ export async function updateAssignmentGroup(formData: FormData) {
     ...(creates.length ? [prisma.serviceAssignment.createMany({ data: creates })] : [])
   ]);
   revalidatePath("/transitos/projects", "page");
-  redirect(returnTo(formData, fallbackUrl));
 }
 
 export async function deleteAssignmentGroup(formData: FormData) {

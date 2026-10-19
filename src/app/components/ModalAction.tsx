@@ -98,6 +98,22 @@ export function ModalAction({
     };
   }, [open, submitting]);
 
+  useEffect(() => {
+    if (!open) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    function finishAndClose() {
+      setSubmitting(false);
+      setShowSubmittingFeedback(false);
+      setOpen(false);
+      window.requestAnimationFrame(() => triggerRef.current?.focus());
+    }
+
+    dialog.addEventListener("transitos:form-success", finishAndClose);
+    return () => dialog.removeEventListener("transitos:form-success", finishAndClose);
+  }, [open]);
+
   function close() {
     if (submitting) return;
     if (dialogRef.current && !confirmDirtyFormExit(dialogRef.current)) return;
@@ -117,6 +133,7 @@ export function ModalAction({
         aria-labelledby={titleId}
         aria-busy={submitting}
         onSubmit={(event) => {
+          if (event.defaultPrevented) return;
           if (submitting) {
             event.preventDefault();
             event.stopPropagation();

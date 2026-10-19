@@ -28,6 +28,7 @@ import { serviceDirectionTitle } from "@/lib/labels";
 import { MonthCalendarSelector } from "@/app/components/MonthCalendarSelector";
 import { ServiceCalendarForm } from "@/app/components/ServiceCalendarForm";
 import { LocalAccordion } from "@/app/components/LocalAccordion";
+import { ActionForm } from "@/app/components/ActionForm";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { readSessionToken } from "@/lib/auth";
 import { formatTRY } from "@/lib/format";
@@ -138,6 +139,7 @@ export default async function ProjectsPage({
             id={`project-${project.id}`}
             key={project.id}
             defaultOpen={selected}
+            group="projects"
             summaryClassName="project-accordion-summary"
             summary={<>
               <div className="project-accordion-copy">
@@ -323,16 +325,18 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
         <ServiceLedger assignments={route.assignments} projectId={project.id} routeId={route.id} returnTo={returnTo} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} />
 
         {canEdit ? (
-          <details className="service-planner-disclosure">
-            <summary>
+          <ModalAction
+            buttonClassName="service-planner-trigger"
+            title={`${route.name} · Yeni Servis Planı`}
+            label={<>
               <span className="service-planner-disclosure-icon" aria-hidden="true"><Plus size={20} /></span>
               <span>
                 <strong>Servis Ekle</strong>
                 <small>Takvimden gün, araç, saat ve servis ücretini planlayın.</small>
               </span>
-              <ChevronDown className="service-planner-disclosure-chevron" size={20} aria-hidden="true" />
-            </summary>
-            <section className="service-planner section">
+            </>}
+          >
+            <section className="service-planner service-create-modal-content section">
               <div>
                 <span className="badge blue">Yeni servis planı</span>
                 <h3>Takvim ve ücretlendirme</h3>
@@ -346,7 +350,7 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
                 <div className="actions"><SubmitButton>✓ Seçili Günleri Planla</SubmitButton></div>
               </ServiceCalendarForm>
             </section>
-          </details>
+          </ModalAction>
         ) : null}
       </div>
     </details>
@@ -456,7 +460,7 @@ function ServiceGroupDetails({
         ) : null}
       </div>
 
-      <form className="stack service-form service-group-edit-form" action={updateAssignmentGroup} data-dirty-guard="true">
+      <ActionForm className="stack service-form service-group-edit-form" action={updateAssignmentGroup} dirtyGuard>
         {group.assignments.map((assignment) => <input key={assignment.id} type="hidden" name="assignmentIds" value={assignment.id} />)}
         <input type="hidden" name="projectId" value={projectId} />
         <input type="hidden" name="routeId" value={routeId} />
@@ -472,7 +476,7 @@ function ServiceGroupDetails({
         <div className="service-group-edit-actions">
           <SubmitButton>✓ Toplu Güncelle</SubmitButton>
         </div>
-      </form>
+      </ActionForm>
 
       <form className="service-group-danger" action={deleteAssignmentGroup} data-confirm-danger="true">
         {group.assignments.map((assignment) => <input key={assignment.id} type="hidden" name="assignmentIds" value={assignment.id} />)}

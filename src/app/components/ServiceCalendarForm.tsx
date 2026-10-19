@@ -19,6 +19,7 @@ export function ServiceCalendarForm({
   async function submit(formData: FormData) {
     await action(formData);
     formRef.current?.reset();
+    formRef.current?.dispatchEvent(new CustomEvent("transitos:form-success", { bubbles: true }));
   }
 
   function confirmVehicleConflict(event: FormEvent<HTMLFormElement>) {

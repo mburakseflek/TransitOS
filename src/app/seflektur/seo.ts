@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { SiteContent } from "@/lib/site-content";
 
 export const seflekSiteUrl = "https://www.seflektur.com";
 
@@ -42,7 +43,11 @@ export function createCorporateMetadata({
     description,
     keywords: seflekKeywords,
     alternates: {
-      canonical: canonicalUrl
+      canonical: canonicalUrl,
+      languages: {
+        "tr-TR": canonicalUrl,
+        "x-default": canonicalUrl
+      }
     },
     openGraph: {
       type: "website",
@@ -77,42 +82,101 @@ export function createCorporateMetadata({
         "max-video-preview": -1
       }
     },
-    category: "transportation"
+    category: "transportation",
+    creator: "Şeflek Tur",
+    publisher: "Şeflek Tur Turizm & Yolcu Taşımacılığı",
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION,
+      yandex: process.env.YANDEX_SITE_VERIFICATION,
+      other: process.env.BING_SITE_VERIFICATION
+        ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION }
+        : undefined
+    },
+    other: {
+      "geo.region": "TR-34",
+      "geo.placename": "İstanbul"
+    }
   };
 }
 
-export const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "TravelAgency"],
-  name: "Şeflek Tur",
-  legalName: "Şeflek Tur Turizm & Yolcu Taşımacılığı",
-  url: seflekSiteUrl,
-  logo: `${seflekSiteUrl}/brand/seflek-logo-navy.png`,
-  image: `${seflekSiteUrl}/og-image.jpg`,
-  areaServed: [
-    {
+const serviceNames = [
+  "Personel Servisi",
+  "Okul Servisi",
+  "VIP Transfer",
+  "Kurumsal Taşımacılık",
+  "Turizm ve Organizasyon Taşımacılığı"
+];
+
+export function createOrganizationJsonLd(content: SiteContent) {
+  const telephone = isPlaceholder(content.contactPhone) ? undefined : content.contactPhone;
+  const email = isPlaceholder(content.contactEmail) ? undefined : content.contactEmail;
+  const streetAddress = isPlaceholder(content.address) ? undefined : content.address;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": ["LocalBusiness", "TravelAgency"],
+    "@id": `${seflekSiteUrl}/#organization`,
+    name: content.companyName || "Şeflek Tur",
+    legalName: "Şeflek Tur Turizm & Yolcu Taşımacılığı",
+    description: content.companySummary,
+    url: `${seflekSiteUrl}/seflektur`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${seflekSiteUrl}/brand/seflek-logo-navy.png`
+    },
+    image: `${seflekSiteUrl}/og-image.jpg`,
+    telephone,
+    email,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress,
+      addressLocality: "Esenyurt",
+      addressRegion: "İstanbul",
+      addressCountry: "TR"
+    },
+    areaServed: {
       "@type": "AdministrativeArea",
       name: "İstanbul"
-    }
-  ],
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "İstanbul",
-    addressCountry: "TR"
-  },
-  serviceType: [
-    "Personel Servisi",
-    "Okul Servisi",
-    "VIP Transfer",
-    "Kurumsal Taşımacılık",
-    "Organizasyon Taşımacılığı"
-  ],
-  knowsAbout: [
-    "İstanbul personel servisi",
-    "İstanbul okul servisi",
-    "VIP transfer İstanbul",
-    "Kurumsal servis planlama"
-  ]
+    },
+    contactPoint: telephone || email ? {
+      "@type": "ContactPoint",
+      telephone,
+      email,
+      contactType: "customer service",
+      areaServed: "TR",
+      availableLanguage: "Turkish"
+    } : undefined,
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Şeflek Tur Ulaşım Hizmetleri",
+      itemListElement: serviceNames.map((name) => ({
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name,
+          areaServed: "İstanbul"
+        }
+      }))
+    },
+    knowsAbout: [
+      "İstanbul personel servisi",
+      "İstanbul okul servisi",
+      "VIP transfer İstanbul",
+      "Kurumsal servis ve güzergah planlama",
+      "Yolcu taşımacılığı operasyon yönetimi"
+    ]
+  };
+}
+
+export const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${seflekSiteUrl}/#website`,
+  url: `${seflekSiteUrl}/seflektur`,
+  name: "Şeflek Tur",
+  alternateName: "Şeflek Tur Turizm & Yolcu Taşımacılığı",
+  inLanguage: "tr-TR",
+  publisher: { "@id": `${seflekSiteUrl}/#organization` }
 };
 
 export const corporateFaqJsonLd = {
@@ -169,3 +233,13 @@ export const corporateFaqJsonLd = {
     }
   ]
 };
+
+export const corporateFaqItems = corporateFaqJsonLd.mainEntity.map((item) => ({
+  question: item.name,
+  answer: item.acceptedAnswer.text
+}));
+
+function isPlaceholder(value: string) {
+  const normalized = value.trim();
+  return !normalized || /\(000\)|000000|example\.com/i.test(normalized);
+}

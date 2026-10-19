@@ -1,6 +1,12 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Auth01Panel, FloatingInput } from "@/app/components/RegistryInterfaceKit";
 import { LoginFormShell, LoginSubmitButton } from "@/app/login/LoginFormShell";
+
+export const metadata: Metadata = {
+  title: "TransitOS Güvenli Giriş",
+  robots: { index: false, follow: false, noarchive: true }
+};
 
 export default async function LoginPage({
   searchParams

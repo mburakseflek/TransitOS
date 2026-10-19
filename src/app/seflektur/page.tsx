@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Bus, FileText, Handshake, Headphones, Mail, ShieldCheck, Route, Sparkles } from "lucide-react";
+import { ArrowRight, BadgeCheck, Bus, CheckCircle2, FileText, Handshake, Headphones, Mail, MapPinned, ShieldCheck, Route, Sparkles } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { OnboardingScreen, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { CompanyInfoList } from "@/app/seflektur/CompanyInfoList";
 import { MobileAppPromo, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
-import { createCorporateMetadata } from "@/app/seflektur/seo";
+import { corporateFaqItems, corporateFaqJsonLd, createCorporateMetadata } from "@/app/seflektur/seo";
 
 const heroFleetImage =
   "/site-media/hero-home.png";
@@ -63,6 +63,10 @@ export default async function SeflekTurPage() {
 
   return (
     <main className="new-site-page paged-site">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(corporateFaqJsonLd) }}
+      />
       <SiteHeader />
 
       <PageHero
@@ -86,6 +90,27 @@ export default async function SeflekTurPage() {
         <div><strong>7/24</strong><span>Ulaşılabilir operasyon</span></div>
         <div><strong>TransitOS</strong><span>Dijital takip ve raporlama</span></div>
         <div><strong>Beyaz Filo</strong><span>Kurumsal araç görünümü</span></div>
+      </section>
+
+      <section className="seo-intro-section" aria-labelledby="istanbul-ulasim-cozumleri">
+        <div className="seo-intro-copy">
+          <span className="new-eyebrow">İstanbul ulaşım çözümleri</span>
+          <h2 id="istanbul-ulasim-cozumleri">Personel servisi, okul servisi ve VIP transfer tek operasyon disipliniyle.</h2>
+          <p>
+            Şeflek Tur; İstanbul genelindeki kurumlar, okullar, etkinlik ekipleri ve bireysel yolcular için
+            ihtiyaca göre güzergah, araç ve zaman planlaması yapar. Süreç; teklif aşamasından servis takibi ve
+            raporlamaya kadar ulaşılabilir bir operasyon ekibiyle yürütülür.
+          </p>
+          <Link className="text-action-link" href="/seflektur/hizmetler">
+            Tüm taşımacılık hizmetlerini incele <ArrowRight size={17} />
+          </Link>
+        </div>
+        <div className="seo-service-list" aria-label="Şeflek Tur hizmet alanları">
+          {["Kurumsal personel taşımacılığı", "Okul ve öğrenci servisi", "Havalimanı ve VIP transfer", "Turizm ve organizasyon ulaşımı"].map((service) => (
+            <div key={service}><CheckCircle2 size={19} aria-hidden="true" /><span>{service}</span></div>
+          ))}
+          <div><MapPinned size={19} aria-hidden="true" /><span>İstanbul merkezli planlama ve destek</span></div>
+        </div>
       </section>
 
       <OnboardingScreen
@@ -198,6 +223,22 @@ export default async function SeflekTurPage() {
           <strong>7/24 iletişim</strong>
           <span>Şeflek Tur ayrıcalıklarını inceleyin <ArrowRight size={16} /></span>
         </Link>
+      </section>
+
+      <section className="corporate-faq-section" aria-labelledby="sik-sorulan-sorular">
+        <div className="section-title-block">
+          <span className="new-eyebrow">Hızlı yanıtlar</span>
+          <h2 id="sik-sorulan-sorular">Şeflek Tur hakkında sık sorulan sorular</h2>
+          <p>Hizmet kapsamı, araç seçenekleri ve çalışma süreciyle ilgili temel bilgiler.</p>
+        </div>
+        <div className="corporate-faq-list">
+          {corporateFaqItems.map((item, index) => (
+            <details key={item.question} open={index === 0}>
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
       </section>
 
       <SiteFooter tickerItems={content.tickerItems} />

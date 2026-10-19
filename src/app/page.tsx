@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 import { createCorporateMetadata } from "@/app/seflektur/seo";
 
 export const metadata = createCorporateMetadata({
@@ -6,5 +6,5 @@ export const metadata = createCorporateMetadata({
 });
 
 export default function HomePage() {
-  redirect("/seflektur");
+  permanentRedirect("/seflektur");
 }

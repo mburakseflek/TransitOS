@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { cache } from "react";
 import { prisma } from "@/lib/db";
 
 export type SiteCard = {
@@ -592,7 +593,7 @@ function shouldUseContentDatabase() {
   );
 }
 
-export async function readSiteContent(): Promise<SiteContent> {
+async function loadSiteContent(): Promise<SiteContent> {
   const databaseContent = await readDatabaseContent();
   if (databaseContent) return databaseContent;
 
@@ -603,6 +604,8 @@ export async function readSiteContent(): Promise<SiteContent> {
     return canonicalSiteContent(defaultSiteContent);
   }
 }
+
+export const readSiteContent = cache(loadSiteContent);
 
 export async function writeSiteContent(content: SiteContent) {
   if (await writeDatabaseContent(content)) return;

@@ -22,6 +22,8 @@ import {
 import { notifyOperationFinish, notifyOperationStart } from "@/app/components/GlobalOperationOverlay";
 import { saveSiteContent } from "@/app/site-actions";
 import type { CompanyDetail, CustomPage, SiteBlock, SiteCard, SiteContent } from "@/lib/site-content";
+import type { VisitorAnalytics } from "@/lib/site-analytics";
+import { VisitorAnalyticsModal } from "@/app/site-admin/VisitorAnalyticsModal";
 
 type EditablePageKey =
   | "gateway"
@@ -398,12 +400,14 @@ export function SiteEditorClient({
   initialContent,
   carriers,
   requests,
-  saved
+  saved,
+  visitorAnalytics
 }: {
   initialContent: SiteContent;
   carriers: Record<string, string>[];
   requests: Record<string, string>[];
   saved: boolean;
+  visitorAnalytics: VisitorAnalytics;
 }) {
   const [content, setContent] = useState(initialContent);
   const [notice, setNotice] = useState(saved ? "Kaydedildi." : "");
@@ -549,6 +553,7 @@ export function SiteEditorClient({
             <span>{notice || "Canlı düzenleme modu"}</span>
             <Link className="ghost" href="/seflektur">Siteyi görüntüle</Link>
             <Link className="ghost" href="/site-admin/talepler">Başvuru talepleri</Link>
+            <VisitorAnalyticsModal analytics={visitorAnalytics} />
             <Link className="ghost" href="/transitos/dashboard">TransitOS paneli</Link>
             <button className="new-primary" type="submit"><Save size={17} /> Kaydet</button>
           </div>

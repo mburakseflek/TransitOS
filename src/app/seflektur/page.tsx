@@ -179,7 +179,7 @@ export default async function SeflekTurPage() {
         <div className="partner-strip">
           {content.references.slice(0, 8).map((partner) => (
             <span className="partner-strip-item" key={partner.title}>
-              {partner.imageUrl ? <img src={partner.imageUrl} alt={partner.title} /> : partner.title}
+              {partner.imageUrl ? <img src={partner.imageUrl} alt={partner.title} loading="lazy" decoding="async" /> : partner.title}
             </span>
           ))}
         </div>

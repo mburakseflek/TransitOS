@@ -4,6 +4,7 @@ import { storeUpload } from "@/lib/upload-storage";
 import { canManageSite, readSessionToken } from "@/lib/auth";
 
 const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const maximumFileSize = 10 * 1024 * 1024;
 
 export async function POST(request: Request) {
   const token = (await cookies()).get("transitos_session")?.value;
@@ -19,6 +20,10 @@ export async function POST(request: Request) {
 
   if (!allowedTypes.has(file.type)) {
     return NextResponse.json({ message: "Yalnızca görsel dosyası yüklenebilir." }, { status: 400 });
+  }
+
+  if (file.size <= 0 || file.size > maximumFileSize) {
+    return NextResponse.json({ message: "Görsel 10 MB boyutundan küçük olmalıdır." }, { status: 400 });
   }
 
   const storedFile = await storeUpload({ file, folder: "uploads" });

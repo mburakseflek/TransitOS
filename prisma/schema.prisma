@@ -347,6 +347,13 @@ model SiteLead {
   @@index([kind, createdAt])
 }
 
+model SiteDailyVisit {
+  day       DateTime @id @db.Date
+  visitors  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model StoredFile {
   id        String   @id @default(cuid())
   fileName  String

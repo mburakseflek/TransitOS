@@ -50,7 +50,7 @@ export default async function CustomContentPage({ params }: { params: Promise<{ 
           const Icon = block.type === "image" ? ImageIcon : block.type === "card" ? LayoutPanelTop : FileText;
           return (
             <article className={`custom-block ${block.type === "image" ? "image-block" : ""} hover-card`} key={block.id}>
-              {block.imageUrl ? <img src={block.imageUrl} alt={block.title} /> : null}
+              {block.imageUrl ? <img src={block.imageUrl} alt={block.title} loading="lazy" decoding="async" /> : null}
               <div>
                 <Icon size={24} />
                 <h2>{block.title}</h2>

@@ -22,7 +22,10 @@ function sessionCookie(response) {
 }
 
 async function main() {
-  for (const path of ["/", "/seflektur", "/login", "/api/market", "/api/macos/health"]) {
+  const root = await request("/");
+  check("Ana giriş kurumsal siteye yönleniyor", root.status === 308 && root.headers.get("location")?.endsWith("/seflektur"), `HTTP ${root.status}`);
+
+  for (const path of ["/seflektur", "/login", "/api/market", "/api/macos/health"]) {
     const response = await request(path);
     check(`Genel uç erişilebilir: ${path}`, response.ok, `HTTP ${response.status}`);
   }
@@ -56,6 +59,17 @@ async function main() {
   });
   const cookie = sessionCookie(login);
   check("Yönetici girişi başarılı", login.status === 200 && Boolean(cookie), `HTTP ${login.status}`);
+
+  const siteAdmin = await request("/site-admin", { headers: { cookie } });
+  const siteAdminHtml = siteAdmin.ok ? await siteAdmin.text() : "";
+  check("Moderatör ziyaretçi grafiği hazır", siteAdmin.ok && siteAdminHtml.includes("Ziyaretçi grafiği"), `HTTP ${siteAdmin.status}`);
+
+  const firstVisit = await request("/api/site/visit", { method: "POST" });
+  const visitCookie = sessionCookie(firstVisit);
+  const firstVisitBody = firstVisit.ok ? await firstVisit.json() : null;
+  const repeatVisit = await request("/api/site/visit", { method: "POST", headers: { cookie: visitCookie } });
+  const repeatVisitBody = repeatVisit.ok ? await repeatVisit.json() : null;
+  check("Anonim günlük ziyaret yalnızca bir kez sayılıyor", firstVisitBody?.counted === true && repeatVisitBody?.counted === false, `HTTP ${firstVisit.status}/${repeatVisit.status}`);
 
   for (const path of [
     "/transitos/dashboard",

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { canManageSite, readSessionToken } from "@/lib/auth";
 import { readJsonRecords, readSiteContent } from "@/lib/site-content";
 import { SiteEditorClient } from "@/app/site-admin/SiteEditorClient";
+import { readVisitorAnalytics } from "@/lib/site-analytics";
 
 export default async function SiteAdminPage({ searchParams }: { searchParams?: Promise<{ saved?: string }> }) {
   const params = await searchParams;
@@ -14,10 +15,11 @@ export default async function SiteAdminPage({ searchParams }: { searchParams?: P
     redirect("/login?next=/site-admin");
   }
 
-  const [content, carriers, requests] = await Promise.all([
+  const [content, carriers, requests, visitorAnalytics] = await Promise.all([
     readSiteContent(),
     readJsonRecords("carrier"),
-    readJsonRecords("service")
+    readJsonRecords("service"),
+    readVisitorAnalytics()
   ]);
 
   return (
@@ -26,6 +28,7 @@ export default async function SiteAdminPage({ searchParams }: { searchParams?: P
       carriers={carriers}
       requests={requests}
       saved={params?.saved === "1"}
+      visitorAnalytics={visitorAnalytics}
     />
   );
 }

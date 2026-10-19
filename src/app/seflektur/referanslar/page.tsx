@@ -74,7 +74,7 @@ function PartnerCard({ partner }: { partner: SiteCard }) {
     <article className="partner-logo-card hover-card">
       <div className="partner-logo-mark">
         {partner.imageUrl ? (
-          <img src={partner.imageUrl} alt={partner.title} />
+          <img src={partner.imageUrl} alt={partner.title} loading="lazy" decoding="async" />
         ) : (
           <span>{partner.title}</span>
         )}

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { createCorporateMetadata, createOrganizationJsonLd, websiteJsonLd } from "@/app/seflektur/seo";
 import { readSiteContent } from "@/lib/site-content";
+import { SiteVisitTracker } from "@/app/seflektur/SiteVisitTracker";
 
 export const metadata = createCorporateMetadata({
   path: "/seflektur"
@@ -19,6 +20,7 @@ export default async function SeflekTurLayout({ children }: { children: ReactNod
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
+      <SiteVisitTracker />
       {children}
     </>
   );

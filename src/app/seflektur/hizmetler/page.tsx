@@ -34,7 +34,7 @@ export default async function ServicesPage() {
               <article className="detail-card hover-card" key={service.title}>
                 {service.imageUrl ? (
                   <div className="service-image">
-                    <img src={service.imageUrl} alt={service.title} />
+                    <img src={service.imageUrl} alt={service.title} loading="lazy" decoding="async" />
                     <Icon size={28} />
                   </div>
                 ) : <Icon size={28} />}

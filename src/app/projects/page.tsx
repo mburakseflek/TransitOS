@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { ChevronDown, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, MoreHorizontal, Pencil, Plus, Settings2, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import {
   FrequencySelector,
@@ -154,6 +154,8 @@ export default async function ProjectsPage({
                 </div>
               </div>
               <span className="project-accordion-toggle" aria-hidden="true">
+                <span className="project-toggle-label project-toggle-label-closed">Aç</span>
+                <span className="project-toggle-label project-toggle-label-open">Açık</span>
                 <ChevronDown size={20} />
               </span>
             </>}
@@ -187,17 +189,15 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
 
   return (
     <section className="project-detail-panel" id={`project-detail-${project.id}`}>
-      <div className="record-head">
+      <div className="project-detail-intro">
         <div>
-          <h2 style={{ margin: 0 }}>{project.name}</h2>
-          <p className="muted">{project.clientCompany}</p>
+          <span className="project-detail-eyebrow">Proje içeriği</span>
+          <p>Güzergâhları açarak servisleri görüntüleyin veya yeni plan oluşturun.</p>
         </div>
-        <div className="toolbar">
-          <span className={statusClass(project.status)}>{statusTitle(project.status)}</span>
-          {canEdit ? <ModalAction
-            label={<Pencil size={17} aria-hidden="true" />}
+        {canEdit ? <ModalAction
+            label={<><Settings2 size={17} aria-hidden="true" /> Proje ayarları</>}
             ariaLabel={`${project.name} projesini düzenle`}
-            buttonClassName="ghost icon-button"
+            buttonClassName="ghost compact-button project-settings-button"
             title={`${project.name} İşlemleri`}
           >
             <div className="stack">
@@ -216,7 +216,6 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
               </form>
             </div>
           </ModalAction> : null}
-        </div>
       </div>
 
       <div className="grid section">
@@ -282,12 +281,12 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
           <h3 style={{ margin: 0 }}>{route.name}</h3>
           <p className="muted">{route.startPoint} → {route.endPoint}</p>
           <div className="chip-row">
-            <span className="badge green">✓ {completedCount} taşındı</span>
-            <span className="badge yellow">◷ {route.assignments.length - completedCount} plan</span>
+            <span className="badge green"><CheckCircle2 size={14} aria-hidden="true" /> {completedCount} taşındı</span>
+            <span className="badge yellow"><Clock3 size={14} aria-hidden="true" /> {route.assignments.length - completedCount} plan</span>
           </div>
           {vehiclesText ? <p className="muted">Bağlı araçlar: {vehiclesText}</p> : <p className="muted">Henüz araç bağlı değil.</p>}
         </div>
-        <span className="route-summary-cue" aria-hidden="true">⌄</span>
+        <span className="route-summary-cue" aria-hidden="true"><ChevronDown size={18} /></span>
       </summary>
       <div className="record-head route-card-toolbar">
         <span className="badge gray">Servis planı</span>

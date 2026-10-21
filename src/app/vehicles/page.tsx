@@ -1,8 +1,9 @@
 import { cookies, headers } from "next/headers";
-import { ExternalLink, Pencil, QrCode, Trash2 } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, ExternalLink, MoreHorizontal, QrCode, Settings2, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import { ExpandableProfileCard, InlineDisclosureMenu, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
+import { LocalAccordion } from "@/app/components/LocalAccordion";
 import { createVehicle, deleteVehicle, updateVehicle } from "@/app/actions";
 import { readSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -66,7 +67,7 @@ export default async function VehiclesPage({
       </div>
       <PeriodFilter searchParams={params} />
 
-      <section className="stack">
+      <section className="stack vehicle-accordion-stack">
         {vehicles.map((vehicle) => {
           const completed = vehicle.assignments.filter((item) => item.serviceDate <= endOfToday).length;
           const planned = vehicle.assignments.length - completed;
@@ -81,25 +82,41 @@ export default async function VehiclesPage({
           const visibleGroups = compactAssetView ? groupedAssignments.slice(0, 2) : groupedAssignments.slice(0, 4);
           const surveyUrl = `${surveyOrigin}/anket/arac/${vehicle.id}`;
           return (
-          <section className={`card status-card ${compactAssetView ? "compact-asset-card" : ""}`} key={vehicle.id}>
-            <div className="record-head">
+          <LocalAccordion
+            className={`vehicle-accordion ${compactAssetView ? "compact-asset-card" : ""}`}
+            id={`vehicle-${vehicle.id}`}
+            key={vehicle.id}
+            group="vehicles"
+            summaryClassName="vehicle-accordion-summary"
+            summary={<>
               <div>
                 <h2 style={{ margin: 0 }}>{vehicle.fleetNumber} · {vehicle.plateNumber}</h2>
+                <p className="muted vehicle-summary-meta">{vehicle.make ?? "Marka belirtilmedi"} {vehicle.model ?? ""} · {vehicle.subcontractor?.companyName ?? "Taşeron atanmamış"}</p>
                 <div className="chip-row">
                   <span className={vehicle.status === "ACTIVE" ? "badge green" : vehicle.status === "MAINTENANCE" ? "badge red" : "badge gray"}>{vehicle.status === "ACTIVE" ? "Aktif" : vehicle.status === "MAINTENANCE" ? "Bakımda" : "Pasif"}</span>
-                  <span className="badge green">✓ {completed} taşındı</span>
-                  <span className="badge yellow">◷ {planned} plan</span>
-                  {showMoney ? <span className="badge green">✓ {formatTRY(completedEarning)}</span> : null}
-                  {showMoney ? <span className="badge yellow">◷ Tamamlanmamış {formatTRY(pendingEarning)}</span> : null}
-                  {showMoney ? <span className="badge gray">Toplam {formatTRY(totalPotentialEarning)}</span> : null}
+                  <span className="badge green"><CheckCircle2 size={14} aria-hidden="true" /> {completed} tamamlandı</span>
+                  <span className="badge yellow"><Clock3 size={14} aria-hidden="true" /> {planned} plan</span>
                 </div>
               </div>
+              <span className="vehicle-accordion-toggle" aria-hidden="true">
+                <span className="vehicle-toggle-label vehicle-toggle-label-closed">Aç</span>
+                <span className="vehicle-toggle-label vehicle-toggle-label-open">Açık</span>
+                <ChevronDown size={20} />
+              </span>
+            </>}
+          >
+            <div className="vehicle-detail-panel">
+              <div className="vehicle-detail-toolbar">
+                <div>
+                  <span className="project-detail-eyebrow">Araç içeriği</span>
+                  <p>Şoför, dönem işleri ve araç ayarları yalnızca bu alanda gösterilir.</p>
+                </div>
               {canEdit ? (
-                <InlineDisclosureMenu label="..." tone="blue">
+                <InlineDisclosureMenu label={<><MoreHorizontal size={18} aria-hidden="true" /> İşlemler</>} tone="blue">
                   <ModalAction
-                    label={<Pencil size={17} aria-hidden="true" />}
+                    label={<><Settings2 size={17} aria-hidden="true" /> Araç ayarları</>}
                     ariaLabel={`${vehicle.fleetNumber} aracını düzenle`}
-                    buttonClassName="ghost icon-button"
+                    buttonClassName="ghost compact-button"
                     title={`${vehicle.fleetNumber} İşlemleri`}
                   >
                     <div className="stack">
@@ -130,7 +147,14 @@ export default async function VehiclesPage({
                   </ModalAction>
                 </InlineDisclosureMenu>
               ) : null}
-            </div>
+              </div>
+              {showMoney ? (
+                <div className="vehicle-finance-summary" aria-label="Araç dönem özeti">
+                  <span><small>Tamamlanan</small><strong>{formatTRY(completedEarning)}</strong></span>
+                  <span><small>Planlanan</small><strong>{formatTRY(pendingEarning)}</strong></span>
+                  <span><small>Dönem toplamı</small><strong>{formatTRY(totalPotentialEarning)}</strong></span>
+                </div>
+              ) : null}
             <div className="section">
               <ExpandableProfileCard
                 title={`${vehicle.make ?? "-"} ${vehicle.model ?? ""}`}
@@ -154,8 +178,8 @@ export default async function VehiclesPage({
                       <strong>{group.routeName}</strong>
                       <span className="muted">{group.projectName} · {group.directionTitle}</span>
                       <div className="chip-row">
-                        <span className="badge green">✓ {group.completed}</span>
-                        <span className="badge yellow">◷ {group.planned}</span>
+                        <span className="badge green"><CheckCircle2 size={14} aria-hidden="true" /> {group.completed}</span>
+                        <span className="badge yellow"><Clock3 size={14} aria-hidden="true" /> {group.planned}</span>
                         {showMoney ? <span className="badge gray">{formatTRY(group.completedAmount)}</span> : null}
                       </div>
                     </article>
@@ -170,7 +194,8 @@ export default async function VehiclesPage({
                 </div>
               ) : null}
             </div>
-          </section>
+            </div>
+          </LocalAccordion>
         );})}
         {vehicles.length === 0 ? <section className="card muted">Henüz araç kaydı yok.</section> : null}
       </section>

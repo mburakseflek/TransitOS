@@ -5991,6 +5991,293 @@ body {
   }
 }
 
+/* Projects and vehicles: simple selection-first hierarchy. */
+.transitos-shell .project-accordion,
+.transitos-shell .vehicle-accordion {
+  position: relative;
+  overflow: clip;
+  border: 1px solid #d9e4ef !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  box-shadow: 0 5px 18px rgba(20, 47, 76, 0.045) !important;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.transitos-shell .project-accordion[open],
+.transitos-shell .vehicle-accordion[open] {
+  border-color: #8fc4f4 !important;
+  box-shadow: 0 12px 30px rgba(20, 87, 151, 0.11) !important;
+}
+
+.transitos-shell .project-accordion[open]::before,
+.transitos-shell .vehicle-accordion[open]::before {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: #1675e5;
+  content: "";
+}
+
+.transitos-shell .project-accordion-summary,
+.transitos-shell .vehicle-accordion-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 92px;
+  padding: 16px 18px !important;
+  list-style: none;
+  cursor: pointer;
+  background: #ffffff;
+  transition: background 180ms ease;
+}
+
+.transitos-shell .project-accordion-summary::-webkit-details-marker,
+.transitos-shell .vehicle-accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.transitos-shell :is(.project-accordion, .vehicle-accordion)[open] > :is(.project-accordion-summary, .vehicle-accordion-summary) {
+  background: #edf6ff;
+}
+
+.transitos-shell :is(.project-accordion-summary, .vehicle-accordion-summary):hover {
+  background: #f5f9fd;
+}
+
+.transitos-shell :is(.project-accordion-summary, .vehicle-accordion-summary):focus-visible {
+  outline: 3px solid rgba(22, 117, 229, 0.3);
+  outline-offset: -3px;
+}
+
+.transitos-shell :is(.project-accordion-summary, .vehicle-accordion-summary) h2 {
+  margin: 0 0 5px !important;
+  color: #102b48 !important;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  letter-spacing: -0.018em;
+}
+
+.vehicle-summary-meta {
+  margin: 0 0 10px;
+  line-height: 1.45;
+}
+
+.project-accordion-toggle,
+.vehicle-accordion-toggle {
+  display: inline-flex;
+  width: auto;
+  min-width: 76px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid #cbd9e8;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #24415f;
+  font-size: 0.82rem;
+  font-weight: 800;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.project-toggle-label-open,
+.vehicle-toggle-label-open {
+  display: none;
+}
+
+:is(.project-accordion, .vehicle-accordion)[open] > summary :is(.project-toggle-label-closed, .vehicle-toggle-label-closed) {
+  display: none;
+}
+
+:is(.project-accordion, .vehicle-accordion)[open] > summary :is(.project-toggle-label-open, .vehicle-toggle-label-open) {
+  display: inline;
+}
+
+:is(.project-accordion, .vehicle-accordion)[open] > summary :is(.project-accordion-toggle, .vehicle-accordion-toggle) {
+  border-color: #72afe7;
+  background: #dceeff;
+  color: #0b5bb7;
+}
+
+:is(.project-accordion, .vehicle-accordion)[open] > summary :is(.project-accordion-toggle, .vehicle-accordion-toggle) svg {
+  transform: rotate(180deg);
+}
+
+.project-accordion-toggle svg,
+.vehicle-accordion-toggle svg {
+  transition: transform 180ms ease;
+}
+
+.transitos-shell .project-detail-panel,
+.transitos-shell .vehicle-detail-panel {
+  padding: 18px !important;
+  border-top: 1px solid #d9e6f2 !important;
+  background: #f8fbfe !important;
+  box-shadow: none !important;
+}
+
+.project-detail-intro,
+.vehicle-detail-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.project-detail-intro p,
+.vehicle-detail-toolbar p {
+  margin: 4px 0 0;
+  color: #607086;
+  line-height: 1.5;
+}
+
+.project-detail-eyebrow {
+  color: #0b64c8;
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-settings-button {
+  flex: 0 0 auto;
+}
+
+.transitos-shell .project-detail-panel > .grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px !important;
+  margin-top: 0;
+}
+
+.transitos-shell .project-detail-panel > .grid > .metric {
+  min-height: 88px !important;
+  padding: 13px !important;
+  border: 1px solid #e0e9f2 !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.transitos-shell .route-card.route-accordion {
+  border: 1px solid #dce6f0 !important;
+  border-radius: 15px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.transitos-shell .route-card.route-accordion[open] {
+  border-color: #a8cdea !important;
+  box-shadow: 0 8px 20px rgba(25, 74, 120, 0.07) !important;
+}
+
+.transitos-shell .route-card.route-accordion[open] > .route-summary {
+  border-radius: 14px 14px 0 0;
+  background: #f0f7fd;
+}
+
+.transitos-shell .route-summary-cue {
+  width: 44px;
+  height: 44px;
+}
+
+.transitos-shell .vehicle-accordion-stack {
+  gap: 12px;
+}
+
+.vehicle-finance-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.vehicle-finance-summary > span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #e0e9f2;
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+.vehicle-finance-summary small {
+  color: #6a788a;
+  font-weight: 700;
+}
+
+.vehicle-finance-summary strong {
+  color: #173a5c;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.vehicle-detail-panel > .section {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .transitos-shell .project-detail-panel > .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .transitos-shell .project-accordion-summary,
+  .transitos-shell .vehicle-accordion-summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    min-height: 0;
+    padding: 14px !important;
+  }
+
+  .project-accordion-toggle,
+  .vehicle-accordion-toggle {
+    min-width: 44px;
+    padding: 0;
+  }
+
+  .project-toggle-label,
+  .vehicle-toggle-label {
+    display: none !important;
+  }
+
+  .project-detail-intro,
+  .vehicle-detail-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .project-detail-intro > :last-child,
+  .vehicle-detail-toolbar > :last-child {
+    width: 100%;
+  }
+
+  .transitos-shell .project-detail-panel > .grid,
+  .vehicle-finance-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .transitos-shell .project-detail-panel,
+  .transitos-shell .vehicle-detail-panel {
+    padding: 14px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transitos-shell :is(.project-accordion, .vehicle-accordion, .project-accordion-summary, .vehicle-accordion-summary),
+  .project-accordion-toggle svg,
+  .vehicle-accordion-toggle svg {
+    transition: none !important;
+  }
+}
+
 /* Moderator visitor analytics */
 .analytics-modal-open {
   overflow: hidden;
@@ -21689,4 +21976,20 @@ body .modal-window .service-create-modal-content .fixed-calendar-form > * {
   .corporate-faq-section .section-title-block > p {
     font-size: 1rem;
   }
+}
+
+/* Keep the final TransitOS cascade selection-first and visibly expanded. */
+.transitos-shell .project-detail-panel,
+.transitos-shell .vehicle-detail-panel {
+  border-top: 1px solid #d9e6f2 !important;
+  background: #f8fbfe !important;
+  box-shadow: none !important;
+}
+
+.transitos-shell :is(.project-accordion, .vehicle-accordion)[open] > :is(.project-accordion-summary, .vehicle-accordion-summary) {
+  background: #edf6ff !important;
+}
+
+.transitos-shell .route-card.route-accordion[open] > .route-summary {
+  background: #f0f7fd !important;
 }

@@ -154,8 +154,8 @@ export default async function ProjectsPage({
                 </div>
               </div>
               <span className="project-accordion-toggle" aria-hidden="true">
-                <span className="project-toggle-label project-toggle-label-closed">Aç</span>
-                <span className="project-toggle-label project-toggle-label-open">Açık</span>
+                <span className="project-toggle-label project-toggle-label-closed">Detayları göster</span>
+                <span className="project-toggle-label project-toggle-label-open">Detayları gizle</span>
                 <ChevronDown size={20} />
               </span>
             </>}
@@ -225,22 +225,30 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
         <Metric title="Planlanan" value={allAssignments.length - completedAssignments.length} />
         <Metric title="Bağlı Araç" value={activeVehicles.size} />
       </div>
-      <RegistryStatusPills
-        items={[
-          { label: "tamamlanan", value: totalServices, tone: "green" },
-          { label: "plan", value: allAssignments.length - completedAssignments.length, tone: "yellow" },
-          { label: "aktif araç", value: activeVehicles.size, tone: "blue" }
-        ]}
-      />
-      <div className="chip-row section">
-        <span className="badge blue">Proje sahipleri</span>
-        {project.projectCompany?.ownerUsers.length ? project.projectCompany.ownerUsers.map((owner: any) => (
-          <span className="badge gray" key={owner.id}>{owner.displayName}</span>
-        )) : <span className="badge yellow">Henüz proje sahibi atanmadı</span>}
+      <div className="project-context-strip">
+        <RegistryStatusPills
+          items={[
+            { label: "tamamlanan", value: totalServices, tone: "green" },
+            { label: "plan", value: allAssignments.length - completedAssignments.length, tone: "yellow" },
+            { label: "aktif araç", value: activeVehicles.size, tone: "blue" }
+          ]}
+        />
+        <div className="project-owner-row">
+          <span className="project-owner-label">Proje sahipleri</span>
+          <div className="chip-row">
+            {project.projectCompany?.ownerUsers.length ? project.projectCompany.ownerUsers.map((owner: any) => (
+              <span className="badge gray" key={owner.id}>{owner.displayName}</span>
+            )) : <span className="badge yellow">Henüz proje sahibi atanmadı</span>}
+          </div>
+        </div>
       </div>
 
-      <div className="record-head section">
-        <h3 style={{ margin: 0 }}>Güzergahlar</h3>
+      <div className="record-head section project-routes-heading">
+        <div>
+          <span className="project-detail-eyebrow">Operasyon planı</span>
+          <h3>Güzergâhlar</h3>
+          <p>Servisleri görmek veya planlamak için bir güzergâh seçin.</p>
+        </div>
         {canEdit ? <ModalAction label="Güzergah Ekle" title="Güzergah Ekle">
           <form className="stack" action={createRoute}>
             <input type="hidden" name="projectId" value={project.id} />
@@ -258,9 +266,6 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
         {project.routes.length === 0 ? <p className="muted">Bu projeye henüz güzergah eklenmemiş.</p> : null}
       </div>
 
-      {!initialRouteId && project.routes.length > 0 ? (
-        <p className="muted section">Mesai ve planları görmek için güzergah kartını açın. Sayfa yenilenmeden detaylar burada genişler.</p>
-      ) : null}
     </section>
   );
 }

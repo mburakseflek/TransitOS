@@ -99,8 +99,8 @@ export default async function VehiclesPage({
                 </div>
               </div>
               <span className="vehicle-accordion-toggle" aria-hidden="true">
-                <span className="vehicle-toggle-label vehicle-toggle-label-closed">Aç</span>
-                <span className="vehicle-toggle-label vehicle-toggle-label-open">Açık</span>
+                <span className="vehicle-toggle-label vehicle-toggle-label-closed">Detayları göster</span>
+                <span className="vehicle-toggle-label vehicle-toggle-label-open">Detayları gizle</span>
                 <ChevronDown size={20} />
               </span>
             </>}

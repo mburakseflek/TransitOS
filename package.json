@@ -25,6 +25,7 @@
     "db:studio": "prisma studio",
     "test:roles": "node scripts/role-smoke-test.js",
     "test:http": "node scripts/http-smoke-test.js",
+    "test:integrity": "node scripts/system-integrity-test.js",
     "seo:indexnow": "node scripts/submit-indexnow.js"
   },
   "prisma": {

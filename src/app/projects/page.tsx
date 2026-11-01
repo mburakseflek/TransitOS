@@ -33,7 +33,7 @@ import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { readSessionToken } from "@/lib/auth";
 import { formatTRY } from "@/lib/format";
 import { parsePeriod, periodDateWhere } from "@/lib/period";
-import { assignmentAccessWhere, canEditOperations, isProjectOwner, isSubcontractor, projectAccessWhere, routeAccessWhere, vehicleAccessWhere } from "@/lib/permissions";
+import { assignmentAccessWhere, canEditOperations, isManager, isProjectOwner, isSubcontractor, projectAccessWhere, routeAccessWhere, vehicleAccessWhere } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +47,7 @@ export default async function ProjectsPage({
   const sessionCookie = (await cookies()).get("transitos_session")?.value;
   const user = sessionCookie ? await readSessionToken(sessionCookie).catch(() => null) : null;
   const canEdit = canEditOperations(user);
+  const canManageStructure = isManager(user);
   const requestedProjectId = params?.project ?? null;
   const visibleAssignmentWhere = {
     AND: [{ serviceDate: periodDateWhere(period) }, assignmentAccessWhere(user)]
@@ -129,7 +130,7 @@ export default async function ProjectsPage({
     >
       <PeriodFilter searchParams={params} hidden={{ project: initialProjectId, route: initialRouteId }} monthlyOnly />
       <div className="toolbar">
-        {canEdit ? <QuickCreateCard title="Proje" body="Şirket, sahibi ve güzergah yapısını ekleyin.">
+        {canManageStructure ? <QuickCreateCard title="Proje" body="Şirket, sahibi ve güzergah yapısını ekleyin.">
           <ModalAction label="Proje Ekle" title="Proje Ekle">
             <form className="stack" action={createProject}>
               <input type="hidden" name="_returnTo" value="/transitos/projects" />
@@ -139,7 +140,7 @@ export default async function ProjectsPage({
           </ModalAction>
         </QuickCreateCard> : null}
 
-        {canEdit ? <QuickCreateCard title="Tek seferlik iş" body="Projeye bağlamadan bağımsız servis oluşturun.">
+        {canManageStructure ? <QuickCreateCard title="Tek seferlik iş" body="Projeye bağlamadan bağımsız servis oluşturun.">
           <ModalAction label="Tek Seferlik İş Ekle" title="Tek Seferlik İş Ekle">
             <form className="stack" action={createOneOffJob}>
               <input type="hidden" name="_returnTo" value="/transitos/projects" />
@@ -196,7 +197,7 @@ export default async function ProjectsPage({
         {projects.length === 0 ? <section className="card muted">Başlamak için Proje Ekle penceresini kullanın.</section> : null}
       </section>
 
-      <OneOffJobsPanel routes={oneOffRoutes} vehicles={vehicles} canEdit={canEdit} />
+      <OneOffJobsPanel routes={oneOffRoutes} vehicles={vehicles} canEdit={canManageStructure} />
     </AppShell>
   );
 }
@@ -405,7 +406,12 @@ function PreviousMonthTransfer({ route, projectId, targetMonth, returnTo, source
       title={`${route.name} · Önceki Aydan Aktar`}
       label={<><Copy size={18} aria-hidden="true" /><span>Önceki aydan aktar</span></>}
     >
-      <ActionForm className="stack transfer-preview" action={copyPreviousMonthAssignments}>
+      <ActionForm
+        className="stack transfer-preview"
+        action={copyPreviousMonthAssignments}
+        requiredSelectionName="sourceAssignmentIds"
+        requiredSelectionMessage="Aktarmak için en az bir servis seçin."
+      >
         <input type="hidden" name="projectId" value={projectId} />
         <input type="hidden" name="routeId" value={route.id} />
         <input type="hidden" name="targetMonth" value={targetMonth} />
@@ -580,7 +586,13 @@ function ServiceGroupDetails({
         ) : null}
       </div>
 
-      <ActionForm className="stack service-form service-group-edit-form" action={updateAssignmentGroup} dirtyGuard>
+      <ActionForm
+        className="stack service-form service-group-edit-form"
+        action={updateAssignmentGroup}
+        dirtyGuard
+        requiredSelectionName="serviceDates"
+        requiredSelectionMessage="Servis grubunda en az bir gün seçili olmalıdır. Grubu tamamen kaldırmak için silme işlemini kullanın."
+      >
         {group.assignments.map((assignment) => <input key={assignment.id} type="hidden" name="assignmentIds" value={assignment.id} />)}
         <input type="hidden" name="projectId" value={projectId} />
         <input type="hidden" name="routeId" value={routeId} />

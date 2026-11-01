@@ -25,7 +25,7 @@ export function SiteHeader() {
     <>
       <CorporateMobileNav links={siteNavLinks} />
       <header className="new-site-nav">
-        <Link className="navy-brand" href="/">
+        <Link className="navy-brand" href="/seflektur">
           <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" decoding="async" />
         </Link>
         <nav className="site-desktop-nav" aria-label="Kurumsal site menüsü">

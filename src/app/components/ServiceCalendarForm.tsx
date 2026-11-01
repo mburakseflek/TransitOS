@@ -20,20 +20,29 @@ export function ServiceCalendarForm({
 
   async function submit(formData: FormData) {
     setErrorMessage(null);
+    if (!formData.getAll("serviceDates").some((value) => String(value).trim())) {
+      releaseForm();
+      setErrorMessage("Takvimden en az bir servis günü seçin.");
+      return;
+    }
     try {
       await action(formData);
       formRef.current?.reset();
       formRef.current?.dispatchEvent(new CustomEvent("transitos:form-success", { bubbles: true }));
     } catch {
-      const form = formRef.current;
-      if (form) {
-        form.dataset.submitting = "false";
-        form.removeAttribute("aria-busy");
-        form.dispatchEvent(new CustomEvent("transitos:form-error", { bubbles: true }));
-      }
-      notifyOperationFinish();
+      releaseForm();
       setErrorMessage("Servis planı kaydedilemedi. Seçimleriniz korundu; bağlantıyı kontrol edip yeniden deneyin.");
     }
+  }
+
+  function releaseForm() {
+    const form = formRef.current;
+    if (form) {
+      form.dataset.submitting = "false";
+      form.removeAttribute("aria-busy");
+      form.dispatchEvent(new CustomEvent("transitos:form-error", { bubbles: true }));
+    }
+    notifyOperationFinish();
   }
 
   function confirmVehicleConflict(event: FormEvent<HTMLFormElement>) {

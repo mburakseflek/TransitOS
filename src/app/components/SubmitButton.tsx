@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { notifyOperationFinish } from "@/app/components/GlobalOperationOverlay";
 
-export function SubmitButton({ children = "Kaydet" }: { children?: React.ReactNode }) {
+export function SubmitButton({ children = "Kaydet", disabled = false }: { children?: React.ReactNode; disabled?: boolean }) {
   const { pending } = useFormStatus();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const wasPending = useRef(false);
@@ -30,7 +30,7 @@ export function SubmitButton({ children = "Kaydet" }: { children?: React.ReactNo
   }, []);
 
   return (
-    <button ref={buttonRef} className="primary compact submit-button" type="submit" disabled={pending} aria-busy={pending}>
+    <button ref={buttonRef} className="primary compact submit-button" type="submit" disabled={pending || disabled} aria-busy={pending}>
       {pending ? <><span className="submit-button-spinner" aria-hidden="true" /> İşlem yapılıyor…</> : children}
     </button>
   );

@@ -97,6 +97,11 @@ async function main() {
   check("Takvim ana panel içinde hazır", dashboardHtml.includes("Aylık operasyon takvimi"), `HTTP ${dashboardPage.status}`);
   check("Güvenlik politikası gönderiliyor", Boolean(dashboardPage.headers.get("content-security-policy")), "CSP");
 
+  const projectsPage = await request("/transitos/projects", { headers: { cookie } });
+  const projectsHtml = projectsPage.ok ? await projectsPage.text() : "";
+  check("Önceki aydan aktar önizlemesi hazır", projectsHtml.includes("Önceki aydan aktar"), `HTTP ${projectsPage.status}`);
+  check("Aktarım güvenlik kuralları görünür", projectsHtml.includes("Koruma kuralları") && projectsHtml.includes("Kesin kopyalar tekrar oluşturulmaz"), `HTTP ${projectsPage.status}`);
+
   const dashboard = await request("/api/dashboard", { headers: { cookie } });
   const dashboardBody = dashboard.ok ? await dashboard.json() : null;
   check("Yetkili dashboard API çalışıyor", dashboard.ok && Boolean(dashboardBody?.summary), `HTTP ${dashboard.status}`);

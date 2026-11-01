@@ -110,8 +110,17 @@ export function ModalAction({
       window.requestAnimationFrame(() => triggerRef.current?.focus());
     }
 
+    function releaseAfterError() {
+      setSubmitting(false);
+      setShowSubmittingFeedback(false);
+    }
+
     dialog.addEventListener("transitos:form-success", finishAndClose);
-    return () => dialog.removeEventListener("transitos:form-success", finishAndClose);
+    dialog.addEventListener("transitos:form-error", releaseAfterError);
+    return () => {
+      dialog.removeEventListener("transitos:form-success", finishAndClose);
+      dialog.removeEventListener("transitos:form-error", releaseAfterError);
+    };
   }, [open]);
 
   function close() {

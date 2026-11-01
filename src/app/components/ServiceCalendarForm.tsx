@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { notifyOperationFinish } from "@/app/components/GlobalOperationOverlay";
 
 export function ServiceCalendarForm({
   action,
@@ -15,11 +16,24 @@ export function ServiceCalendarForm({
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const submissionKeyRef = useRef<HTMLInputElement>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   async function submit(formData: FormData) {
-    await action(formData);
-    formRef.current?.reset();
-    formRef.current?.dispatchEvent(new CustomEvent("transitos:form-success", { bubbles: true }));
+    setErrorMessage(null);
+    try {
+      await action(formData);
+      formRef.current?.reset();
+      formRef.current?.dispatchEvent(new CustomEvent("transitos:form-success", { bubbles: true }));
+    } catch {
+      const form = formRef.current;
+      if (form) {
+        form.dataset.submitting = "false";
+        form.removeAttribute("aria-busy");
+        form.dispatchEvent(new CustomEvent("transitos:form-error", { bubbles: true }));
+      }
+      notifyOperationFinish();
+      setErrorMessage("Servis planı kaydedilemedi. Seçimleriniz korundu; bağlantıyı kontrol edip yeniden deneyin.");
+    }
   }
 
   function confirmVehicleConflict(event: FormEvent<HTMLFormElement>) {
@@ -40,6 +54,7 @@ export function ServiceCalendarForm({
   return <form ref={formRef} className={className} action={submit} onSubmit={confirmVehicleConflict}>
     <input ref={submissionKeyRef} type="hidden" name="submissionKey" />
     {children}
+    {errorMessage ? <p className="form-action-error" role="alert">{errorMessage}</p> : null}
   </form>;
 }
 

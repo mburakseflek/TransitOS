@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 const recoveryKey = "transitos-runtime-recovery";
-const recoverableError = /chunkloaderror|loading chunk|failed to fetch dynamically imported module|failed to load resource|networkerror/i;
+const recoverableError = /chunkloaderror|loading chunk|failed to fetch dynamically imported module|failed to load resource|networkerror|failed to find server action|server action.{0,40}(not found|missing)|failed to fetch.{0,20}(rsc|server component)|invalid server response/i;
 
 function reloadOnce() {
   const now = Date.now();
@@ -16,6 +16,16 @@ function reloadOnce() {
 export function RuntimeRecovery() {
   useEffect(() => {
     document.documentElement.classList.add("runtime-ready");
+    let blankPageTimer: number | undefined;
+
+    function verifyPageHealth() {
+      window.clearTimeout(blankPageTimer);
+      blankPageTimer = window.setTimeout(() => {
+        const main = document.querySelector<HTMLElement>("main");
+        const hasVisiblePage = Boolean(main && main.getBoundingClientRect().height > 40 && (main.textContent?.trim() || main.querySelector("img, form, section, nav")));
+        if (!hasVisiblePage) reloadOnce();
+      }, 1200);
+    }
 
     function handleError(event: Event) {
       const failedAsset = event.target instanceof HTMLScriptElement ||
@@ -34,17 +44,31 @@ export function RuntimeRecovery() {
       document.body.dataset.operationPending = "false";
       document.body.dataset.navigationPending = "false";
       if (event.persisted && !document.querySelector("main")) reloadOnce();
+      verifyPageHealth();
     }
+
+    function handleOperationFinish() {
+      verifyPageHealth();
+    }
+
+    const pageObserver = new MutationObserver(() => {
+      if (!document.querySelector("main")) verifyPageHealth();
+    });
 
     window.addEventListener("error", handleError, true);
     window.addEventListener("unhandledrejection", handleRejection);
     window.addEventListener("pageshow", restorePage);
+    window.addEventListener("transitos:operation-finish", handleOperationFinish);
+    pageObserver.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       document.documentElement.classList.remove("runtime-ready");
+      window.clearTimeout(blankPageTimer);
+      pageObserver.disconnect();
       window.removeEventListener("error", handleError, true);
       window.removeEventListener("unhandledrejection", handleRejection);
       window.removeEventListener("pageshow", restorePage);
+      window.removeEventListener("transitos:operation-finish", handleOperationFinish);
     };
   }, []);
 

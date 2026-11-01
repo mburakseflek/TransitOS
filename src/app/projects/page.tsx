@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { CheckCircle2, ChevronDown, Clock3, MoreHorizontal, Pencil, Plus, Settings2, Trash2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronDown, Clock3, Copy, MoreHorizontal, Pencil, Plus, Settings2, ShieldCheck, Trash2 } from "lucide-react";
 import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import {
   FrequencySelector,
@@ -98,6 +98,24 @@ export default async function ProjectsPage({
     ? requestedProjectId
     : null;
   const initialRouteId = initialProjectId ? params?.route ?? null : null;
+  const previousMonthEnd = new Date(period.startDate.getTime() - 1);
+  const previousMonthStart = new Date(previousMonthEnd.getFullYear(), previousMonthEnd.getMonth(), 1, 0, 0, 0, 0);
+  const routeIds = projects.flatMap((project) => project.routes.map((route) => route.id));
+  const previousAssignments = canEdit && routeIds.length ? await prisma.serviceAssignment.findMany({
+    where: {
+      routeId: { in: routeIds },
+      serviceDate: { gte: previousMonthStart, lte: previousMonthEnd }
+    },
+    include: { vehicle: true },
+    orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
+  }) : [];
+  const previousByRoute = new Map<string, typeof previousAssignments>();
+  for (const assignment of previousAssignments) {
+    const list = previousByRoute.get(assignment.routeId) ?? [];
+    list.push(assignment);
+    previousByRoute.set(assignment.routeId, list);
+  }
+  const currentMonthAssignments = projects.flatMap((project) => project.routes.flatMap((route) => route.assignments));
 
   return (
     <AppShell
@@ -170,6 +188,8 @@ export default async function ProjectsPage({
               showMoney={canEdit}
               periodMonth={period.month}
               periodQuery={`month=${period.month}&range=${period.range}`}
+              previousByRoute={previousByRoute}
+              currentMonthAssignments={currentMonthAssignments}
             />
           </LocalAccordion>;
         })}
@@ -181,7 +201,7 @@ export default async function ProjectsPage({
   );
 }
 
-function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endOfToday, canEdit, showMoney, periodMonth, periodQuery }: { project: any; initialRouteId: string | null; vehicles: any[]; projectCompanies: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; periodQuery: string }) {
+function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endOfToday, canEdit, showMoney, periodMonth, periodQuery, previousByRoute, currentMonthAssignments }: { project: any; initialRouteId: string | null; vehicles: any[]; projectCompanies: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; periodQuery: string; previousByRoute: Map<string, any[]>; currentMonthAssignments: any[] }) {
   const activeVehicles = new Set(project.routes.flatMap((route: any) => route.assignments.map((item: any) => item.vehicle.fleetNumber)));
 
   return (
@@ -234,7 +254,7 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
 
       <div className="stack section">
         {project.routes.map((route: any) => (
-          <RouteCard route={route} project={project} defaultOpen={initialRouteId === route.id} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} periodMonth={periodMonth} periodQuery={periodQuery} key={route.id} />
+          <RouteCard route={route} project={project} defaultOpen={initialRouteId === route.id} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} periodMonth={periodMonth} periodQuery={periodQuery} previousAssignments={previousByRoute.get(route.id) ?? []} currentMonthAssignments={currentMonthAssignments} key={route.id} />
         ))}
         {project.routes.length === 0 ? <p className="muted">Bu projeye henüz güzergah eklenmemiş.</p> : null}
       </div>
@@ -243,7 +263,7 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
   );
 }
 
-function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit, showMoney, periodMonth, periodQuery }: { route: any; project: any; defaultOpen: boolean; vehicles: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; periodQuery: string }) {
+function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit, showMoney, periodMonth, periodQuery, previousAssignments, currentMonthAssignments }: { route: any; project: any; defaultOpen: boolean; vehicles: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; periodQuery: string; previousAssignments: any[]; currentMonthAssignments: any[] }) {
   const vehiclesText = Array.from(new Set(route.assignments.map((assignment: any) => assignment.vehicle.fleetNumber))).join(", ");
   const completedCount = route.assignments.filter((assignment: any) => assignment.serviceDate <= endOfToday).length;
   const returnTo = `/transitos/projects?project=${project.id}&route=${route.id}&${periodQuery}`;
@@ -303,13 +323,14 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
 
         {canEdit ? (
           <div className="route-planning-actions">
-          <form action={copyPreviousMonthAssignments}>
-            <input type="hidden" name="projectId" value={project.id} />
-            <input type="hidden" name="routeId" value={route.id} />
-            <input type="hidden" name="targetMonth" value={periodMonth} />
-            <input type="hidden" name="_returnTo" value={returnTo} />
-            <SubmitButton>Önceki aydan aktar</SubmitButton>
-          </form>
+          <PreviousMonthTransfer
+            route={route}
+            projectId={project.id}
+            targetMonth={periodMonth}
+            returnTo={returnTo}
+            sourceAssignments={previousAssignments}
+            currentAssignments={currentMonthAssignments}
+          />
           <ModalAction
             buttonClassName="service-planner-trigger"
             title={`${route.name} · Yeni Servis Planı`}
@@ -340,6 +361,119 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
         ) : null}
       </div>
     </details>
+  );
+}
+
+function PreviousMonthTransfer({ route, projectId, targetMonth, returnTo, sourceAssignments, currentAssignments }: { route: any; projectId: string; targetMonth: string; returnTo: string; sourceAssignments: any[]; currentAssignments: any[] }) {
+  const [targetYear, targetMonthNumber] = targetMonth.split("-").map(Number);
+  const targetLastDay = new Date(targetYear, targetMonthNumber, 0).getDate();
+  const sameDayCounts = new Map<number, number>();
+  for (const assignment of sourceAssignments) {
+    const day = assignment.serviceDate.getDate();
+    sameDayCounts.set(day, (sameDayCounts.get(day) ?? 0) + 1);
+  }
+  const currentByTime = new Map<string, any[]>();
+  for (const assignment of currentAssignments) {
+    const key = `${dateInputValue(assignment.serviceDate)}|${timeInputValue(assignment.serviceTime)}`;
+    const list = currentByTime.get(key) ?? [];
+    list.push(assignment);
+    currentByTime.set(key, list);
+  }
+
+  const rows = sourceAssignments.map((assignment) => {
+    const day = assignment.serviceDate.getDate();
+    if (day > targetLastDay) return { assignment, day, targetDate: null, exactDuplicate: false, vehicleConflict: false, routeSlotConflict: false };
+    const targetDate = new Date(targetYear, targetMonthNumber - 1, day, 12, 0, 0, 0);
+    const sameTime = currentByTime.get(`${dateInputValue(targetDate)}|${timeInputValue(assignment.serviceTime)}`) ?? [];
+    return {
+      assignment,
+      day,
+      targetDate,
+      exactDuplicate: sameTime.some((candidate) => candidate.routeId === route.id && candidate.vehicleId === assignment.vehicleId && candidate.direction === assignment.direction),
+      vehicleConflict: sameTime.some((candidate) => candidate.vehicleId === assignment.vehicleId),
+      routeSlotConflict: sameTime.some((candidate) => candidate.routeId === route.id)
+    };
+  });
+  const selectableCount = rows.filter((row) => row.targetDate && !row.exactDuplicate && !row.vehicleConflict).length;
+  const blockedCount = rows.length - selectableCount;
+  const previousMonthTitle = sourceAssignments[0]?.serviceDate.toLocaleDateString("tr-TR", { month: "long", year: "numeric" }) ?? "Önceki ay";
+  const targetMonthTitle = new Date(targetYear, targetMonthNumber - 1, 1).toLocaleDateString("tr-TR", { month: "long", year: "numeric" });
+
+  return (
+    <ModalAction
+      buttonClassName="ghost previous-month-trigger"
+      title={`${route.name} · Önceki Aydan Aktar`}
+      label={<><Copy size={18} aria-hidden="true" /><span>Önceki aydan aktar</span></>}
+    >
+      <ActionForm className="stack transfer-preview" action={copyPreviousMonthAssignments}>
+        <input type="hidden" name="projectId" value={projectId} />
+        <input type="hidden" name="routeId" value={route.id} />
+        <input type="hidden" name="targetMonth" value={targetMonth} />
+        <input type="hidden" name="_returnTo" value={returnTo} />
+
+        <div className="transfer-summary" role="status">
+          <ShieldCheck size={22} aria-hidden="true" />
+          <div>
+            <strong>{previousMonthTitle} → {targetMonthTitle}</strong>
+            <p>{selectableCount} kayıt aktarılabilir{blockedCount ? `, ${blockedCount} kayıt güvenlik nedeniyle kapalı` : ""}.</p>
+          </div>
+        </div>
+
+        {rows.length ? (
+          <fieldset className="transfer-list">
+            <legend>Aktarılacak servisleri seçin</legend>
+            {rows.map((row) => {
+              const blocked = !row.targetDate || row.exactDuplicate || row.vehicleConflict;
+              const repeatedDay = (sameDayCounts.get(row.day) ?? 0) > 1;
+              return (
+                <label className={`transfer-row ${blocked ? "is-blocked" : row.routeSlotConflict ? "has-warning" : ""}`} key={row.assignment.id}>
+                  <input
+                    type="checkbox"
+                    name="sourceAssignmentIds"
+                    value={row.assignment.id}
+                    defaultChecked={!blocked && !row.routeSlotConflict}
+                    disabled={blocked}
+                  />
+                  <span className="transfer-row-main">
+                    <strong>{row.targetDate ? row.targetDate.toLocaleDateString("tr-TR", { day: "numeric", month: "short", weekday: "short" }) : `${row.day}. gün`}</strong>
+                    <span>{formatServiceTime(row.assignment.serviceTime)} · {row.assignment.vehicle.fleetNumber} · {serviceDirectionTitle(row.assignment.direction)}</span>
+                  </span>
+                  <span className="transfer-row-status">
+                    {!row.targetDate ? <span className="badge gray">Bu ayda gün yok</span> : null}
+                    {row.exactDuplicate ? <span className="badge gray">Zaten mevcut</span> : null}
+                    {!row.exactDuplicate && row.vehicleConflict ? <span className="badge red"><AlertTriangle size={13} /> Araç çakışıyor</span> : null}
+                    {!blocked && row.routeSlotConflict ? <span className="badge yellow"><AlertTriangle size={13} /> Aynı saat dolu</span> : null}
+                    {!blocked && !row.routeSlotConflict && repeatedDay ? <span className="badge blue">Aynı gün birden fazla servis</span> : null}
+                    {!blocked && !row.routeSlotConflict && !repeatedDay ? <span className="badge green">Aktarılabilir</span> : null}
+                  </span>
+                </label>
+              );
+            })}
+          </fieldset>
+        ) : (
+          <div className="transfer-empty">Önceki ay bu güzergâhta aktarılabilecek servis bulunmuyor.</div>
+        )}
+
+        {rows.some((row) => row.routeSlotConflict && !row.exactDuplicate && !row.vehicleConflict) ? (
+          <Field label="Aynı saat doluysa" hint="Farklı araçla aynı güzergâh ve saatte servis bulunursa uygulanacak kural.">
+            <select name="conflictPolicy" defaultValue="safe-only">
+              <option value="safe-only">Çakışanları atla (önerilen)</option>
+              <option value="include-route-slots">Seçtiklerimi yine de aktar</option>
+            </select>
+          </Field>
+        ) : <input type="hidden" name="conflictPolicy" value="safe-only" />}
+
+        <div className="transfer-rules" aria-label="Aktarım güvenlik kuralları">
+          <strong>Koruma kuralları</strong>
+          <ul>
+            <li>Kesin kopyalar tekrar oluşturulmaz.</li>
+            <li>Aynı araç aynı saatte iki güzergâha atanmaz.</li>
+            <li>Farklı araçların aynı gün yaptığı servisler ayrı ayrı korunur.</li>
+          </ul>
+        </div>
+        <div className="actions"><SubmitButton disabled={selectableCount === 0}>Seçili servisleri aktar</SubmitButton></div>
+      </ActionForm>
+    </ModalAction>
   );
 }
 

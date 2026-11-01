@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
+import { notifyOperationFinish } from "@/app/components/GlobalOperationOverlay";
 
 export function ActionForm({
   action,
@@ -14,15 +15,29 @@ export function ActionForm({
   dirtyGuard?: boolean;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   async function submit(formData: FormData) {
-    await action(formData);
-    formRef.current?.dispatchEvent(new CustomEvent("transitos:form-success", { bubbles: true }));
+    setErrorMessage(null);
+    try {
+      await action(formData);
+      formRef.current?.dispatchEvent(new CustomEvent("transitos:form-success", { bubbles: true }));
+    } catch {
+      const form = formRef.current;
+      if (form) {
+        form.dataset.submitting = "false";
+        form.removeAttribute("aria-busy");
+        form.dispatchEvent(new CustomEvent("transitos:form-error", { bubbles: true }));
+      }
+      notifyOperationFinish();
+      setErrorMessage("İşlem tamamlanamadı. Bilgileriniz korundu; bağlantıyı kontrol edip yeniden deneyin.");
+    }
   }
 
   return (
     <form ref={formRef} className={className} action={submit} data-dirty-guard={dirtyGuard ? "true" : undefined}>
       {children}
+      {errorMessage ? <p className="form-action-error" role="alert">{errorMessage}</p> : null}
     </form>
   );
 }

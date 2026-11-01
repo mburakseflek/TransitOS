@@ -39,6 +39,7 @@ async function cleanup() {
   });
   await prisma.routeStop.deleteMany({ where: { route: { name: { startsWith: prefix } } } });
   await prisma.driverDocument.deleteMany({ where: { vehicle: { fleetNumber: { startsWith: prefix } } } });
+  await prisma.vehicleMaintenance.deleteMany({ where: { vehicle: { fleetNumber: { startsWith: prefix } } } });
   await prisma.expense.deleteMany({ where: { subcontractor: { companyName: { startsWith: prefix } } } });
   await prisma.serviceAssignment.deleteMany({
     where: {
@@ -98,6 +99,37 @@ async function main() {
       driverPhone: "+90 (555) 444 55 66"
     }
   });
+  const companyVehicle = await prisma.vehicle.create({
+    data: {
+      fleetNumber: `${prefix}-S1`,
+      plateNumber: "34 TEST 003",
+      capacity: 16
+    }
+  });
+  const maintenanceRecord = await prisma.vehicleMaintenance.create({
+    data: {
+      vehicleId: companyVehicle.id,
+      serviceProvider: "Test servis",
+      serviceDate: now,
+      odometerKm: 125000,
+      workPerformed: "Periyodik bakım",
+      replacedParts: "Motor yağı ve filtre",
+      amount: 4500,
+      notes: prefix
+    }
+  });
+  const companyMaintenance = await prisma.vehicleMaintenance.findFirst({
+    where: { id: maintenanceRecord.id, vehicle: { subcontractorId: null } },
+    include: { vehicle: true }
+  });
+  ok(
+    "Sirket araci bakim gecmisi arac bazli saklanir",
+    companyMaintenance?.vehicleId === companyVehicle.id && companyMaintenance.odometerKm === 125000 && Number(companyMaintenance.amount) === 4500
+  );
+  const subcontractorMaintenanceVehicles = await prisma.vehicle.count({
+    where: { id: vehicleA.id, subcontractorId: null }
+  });
+  ok("Taseron araci bakim paneline dahil edilmez", subcontractorMaintenanceVehicles === 0);
 
   const manager = await prisma.user.create({
     data: { loginId: `${prefix}-manager`, passwordHash: hash, displayName: "Test Yonetici", role: "MANAGER" }
@@ -287,7 +319,7 @@ async function main() {
     where: { serviceUsers: { some: { id: supervisor.id } }, name: { startsWith: prefix } }
   });
   ok("Servis sorumlusu sadece atanmis projeyi gorur", supervisorProjects.length === 1 && supervisorProjects[0].id === projectA.id);
-  ok("Servis sorumlusu tum taseron/arac havuzuna erisebilir", (await prisma.vehicle.count({ where: { fleetNumber: { startsWith: prefix } } })) === 2);
+  ok("Servis sorumlusu tum sirket ve taseron arac havuzuna erisebilir", (await prisma.vehicle.count({ where: { fleetNumber: { startsWith: prefix } } })) === 3);
 
   const subVehicles = await prisma.vehicle.findMany({
     where: { subcontractorId: subcontractorA.id, fleetNumber: { startsWith: prefix } }

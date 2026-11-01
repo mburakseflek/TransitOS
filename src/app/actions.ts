@@ -363,6 +363,79 @@ export async function deleteVehicle(formData: FormData) {
   redirect(returnTo(formData, "/transitos/vehicles"));
 }
 
+async function companyVehicleId(formData: FormData) {
+  const vehicleId = text(formData, "vehicleId");
+  const vehicle = await prisma.vehicle.findFirst({
+    where: { id: vehicleId, subcontractorId: null },
+    select: { id: true }
+  });
+  return vehicle?.id ?? null;
+}
+
+export async function createVehicleMaintenance(formData: FormData) {
+  await requireUserManager();
+  const vehicleId = await companyVehicleId(formData);
+  if (!vehicleId) redirect("/transitos/maintenance" as never);
+
+  await prisma.vehicleMaintenance.create({
+    data: {
+      vehicleId,
+      serviceProvider: text(formData, "serviceProvider"),
+      serviceDate: dateValue(formData, "serviceDate"),
+      odometerKm: Math.max(0, Math.round(numberValue(formData, "odometerKm"))),
+      workPerformed: text(formData, "workPerformed"),
+      replacedParts: optional(formData, "replacedParts"),
+      amount: moneyValue(formData, "amount"),
+      notes: optional(formData, "notes")
+    }
+  });
+  revalidatePath("/transitos/maintenance", "page");
+  redirect(`/transitos/maintenance?vehicle=${encodeURIComponent(vehicleId)}` as never);
+}
+
+export async function updateVehicleMaintenance(formData: FormData) {
+  await requireUserManager();
+  const id = text(formData, "id");
+  const vehicleId = await companyVehicleId(formData);
+  if (!vehicleId) redirect("/transitos/maintenance" as never);
+
+  const existing = await prisma.vehicleMaintenance.findFirst({
+    where: { id, vehicle: { subcontractorId: null } },
+    select: { id: true }
+  });
+  if (!existing) redirect(`/transitos/maintenance?vehicle=${encodeURIComponent(vehicleId)}` as never);
+
+  await prisma.vehicleMaintenance.update({
+    where: { id },
+    data: {
+      vehicleId,
+      serviceProvider: text(formData, "serviceProvider"),
+      serviceDate: dateValue(formData, "serviceDate"),
+      odometerKm: Math.max(0, Math.round(numberValue(formData, "odometerKm"))),
+      workPerformed: text(formData, "workPerformed"),
+      replacedParts: optional(formData, "replacedParts"),
+      amount: moneyValue(formData, "amount"),
+      notes: optional(formData, "notes")
+    }
+  });
+  revalidatePath("/transitos/maintenance", "page");
+  redirect(`/transitos/maintenance?vehicle=${encodeURIComponent(vehicleId)}` as never);
+}
+
+export async function deleteVehicleMaintenance(formData: FormData) {
+  await requireUserManager();
+  const id = text(formData, "id");
+  const record = await prisma.vehicleMaintenance.findFirst({
+    where: { id, vehicle: { subcontractorId: null } },
+    select: { id: true, vehicleId: true }
+  });
+  if (!record) redirect("/transitos/maintenance" as never);
+
+  await prisma.vehicleMaintenance.delete({ where: { id: record.id } });
+  revalidatePath("/transitos/maintenance", "page");
+  redirect(`/transitos/maintenance?vehicle=${encodeURIComponent(record.vehicleId)}` as never);
+}
+
 export async function createProject(formData: FormData) {
   await requireOperationsEditor();
   const company = await prisma.projectCompany.findUnique({ where: { id: text(formData, "projectCompanyId") } });

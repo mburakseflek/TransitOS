@@ -57,60 +57,79 @@ enum FinancialDocumentLineKind {
 }
 
 model User {
-  id              String         @id @default(cuid())
-  loginId         String         @unique
-  passwordHash    String
-  displayName     String
-  role            UserRole
-  subcontractorId String?
-  subcontractor   Subcontractor? @relation(fields: [subcontractorId], references: [id])
-  serviceProjects Project[]      @relation("ServiceSupervisorProjects")
-  ownerProjects   Project[]      @relation("ProjectOwnerProjects")
-  ownerCompanies  ProjectCompany[] @relation("ProjectCompanyOwners")
+  id                 String              @id @default(cuid())
+  loginId            String              @unique
+  passwordHash       String
+  displayName        String
+  role               UserRole
+  subcontractorId    String?
+  subcontractor      Subcontractor?      @relation(fields: [subcontractorId], references: [id])
+  serviceProjects    Project[]           @relation("ServiceSupervisorProjects")
+  ownerProjects      Project[]           @relation("ProjectOwnerProjects")
+  ownerCompanies     ProjectCompany[]    @relation("ProjectCompanyOwners")
   financialDocuments FinancialDocument[] @relation("FinancialDocumentCreator")
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 }
 
 model Subcontractor {
-  id               String     @id @default(cuid())
-  companyName      String
-  authorizedPerson String
-  phone            String
-  email            String?
-  taxOffice        String?
-  taxNumber        String?
-  iban             String?
-  address          String?
-  notes            String?
-  status           RecordStatus @default(ACTIVE)
-  users            User[]
-  vehicles         Vehicle[]
-  expenses         Expense[]
+  id                 String              @id @default(cuid())
+  companyName        String
+  authorizedPerson   String
+  phone              String
+  email              String?
+  taxOffice          String?
+  taxNumber          String?
+  iban               String?
+  address            String?
+  notes              String?
+  status             RecordStatus        @default(ACTIVE)
+  users              User[]
+  vehicles           Vehicle[]
+  expenses           Expense[]
   financialDocuments FinancialDocument[]
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 }
 
 model Vehicle {
-  id              String          @id @default(cuid())
-  subcontractorId String?
-  subcontractor   Subcontractor?  @relation(fields: [subcontractorId], references: [id])
-  fleetNumber     String
-  plateNumber     String
-  make            String?
-  model           String?
-  modelYear       Int?
-  capacity        Int             @default(0)
-  status          RecordStatus    @default(ACTIVE)
-  driverName      String?
-  driverPhone     String?
-  documents       DriverDocument[]
-  assignments     ServiceAssignment[]
-  expenses        Expense[]
-  surveyResponses VehicleSurveyResponse[]
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  id                 String                  @id @default(cuid())
+  subcontractorId    String?
+  subcontractor      Subcontractor?          @relation(fields: [subcontractorId], references: [id])
+  fleetNumber        String
+  plateNumber        String
+  make               String?
+  model              String?
+  modelYear          Int?
+  capacity           Int                     @default(0)
+  status             RecordStatus            @default(ACTIVE)
+  driverName         String?
+  driverPhone        String?
+  documents          DriverDocument[]
+  assignments        ServiceAssignment[]
+  expenses           Expense[]
+  maintenanceRecords VehicleMaintenance[]
+  surveyResponses    VehicleSurveyResponse[]
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+}
+
+model VehicleMaintenance {
+  id              String   @id @default(cuid())
+  vehicleId       String
+  vehicle         Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  serviceProvider String
+  serviceDate     DateTime
+  odometerKm      Int
+  workPerformed   String
+  replacedParts   String?
+  amount          Decimal  @default(0)
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([vehicleId, serviceDate])
+  @@index([serviceDate])
 }
 
 model DriverDocument {
@@ -123,53 +142,53 @@ model DriverDocument {
 }
 
 model Project {
-  id             String             @id @default(cuid())
-  name           String
-  clientCompany  String
-  projectCompanyId String?
-  projectCompany ProjectCompany? @relation(fields: [projectCompanyId], references: [id], onDelete: SetNull)
-  personnelCount Int                @default(0)
-  status         RecordStatus       @default(PLANNING)
-  serviceUsers   User[]             @relation("ServiceSupervisorProjects")
-  ownerUsers     User[]             @relation("ProjectOwnerProjects")
-  routes         ServiceRoute[]
-  assignments    ServiceAssignment[]
-  surveyResponses VehicleSurveyResponse[]
+  id                 String                  @id @default(cuid())
+  name               String
+  clientCompany      String
+  projectCompanyId   String?
+  projectCompany     ProjectCompany?         @relation(fields: [projectCompanyId], references: [id], onDelete: SetNull)
+  personnelCount     Int                     @default(0)
+  status             RecordStatus            @default(PLANNING)
+  serviceUsers       User[]                  @relation("ServiceSupervisorProjects")
+  ownerUsers         User[]                  @relation("ProjectOwnerProjects")
+  routes             ServiceRoute[]
+  assignments        ServiceAssignment[]
+  surveyResponses    VehicleSurveyResponse[]
   financialDocuments FinancialDocument[]
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
 
   @@index([projectCompanyId])
 }
 
 model ProjectCompany {
-  id         String    @id @default(cuid())
-  name       String    @unique
-  projects   Project[]
-  ownerUsers User[]    @relation("ProjectCompanyOwners")
+  id                 String              @id @default(cuid())
+  name               String              @unique
+  projects           Project[]
+  ownerUsers         User[]              @relation("ProjectCompanyOwners")
   financialDocuments FinancialDocument[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 }
 
 model ServiceRoute {
-  id                 String              @id @default(cuid())
-  projectId          String?
-  project            Project?            @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  name               String
-  startPoint         String
-  endPoint           String
-  averageKilometers  Decimal             @default(0)
-  mapDistanceKm      Decimal             @default(0)
-  standardWorkDays    Int                 @default(0)
-  defaultCarrierPricePerService Decimal   @default(0)
-  defaultClientPricePerService Decimal    @default(0)
-  routePolyline      String?
-  stops              RouteStop[]
-  assignments        ServiceAssignment[]
-  surveyResponses    VehicleSurveyResponse[]
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  id                            String                  @id @default(cuid())
+  projectId                     String?
+  project                       Project?                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name                          String
+  startPoint                    String
+  endPoint                      String
+  averageKilometers             Decimal                 @default(0)
+  mapDistanceKm                 Decimal                 @default(0)
+  standardWorkDays              Int                     @default(0)
+  defaultCarrierPricePerService Decimal                 @default(0)
+  defaultClientPricePerService  Decimal                 @default(0)
+  routePolyline                 String?
+  stops                         RouteStop[]
+  assignments                   ServiceAssignment[]
+  surveyResponses               VehicleSurveyResponse[]
+  createdAt                     DateTime                @default(now())
+  updatedAt                     DateTime                @updatedAt
 }
 
 model RouteStop {
@@ -183,30 +202,30 @@ model RouteStop {
 }
 
 model ServiceAssignment {
-  id              String           @id @default(cuid())
-  seriesId        String?
-  submissionKey   String?
-  projectId       String?
-  routeId         String
-  vehicleId       String
-  project         Project?         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  route           ServiceRoute     @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  vehicle         Vehicle          @relation(fields: [vehicleId], references: [id])
-  serviceDate     DateTime
-  serviceTime     DateTime
-  direction       ServiceDirection
-  serviceCount    Int              @default(1)
-  kilometers      Decimal          @default(0)
-  pricePerService Decimal          @default(0)
-  clientPricePerService Decimal    @default(0)
-  monthKey        String
-  financialLines  FinancialDocumentLine[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id                    String                  @id @default(cuid())
+  seriesId              String?
+  submissionKey         String?
+  projectId             String?
+  routeId               String
+  vehicleId             String
+  project               Project?                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  route                 ServiceRoute            @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  vehicle               Vehicle                 @relation(fields: [vehicleId], references: [id])
+  serviceDate           DateTime
+  serviceTime           DateTime
+  direction             ServiceDirection
+  serviceCount          Int                     @default(1)
+  kilometers            Decimal                 @default(0)
+  pricePerService       Decimal                 @default(0)
+  clientPricePerService Decimal                 @default(0)
+  monthKey              String
+  financialLines        FinancialDocumentLine[]
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
 
+  @@unique([submissionKey, serviceDate])
   @@index([serviceDate])
   @@index([seriesId])
-  @@unique([submissionKey, serviceDate])
   @@index([monthKey])
   @@index([projectId, serviceDate])
   @@index([routeId, serviceDate])
@@ -214,13 +233,13 @@ model ServiceAssignment {
 }
 
 model VehicleSurveyResponse {
-  id                   String       @id @default(cuid())
+  id                   String        @id @default(cuid())
   vehicleId            String
-  vehicle              Vehicle      @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  vehicle              Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   routeId              String?
   route                ServiceRoute? @relation(fields: [routeId], references: [id], onDelete: SetNull)
   projectId            String?
-  project              Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  project              Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
   vehicleFleetNumber   String
   vehiclePlateNumber   String
   driverName           String?
@@ -239,12 +258,12 @@ model VehicleSurveyResponse {
   trustRating          Int
   satisfactionRating   Int
   recommendationRating Int
-  favoriteTopics       Json         @default("[]")
+  favoriteTopics       Json          @default("[]")
   comments             String?
   lowScoreExplanation  String?
-  averageRating        Decimal      @default(0)
-  createdAt            DateTime     @default(now())
-  updatedAt            DateTime     @updatedAt
+  averageRating        Decimal       @default(0)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
 
   @@unique([vehicleId, journeyDate, deviceKey])
   @@index([vehicleId, journeyDate])
@@ -254,11 +273,11 @@ model VehicleSurveyResponse {
 }
 
 model Expense {
-  id              String          @id @default(cuid())
+  id              String                  @id @default(cuid())
   subcontractorId String
   vehicleId       String?
-  subcontractor   Subcontractor   @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
-  vehicle         Vehicle?        @relation(fields: [vehicleId], references: [id])
+  subcontractor   Subcontractor           @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
+  vehicle         Vehicle?                @relation(fields: [vehicleId], references: [id])
   category        ExpenseCategory
   amount          Decimal
   expenseDate     DateTime
@@ -266,8 +285,8 @@ model Expense {
   notes           String?
   receiptUrl      String?
   financialLines  FinancialDocumentLine[]
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
 
   @@index([expenseDate])
   @@index([monthKey])
@@ -276,28 +295,28 @@ model Expense {
 }
 
 model FinancialDocument {
-  id              String                  @id @default(cuid())
-  type            FinancialDocumentType
-  status          FinancialDocumentStatus @default(ISSUED)
-  monthKey        String
-  periodStart     DateTime
-  periodEnd       DateTime
-  subcontractorId String?
-  subcontractor   Subcontractor?          @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
-  projectId       String?
-  project         Project?                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id               String                  @id @default(cuid())
+  type             FinancialDocumentType
+  status           FinancialDocumentStatus @default(ISSUED)
+  monthKey         String
+  periodStart      DateTime
+  periodEnd        DateTime
+  subcontractorId  String?
+  subcontractor    Subcontractor?          @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
+  projectId        String?
+  project          Project?                @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectCompanyId String?
-  projectCompany   ProjectCompany?        @relation(fields: [projectCompanyId], references: [id], onDelete: SetNull)
-  createdByUserId String?
-  createdBy       User?                   @relation("FinancialDocumentCreator", fields: [createdByUserId], references: [id])
-  issuedAt        DateTime                @default(now())
-  grossAmount     Decimal                 @default(0)
-  expenseAmount   Decimal                 @default(0)
-  netAmount       Decimal                 @default(0)
-  notes           String?
-  lines           FinancialDocumentLine[]
-  createdAt       DateTime                @default(now())
-  updatedAt       DateTime                @updatedAt
+  projectCompany   ProjectCompany?         @relation(fields: [projectCompanyId], references: [id], onDelete: SetNull)
+  createdByUserId  String?
+  createdBy        User?                   @relation("FinancialDocumentCreator", fields: [createdByUserId], references: [id])
+  issuedAt         DateTime                @default(now())
+  grossAmount      Decimal                 @default(0)
+  expenseAmount    Decimal                 @default(0)
+  netAmount        Decimal                 @default(0)
+  notes            String?
+  lines            FinancialDocumentLine[]
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
 
   @@index([type, monthKey])
   @@index([subcontractorId, monthKey])
@@ -306,14 +325,14 @@ model FinancialDocument {
 }
 
 model FinancialDocumentLine {
-  id                  String                 @id @default(cuid())
+  id                  String                    @id @default(cuid())
   documentId          String
-  document            FinancialDocument      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  document            FinancialDocument         @relation(fields: [documentId], references: [id], onDelete: Cascade)
   kind                FinancialDocumentLineKind
   serviceAssignmentId String?
-  serviceAssignment   ServiceAssignment?     @relation(fields: [serviceAssignmentId], references: [id])
+  serviceAssignment   ServiceAssignment?        @relation(fields: [serviceAssignmentId], references: [id])
   expenseId           String?
-  expense             Expense?               @relation(fields: [expenseId], references: [id])
+  expense             Expense?                  @relation(fields: [expenseId], references: [id])
   serviceDate         DateTime?
   title               String
   description         String?
@@ -321,10 +340,10 @@ model FinancialDocumentLine {
   routeName           String?
   vehicleName         String?
   serviceType         String?
-  serviceCount        Int                    @default(0)
-  unitPrice           Decimal                @default(0)
-  amount              Decimal                @default(0)
-  createdAt           DateTime               @default(now())
+  serviceCount        Int                       @default(0)
+  unitPrice           Decimal                   @default(0)
+  amount              Decimal                   @default(0)
+  createdAt           DateTime                  @default(now())
 
   @@index([documentId])
   @@index([serviceAssignmentId])

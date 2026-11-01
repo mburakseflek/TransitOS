@@ -13,6 +13,7 @@ import {
   Menu,
   MinusCircle,
   Settings,
+  Wrench,
   UserRound,
   UsersRound
 } from "lucide-react";
@@ -28,6 +29,7 @@ const navItems = [
   { label: "Panel", path: "/dashboard", icon: Gauge },
   { label: "Taşeronlar", path: "/subcontractors", icon: UsersRound },
   { label: "Araçlar", path: "/vehicles", icon: Bus },
+  { label: "Bakımlar", path: "/maintenance", icon: Wrench },
   { label: "Anketler", path: "/surveys", icon: ClipboardCheck },
   { label: "Sürücüler", path: "/drivers", icon: UserRound },
   { label: "Projeler", path: "/projects", icon: FolderKanban },
@@ -198,6 +200,7 @@ function roleGuide(role: string) {
 }
 
 function isNavVisible(label: string, role?: string) {
+  if (label === "Bakımlar") return role === "MANAGER";
   if (role === "SERVICE_SUPERVISOR") {
     return !["Giderler", "Hakedişler", "Ayarlar"].includes(label);
   }

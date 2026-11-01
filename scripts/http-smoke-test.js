@@ -30,7 +30,7 @@ async function main() {
     check(`Genel uç erişilebilir: ${path}`, response.ok, `HTTP ${response.status}`);
   }
 
-  for (const path of ["/transitos/dashboard", "/transitos/projects", "/transitos/settings"]) {
+  for (const path of ["/transitos/dashboard", "/transitos/projects", "/transitos/maintenance", "/transitos/settings"]) {
     const response = await request(path);
     check(`Oturumsuz sayfa korunuyor: ${path}`, response.status >= 300 && response.status < 400, `HTTP ${response.status}`);
   }
@@ -75,6 +75,7 @@ async function main() {
     "/transitos/dashboard",
     "/transitos/projects",
     "/transitos/vehicles",
+    "/transitos/maintenance",
     "/transitos/drivers",
     "/transitos/subcontractors",
     "/transitos/expenses",

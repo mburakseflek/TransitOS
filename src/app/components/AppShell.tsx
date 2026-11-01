@@ -3,9 +3,7 @@ import { redirect } from "next/navigation";
 import {
   Banknote,
   Bus,
-  CalendarDays,
   ChartNoAxesCombined,
-  CircleHelp,
   ClipboardCheck,
   FolderKanban,
   Gauge,
@@ -27,16 +25,15 @@ export { ModalAction } from "@/app/components/ModalAction";
 
 const navItems = [
   { label: "Panel", path: "/dashboard", icon: Gauge },
+  { label: "Projeler", path: "/projects", icon: FolderKanban },
   { label: "Taşeronlar", path: "/subcontractors", icon: UsersRound },
   { label: "Araçlar", path: "/vehicles", icon: Bus },
-  { label: "Bakımlar", path: "/maintenance", icon: Wrench },
-  { label: "Anketler", path: "/surveys", icon: ClipboardCheck },
   { label: "Sürücüler", path: "/drivers", icon: UserRound },
-  { label: "Projeler", path: "/projects", icon: FolderKanban },
   { label: "Giderler", path: "/expenses", icon: MinusCircle },
   { label: "Finans", path: "/finance", icon: ChartNoAxesCombined },
-  { label: "Takvim", path: "/calendar", icon: CalendarDays },
   { label: "Hakedişler", path: "/earnings", icon: Banknote },
+  { label: "Bakımlar", path: "/maintenance", icon: Wrench },
+  { label: "Anketler", path: "/surveys", icon: ClipboardCheck },
   { label: "Ayarlar", path: "/settings", icon: Settings }
 ] as const;
 
@@ -71,7 +68,6 @@ export async function AppShell({
     .filter((item) => isNavVisible(item.label, user?.role))
     .map((item) => user?.role === "PROJECT_OWNER" && item.label === "Hakedişler" ? { ...item, label: "Faturalar" } : item);
   const activeNavLabel = visibleNavItems.find((item) => item.path === activePath)?.label ?? "Menü";
-  const guide = roleGuide(user.role);
 
   return (
     <main className="shell transitos-shell" data-user-role={user.role}>
@@ -101,11 +97,11 @@ export async function AppShell({
             </a>
           );
         })}
-        <LogoutButton className="mobile-drawer-logout" />
         <a className="site-return-link mobile-site-return-link" href="/seflektur">
           <House size={17} />
           <span>Siteye dön</span>
         </a>
+        <LogoutButton className="mobile-drawer-logout" />
       </nav>
       <aside className="sidebar aceternity-sidebar" aria-label="TransitOS ana menüsü" data-collapsible="auto">
         <span className="aceternity-sidebar-glow" aria-hidden="true" />
@@ -125,11 +121,11 @@ export async function AppShell({
             </a>
           );})}
         </nav>
-        <LogoutButton className="sidebar-logout-button" />
         <a className="site-return-link" href="/seflektur" title="Şeflek Tur sitesine dön">
           <House size={17} />
           <span>Siteye dön</span>
         </a>
+        <LogoutButton className="sidebar-logout-button" />
       </aside>
 
       <section className="content magic-bento-surface">
@@ -139,11 +135,6 @@ export async function AppShell({
             <p className="muted">{subtitle}</p>
           </div>
           <div className="topbar-actions">
-            <LogoutButton className="ghost compact-button topbar-logout-button" />
-            <a className="ghost compact-button home-return-button" href="/">
-              <House size={16} />
-              Ana sayfaya dön
-            </a>
             <ExpandableProfileCard
               title={displayName}
               subtitle={currentRoleTitle}
@@ -157,46 +148,11 @@ export async function AppShell({
             </ExpandableProfileCard>
           </div>
         </div>
-        <section className="role-guide-card" aria-label="Bu ekranda ne yapabilirsiniz?">
-          <CircleHelp size={20} aria-hidden="true" />
-          <div>
-            <strong>{guide.title}</strong>
-            <span>{guide.body}</span>
-          </div>
-          <a href={guide.href}>{guide.action}</a>
-        </section>
         {children}
         <MarketTicker fallbackItems={tickerItems} placement="app" />
       </section>
     </main>
   );
-}
-
-function roleGuide(role: string) {
-  if (role === "SUBCONTRACTOR") return {
-    title: "Size ait operasyon alanı",
-    body: "Yalnız firmanızın araçları, taşıdığı servisler, güzergahlar ve hakedişleri gösterilir.",
-    href: "/transitos/projects",
-    action: "Servislerimi gör"
-  };
-  if (role === "PROJECT_OWNER") return {
-    title: "Proje sahibi görünümü",
-    body: "Yalnız sahibi olduğunuz projeler, servis planları, araçlar ve faturalar gösterilir.",
-    href: "/transitos/projects",
-    action: "Projelerimi gör"
-  };
-  if (role === "SERVICE_SUPERVISOR") return {
-    title: "Operasyon çalışma alanı",
-    body: "Size atanan projelerin servis, araç ve güzergah işlemlerini buradan yönetebilirsiniz.",
-    href: "/transitos/projects",
-    action: "Operasyona git"
-  };
-  return {
-    title: "Yönetici çalışma alanı",
-    body: "Önce projeyi seçin, ardından güzergah ve servis işlemlerini adım adım tamamlayın.",
-    href: "/transitos/projects",
-    action: "Projeleri yönet"
-  };
 }
 
 function isNavVisible(label: string, role?: string) {
@@ -205,7 +161,7 @@ function isNavVisible(label: string, role?: string) {
     return !["Giderler", "Hakedişler", "Ayarlar"].includes(label);
   }
   if (role === "SUBCONTRACTOR") {
-    return !["Taşeronlar", "Anketler", "Sürücüler", "Giderler", "Finans", "Takvim"].includes(label);
+    return !["Taşeronlar", "Anketler", "Sürücüler", "Giderler", "Finans"].includes(label);
   }
   if (role === "PROJECT_OWNER") {
     return !["Taşeronlar", "Anketler", "Giderler", "Finans", "Ayarlar"].includes(label);

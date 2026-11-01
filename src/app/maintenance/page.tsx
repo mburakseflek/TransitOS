@@ -62,16 +62,6 @@ export default async function MaintenancePage({
         </section>
       ) : (
         <>
-          <section className="maintenance-hero" aria-labelledby="maintenance-hero-title">
-            <div className="maintenance-hero-icon" aria-hidden="true"><Wrench size={26} /></div>
-            <div>
-              <span className="project-detail-eyebrow">Kalıcı araç geçmişi</span>
-              <h2 id="maintenance-hero-title">Bakım kayıtları aylık dönemlerden bağımsızdır</h2>
-              <p>Önce şirket aracını seçin. Yapılan işlemler ve değişen parçalar aracın tüm kullanım ömrü boyunca saklanır.</p>
-            </div>
-            <span className="maintenance-hero-count">{vehicles.length} şirket aracı</span>
-          </section>
-
           {vehicles.length > 0 ? (
             <form className="maintenance-vehicle-picker" method="get">
               <label>
@@ -97,7 +87,7 @@ export default async function MaintenancePage({
                   <h2>{vehicles.length ? "Bir şirket aracı seçin" : "Şirket aracı bulunamadı"}</h2>
                   <p>{vehicles.length
                     ? "Bakım kayıtları yalnızca seçtiğiniz araç için açılır; diğer araçların bilgileri ekranda kalabalık oluşturmaz."
-                    : "Araçlar panelinde araç sahibini “Şeflek Tur · Şirket aracı” seçerek bakım takibine başlayabilirsiniz."}</p>
+                    : "Araçlar panelinde “Şirket filosuna ekle” seçeneğiyle bakım takibine başlayabilirsiniz."}</p>
                 </div>
               </div>
               {vehicles.length ? (

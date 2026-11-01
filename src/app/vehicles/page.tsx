@@ -91,7 +91,7 @@ export default async function VehiclesPage({
             summary={<>
               <div>
                 <h2 style={{ margin: 0 }}>{vehicle.fleetNumber} · {vehicle.plateNumber}</h2>
-                <p className="muted vehicle-summary-meta">{vehicle.make ?? "Marka belirtilmedi"} {vehicle.model ?? ""} · {vehicle.subcontractor?.companyName ?? "Taşeron atanmamış"}</p>
+                <p className="muted vehicle-summary-meta">{vehicle.make ?? "Marka belirtilmedi"} {vehicle.model ?? ""} · {vehicle.subcontractor?.companyName ?? "Şirket filosu"}</p>
                 <div className="chip-row">
                   <span className={vehicle.status === "ACTIVE" ? "badge green" : vehicle.status === "MAINTENANCE" ? "badge red" : "badge gray"}>{vehicle.status === "ACTIVE" ? "Aktif" : vehicle.status === "MAINTENANCE" ? "Bakımda" : "Pasif"}</span>
                   <span className="badge green"><CheckCircle2 size={14} aria-hidden="true" /> {completed} tamamlandı</span>
@@ -159,7 +159,7 @@ export default async function VehiclesPage({
               <ExpandableProfileCard
                 title={`${vehicle.make ?? "-"} ${vehicle.model ?? ""}`}
                 subtitle={`${vehicle.modelYear ?? "-"} · ${vehicle.capacity} koltuk`}
-                meta={`Taşeron: ${vehicle.subcontractor?.companyName ?? "Atanmamış"}`}
+                meta={vehicle.subcontractor?.companyName ? `Taşeron: ${vehicle.subcontractor.companyName}` : "Şirket filosu"}
                 badge={<span className="badge blue">Şoför</span>}
               >
                 <p className="muted">Şoför: {vehicle.driverName ?? "-"} · {vehicle.driverPhone ?? "-"}</p>
@@ -302,9 +302,9 @@ function VehicleFields({ vehicle, subcontractors }: { vehicle?: any; subcontract
   return (
     <>
       <FormSection title="Araç bilgileri" description="Aracı tanımlayan zorunlu bilgileri girin.">
-        <Field label="Araç kodu" hint="Filoda görünen kısa kod."><input name="fleetNumber" defaultValue={vehicle?.fleetNumber ?? ""} required /></Field>
+        <Field label="Araç kodu" hint="Kendi kullandığınız mevcut filo kodu."><input name="fleetNumber" defaultValue={vehicle?.fleetNumber ?? ""} required /></Field>
         <Field label="Plaka" hint="Resmi araç plakası."><input name="plateNumber" defaultValue={vehicle?.plateNumber ?? ""} required /></Field>
-        <Field label="Araç sahibi" hint="Şirket aracı veya bağlı olduğu taşeron."><select name="subcontractorId" defaultValue={vehicle?.subcontractorId ?? ""}><option value="">Şeflek Tur · Şirket aracı</option>{subcontractors.map((item) => <option key={item.id} value={item.id}>{item.companyName}</option>)}</select></Field>
+        <Field label="Filo seçimi" hint="Kendi araçlarınız için şirket filosunu seçin."><select name="subcontractorId" defaultValue={vehicle?.subcontractorId ?? ""}><option value="">Şirket filosuna ekle</option>{subcontractors.map((item) => <option key={item.id} value={item.id}>{item.companyName}</option>)}</select></Field>
         <Field label="Durum" hint="Aktif, pasif veya bakımda."><select name="status" defaultValue={vehicle?.status ?? "ACTIVE"}><option value="ACTIVE">Aktif</option><option value="PASSIVE">Pasif</option><option value="MAINTENANCE">Bakımda</option></select></Field>
       </FormSection>
       <FormSection title="Teknik bilgiler" description="Model ve kapasite bilgilerini ekleyin." optional>

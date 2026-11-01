@@ -1,16 +1,19 @@
 import { AlertTriangle, Bus, CalendarDays, Clock3, FolderKanban, MapPinned, Users } from "lucide-react";
 import { FinancialDocumentType } from "@prisma/client";
-import { AppShell } from "@/app/components/AppShell";
+import { AppShell, ModalAction } from "@/app/components/AppShell";
+import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { CalendarMiniPanel, OnboardingScreen, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { YandexTrafficMap } from "@/app/components/YandexTrafficMap";
 import { prisma } from "@/lib/db";
 import { formatTRY } from "@/lib/format";
+import { parsePeriod } from "@/lib/period";
 import { serviceDirectionTitle } from "@/lib/labels";
 import { getFastTrafficSnapshot, istanbulTrafficMapEmbedUrl } from "@/lib/traffic";
 import { cookies } from "next/headers";
 import { readSessionToken } from "@/lib/auth";
 import {
   assignmentAccessWhere,
+  canEditOperations,
   isProjectOwner,
   isManager,
   isSubcontractor,
@@ -20,11 +23,14 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams?: Promise<{ month?: string }> }) {
+  const params = await searchParams;
+  const period = parsePeriod({ month: params?.month, range: "1" });
   const sessionCookie = (await cookies()).get("transitos_session")?.value;
   const user = sessionCookie ? await readSessionToken(sessionCookie).catch(() => null) : null;
   const subcontractorView = isSubcontractor(user);
   const projectOwnerView = isProjectOwner(user);
+  const canEdit = canEditOperations(user);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
@@ -32,12 +38,15 @@ export default async function DashboardPage() {
   const previousMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
   const previousMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999);
   const previousMonthKey = `${previousMonthStart.getFullYear()}-${String(previousMonthStart.getMonth() + 1).padStart(2, "0")}`;
+  const [calendarYear, calendarMonth] = period.month.split("-").map(Number);
+  const calendarStart = new Date(calendarYear, calendarMonth - 1, 1);
+  const calendarEnd = new Date(calendarYear, calendarMonth, 0, 23, 59, 59, 999);
 
   const vehicleScope = vehicleAccessWhere(user);
   const assignmentScope = assignmentAccessWhere(user);
   const projectScope = projectAccessWhere(user);
 
-  const [subcontractors, vehicles, activeProjects, todayAssignments, completedAssignments, trafficSnapshot, pendingPreviousEarnings] = await Promise.all([
+  const [subcontractors, vehicles, activeProjects, todayAssignments, completedAssignments, trafficSnapshot, pendingPreviousEarnings, monthAssignments] = await Promise.all([
     projectOwnerView || subcontractorView ? Promise.resolve(0) : prisma.subcontractor.count(),
     prisma.vehicle.count({ where: vehicleScope }),
     prisma.project.count({ where: { status: "ACTIVE", ...projectScope } }),
@@ -75,7 +84,12 @@ export default async function DashboardPage() {
         }
       },
       orderBy: { companyName: "asc" }
-    }) : Promise.resolve([])
+    }) : Promise.resolve([]),
+    prisma.serviceAssignment.findMany({
+      where: { serviceDate: { gte: calendarStart, lte: calendarEnd }, ...assignmentScope },
+      include: { route: true, vehicle: true, project: true },
+      orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
+    })
   ]);
   const trafficItems = trafficSnapshot.items;
   const pendingPreviousEarningTotal = pendingPreviousEarnings.reduce((total, subcontractor) => {
@@ -84,6 +98,13 @@ export default async function DashboardPage() {
     const expenses = subcontractor.expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
     return total + gross - expenses;
   }, 0);
+  const calendarAssignmentsByDay = new Map<string, typeof monthAssignments>();
+  for (const assignment of monthAssignments) {
+    const key = localDateKey(assignment.serviceDate);
+    const items = calendarAssignmentsByDay.get(key) ?? [];
+    items.push(assignment);
+    calendarAssignmentsByDay.set(key, items);
+  }
 
   return (
     <AppShell active="/dashboard" title="Ana Panel" subtitle="SeflekTur TransitOS Cloud v2.0 ortak veri merkezi">
@@ -105,6 +126,42 @@ export default async function DashboardPage() {
           <a className="primary compact-button" href={`/transitos/earnings?month=${previousMonthKey}&range=1`}>Hakedişleri kontrol et</a>
         </section>
       ) : null}
+
+      <section className="dashboard-calendar section" aria-labelledby="dashboard-calendar-title">
+        <div className="dashboard-calendar-head">
+          <div>
+            <h2 id="dashboard-calendar-title">Aylık operasyon takvimi</h2>
+            <p>Bir güne dokunarak o günün servislerini görüntüleyin.</p>
+          </div>
+          <PeriodFilter searchParams={{ month: period.month, range: "1" }} />
+        </div>
+        <div className="dashboard-calendar-grid">
+          {Array.from({ length: calendarEnd.getDate() }, (_, index) => {
+            const date = new Date(calendarYear, calendarMonth - 1, index + 1);
+            const items = calendarAssignmentsByDay.get(localDateKey(date)) ?? [];
+            return (
+              <ModalAction
+                key={date.toISOString()}
+                buttonClassName={`dashboard-calendar-day ${date.toDateString() === new Date().toDateString() ? "today" : ""}`}
+                title={`${date.toLocaleDateString("tr-TR")} Servisleri`}
+                label={<><strong>{date.getDate()}</strong><span>{items.length ? `${items.length} servis` : "—"}</span></>}
+              >
+                <div className="dashboard-day-list">
+                  {items.map((item) => (
+                    <article key={item.id}>
+                      <strong>{item.serviceTime.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}</strong>
+                      <span>{item.route.name}</span>
+                      <small>{item.project?.name ?? "Tek seferlik iş"} · {item.vehicle.fleetNumber} · {serviceDirectionTitle(item.direction)}</small>
+                    </article>
+                  ))}
+                  {!items.length ? <p>Bu gün için servis planı yok.</p> : null}
+                </div>
+              </ModalAction>
+            );
+          })}
+        </div>
+        {canEdit ? <a className="dashboard-project-link" href={`/transitos/projects?month=${period.month}&range=1`}>Servis planlamaya git</a> : null}
+      </section>
 
       <OnboardingScreen
         eyebrow="Günlük Operasyon"
@@ -251,6 +308,10 @@ export default async function DashboardPage() {
       </section>
     </AppShell>
   );
+}
+
+function localDateKey(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 function Metric({ title, value, icon }: { title: string; value: string | number; icon: React.ReactNode }) {

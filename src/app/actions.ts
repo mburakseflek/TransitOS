@@ -740,6 +740,62 @@ export async function createBulkAssignments(formData: FormData) {
   revalidatePath("/transitos/projects", "page");
 }
 
+export async function copyPreviousMonthAssignments(formData: FormData) {
+  await requireOperationsEditor();
+  const routeId = text(formData, "routeId");
+  const projectId = optionalId(formData, "projectId");
+  const target = periodFromMonthKey(text(formData, "targetMonth"));
+  const previousEnd = new Date(target.startDate.getTime() - 1);
+  const previousStart = new Date(previousEnd.getFullYear(), previousEnd.getMonth(), 1, 0, 0, 0, 0);
+  const [source, existing] = await Promise.all([
+    prisma.serviceAssignment.findMany({
+      where: { routeId, serviceDate: { gte: previousStart, lte: previousEnd } },
+      orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
+    }),
+    prisma.serviceAssignment.findMany({
+      where: { routeId, serviceDate: { gte: target.startDate, lte: target.endDate } },
+      select: { serviceDate: true, serviceTime: true, vehicleId: true, direction: true }
+    })
+  ]);
+
+  const lastDay = target.endDate.getDate();
+  const existingKeys = new Set(existing.map((item) => `${dateKey(item.serviceDate)}|${item.vehicleId}|${item.direction}|${item.serviceTime.getHours()}:${item.serviceTime.getMinutes()}`));
+  const seriesIds = new Map<string, string>();
+  const records: Prisma.ServiceAssignmentCreateManyInput[] = [];
+
+  for (const item of source) {
+    const day = item.serviceDate.getDate();
+    if (day > lastDay) continue;
+    const serviceDate = new Date(target.startDate.getFullYear(), target.startDate.getMonth(), day, 12, 0, 0, 0);
+    const serviceTime = new Date(serviceDate);
+    serviceTime.setHours(item.serviceTime.getHours(), item.serviceTime.getMinutes(), 0, 0);
+    const key = `${dateKey(serviceDate)}|${item.vehicleId}|${item.direction}|${serviceTime.getHours()}:${serviceTime.getMinutes()}`;
+    if (existingKeys.has(key)) continue;
+    const sourceSeries = item.seriesId ?? item.id;
+    if (!seriesIds.has(sourceSeries)) seriesIds.set(sourceSeries, randomUUID());
+    records.push({
+      seriesId: seriesIds.get(sourceSeries),
+      submissionKey: randomUUID(),
+      projectId: projectId ?? item.projectId,
+      routeId,
+      vehicleId: item.vehicleId,
+      serviceDate,
+      serviceTime,
+      direction: item.direction,
+      serviceCount: 1,
+      kilometers: item.kilometers,
+      pricePerService: item.pricePerService,
+      clientPricePerService: item.clientPricePerService,
+      monthKey: target.monthKey
+    });
+    existingKeys.add(key);
+  }
+
+  if (records.length) await prisma.serviceAssignment.createMany({ data: records, skipDuplicates: true });
+  revalidatePath("/transitos/projects", "page");
+  redirect(returnTo(formData, `/transitos/projects?project=${projectId ?? ""}&route=${routeId}&month=${target.monthKey}&range=1`));
+}
+
 export async function updateAssignmentGroup(formData: FormData) {
   await requireOperationsEditor();
   const assignmentIds = ids(formData, "assignmentIds");

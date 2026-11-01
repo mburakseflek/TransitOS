@@ -30,6 +30,9 @@ async function main() {
     check(`Genel uç erişilebilir: ${path}`, response.ok, `HTTP ${response.status}`);
   }
 
+  const phpProbe = await request("/wp-login.php");
+  check("PHP saldırı uçları yayınlanmıyor", phpProbe.status === 404, `HTTP ${phpProbe.status}`);
+
   for (const path of ["/transitos/dashboard", "/transitos/projects", "/transitos/maintenance", "/transitos/settings"]) {
     const response = await request(path);
     check(`Oturumsuz sayfa korunuyor: ${path}`, response.status >= 300 && response.status < 400, `HTTP ${response.status}`);
@@ -88,6 +91,11 @@ async function main() {
     const response = await request(path, { headers: { cookie } });
     check(`Yönetici sayfası açılıyor: ${path}`, response.ok, `HTTP ${response.status}`);
   }
+
+  const dashboardPage = await request("/transitos/dashboard", { headers: { cookie } });
+  const dashboardHtml = dashboardPage.ok ? await dashboardPage.text() : "";
+  check("Takvim ana panel içinde hazır", dashboardHtml.includes("Aylık operasyon takvimi"), `HTTP ${dashboardPage.status}`);
+  check("Güvenlik politikası gönderiliyor", Boolean(dashboardPage.headers.get("content-security-policy")), "CSP");
 
   const dashboard = await request("/api/dashboard", { headers: { cookie } });
   const dashboardBody = dashboard.ok ? await dashboard.json() : null;

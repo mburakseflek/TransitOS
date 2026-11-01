@@ -4,12 +4,12 @@ import { AppShell, DeleteButton, Field, FormSection, ModalAction, SubmitButton }
 import {
   FrequencySelector,
   InlineDisclosureMenu,
-  QuickCreateCard,
-  RegistryStatusPills
+  QuickCreateCard
 } from "@/app/components/RegistryInterfaceKit";
 import { MoneyInput } from "@/app/components/MoneyInput";
 import {
   createBulkAssignments,
+  copyPreviousMonthAssignments,
   createOneOffJob,
   createProject,
   createRoute,
@@ -182,18 +182,12 @@ export default async function ProjectsPage({
 }
 
 function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endOfToday, canEdit, showMoney, periodMonth, periodQuery }: { project: any; initialRouteId: string | null; vehicles: any[]; projectCompanies: any[]; endOfToday: Date; canEdit: boolean; showMoney: boolean; periodMonth: string; periodQuery: string }) {
-  const allAssignments = project.routes.flatMap((route: any) => route.assignments);
-  const completedAssignments = allAssignments.filter((item: any) => item.serviceDate <= endOfToday);
-  const totalServices = completedAssignments.reduce((sum: number, item: any) => sum + item.serviceCount, 0);
   const activeVehicles = new Set(project.routes.flatMap((route: any) => route.assignments.map((item: any) => item.vehicle.fleetNumber)));
 
   return (
     <section className="project-detail-panel" id={`project-detail-${project.id}`}>
       <div className="project-detail-intro">
-        <div>
-          <span className="project-detail-eyebrow">Proje içeriği</span>
-          <p>Güzergâhları açarak servisleri görüntüleyin veya yeni plan oluşturun.</p>
-        </div>
+        <h3>{project.projectCompany?.name ?? project.clientCompany}</h3>
         {canEdit ? <ModalAction
             label={<><Settings2 size={17} aria-hidden="true" /> Proje ayarları</>}
             ariaLabel={`${project.name} projesini düzenle`}
@@ -221,33 +215,12 @@ function ProjectCard({ project, initialRouteId, vehicles, projectCompanies, endO
       <div className="grid section">
         <Metric title="Personel" value={project.personnelCount} />
         <Metric title="Güzergah" value={project.routes.length} />
-        <Metric title="Taşınan Servis" value={totalServices} />
-        <Metric title="Planlanan" value={allAssignments.length - completedAssignments.length} />
         <Metric title="Bağlı Araç" value={activeVehicles.size} />
-      </div>
-      <div className="project-context-strip">
-        <RegistryStatusPills
-          items={[
-            { label: "tamamlanan", value: totalServices, tone: "green" },
-            { label: "plan", value: allAssignments.length - completedAssignments.length, tone: "yellow" },
-            { label: "aktif araç", value: activeVehicles.size, tone: "blue" }
-          ]}
-        />
-        <div className="project-owner-row">
-          <span className="project-owner-label">Proje sahipleri</span>
-          <div className="chip-row">
-            {project.projectCompany?.ownerUsers.length ? project.projectCompany.ownerUsers.map((owner: any) => (
-              <span className="badge gray" key={owner.id}>{owner.displayName}</span>
-            )) : <span className="badge yellow">Henüz proje sahibi atanmadı</span>}
-          </div>
-        </div>
       </div>
 
       <div className="record-head section project-routes-heading">
         <div>
-          <span className="project-detail-eyebrow">Operasyon planı</span>
           <h3>Güzergâhlar</h3>
-          <p>Servisleri görmek veya planlamak için bir güzergâh seçin.</p>
         </div>
         {canEdit ? <ModalAction label="Güzergah Ekle" title="Güzergah Ekle">
           <form className="stack" action={createRoute}>
@@ -329,6 +302,14 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
         <ServiceLedger assignments={route.assignments} projectId={project.id} routeId={route.id} returnTo={returnTo} vehicles={vehicles} endOfToday={endOfToday} canEdit={canEdit} showMoney={showMoney} />
 
         {canEdit ? (
+          <div className="route-planning-actions">
+          <form action={copyPreviousMonthAssignments}>
+            <input type="hidden" name="projectId" value={project.id} />
+            <input type="hidden" name="routeId" value={route.id} />
+            <input type="hidden" name="targetMonth" value={periodMonth} />
+            <input type="hidden" name="_returnTo" value={returnTo} />
+            <SubmitButton>Önceki aydan aktar</SubmitButton>
+          </form>
           <ModalAction
             buttonClassName="service-planner-trigger"
             title={`${route.name} · Yeni Servis Planı`}
@@ -355,6 +336,7 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
               </ServiceCalendarForm>
             </section>
           </ModalAction>
+          </div>
         ) : null}
       </div>
     </details>

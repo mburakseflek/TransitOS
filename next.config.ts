@@ -50,6 +50,10 @@ const nextConfig: NextConfig = {
           {
             key: "X-Permitted-Cross-Domain-Policies",
             value: "none"
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-src 'self' https://yandex.com https://yandex.com.tr https://*.yandex.com https://*.yandex.com.tr; upgrade-insecure-requests"
           }
         ]
       },

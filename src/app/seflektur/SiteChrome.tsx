@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import { WhatsAppIcon } from "@/app/components/WhatsAppIcon";
-import { SkiperMotionFrame } from "@/app/components/RegistryInterfaceKit";
 import { CorporateMobileNav } from "@/app/seflektur/CorporateMobileNav";
 import { readSiteContent, SiteCard } from "@/lib/site-content";
 import { MarketTicker } from "@/app/components/MarketTicker";
@@ -57,10 +56,8 @@ export function PageHero({
 }) {
   return (
     <section className="page-hero editorial-hero">
-      <span className="hero-route-line hero-route-line-a" aria-hidden="true" />
-      <span className="hero-route-line hero-route-line-b" aria-hidden="true" />
       <div className="page-hero-copy">
-        <span className="new-eyebrow"><i aria-hidden="true" /> {eyebrow}</span>
+        <span className="new-eyebrow">{eyebrow}</span>
         <h1>{title}</h1>
         <p>{body}</p>
         {children}
@@ -71,10 +68,9 @@ export function PageHero({
         </div>
       </div>
       {imageUrl ? (
-        <SkiperMotionFrame className="page-hero-visual" label="Şeflek Tur">
+        <div className="page-hero-visual">
           <img src={imageUrl} alt={imageAlt ?? title} decoding="async" fetchPriority="high" />
-          <div className="hero-visual-caption"><span>Kurumsal mobilite</span><strong>Planlı. İzlenebilir. Güvenli.</strong></div>
-        </SkiperMotionFrame>
+        </div>
       ) : null}
     </section>
   );

@@ -84,6 +84,7 @@ async function main() {
       subcontractorId: subcontractorA.id,
       fleetNumber: `${prefix}-A1`,
       plateNumber: "34 TEST 001",
+      fleetTrackingEnabled: true,
       capacity: 16,
       driverName: "Sofor A",
       driverPhone: "+90 (555) 111 22 33"
@@ -103,7 +104,8 @@ async function main() {
     data: {
       fleetNumber: `${prefix}-S1`,
       plateNumber: "34 TEST 003",
-      capacity: 16
+      capacity: 16,
+      fleetTrackingEnabled: true
     }
   });
   const maintenanceRecord = await prisma.vehicleMaintenance.create({
@@ -126,10 +128,10 @@ async function main() {
     "Sirket araci bakim gecmisi arac bazli saklanir",
     companyMaintenance?.vehicleId === companyVehicle.id && companyMaintenance.odometerKm === 125000 && Number(companyMaintenance.amount) === 4500
   );
-  const subcontractorMaintenanceVehicles = await prisma.vehicle.count({
-    where: { id: vehicleA.id, subcontractorId: null }
+  const trackedSubcontractorVehicle = await prisma.vehicle.count({
+    where: { id: vehicleA.id, fleetTrackingEnabled: true }
   });
-  ok("Taseron araci bakim paneline dahil edilmez", subcontractorMaintenanceVehicles === 0);
+  ok("Secilen taseron araci filo takibine dahil edilebilir", trackedSubcontractorVehicle === 1);
 
   const manager = await prisma.user.create({
     data: { loginId: `${prefix}-manager`, passwordHash: hash, displayName: "Test Yonetici", role: "MANAGER" }

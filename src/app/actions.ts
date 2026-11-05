@@ -10,6 +10,7 @@ import { prisma } from "@/lib/db";
 import { formatPhoneTR, monthKey, normalizePhoneDigitsTR, parseTurkishMoney } from "@/lib/format";
 import { readSessionToken } from "@/lib/auth";
 import { expenseCategoryTitle, serviceDirectionTitle } from "@/lib/labels";
+import { mapToEquivalentWeekday } from "@/lib/monthly-transfer";
 import {
   assignmentAccessWhere,
   canEditOperations,
@@ -362,7 +363,8 @@ export async function createVehicle(formData: FormData) {
       capacity: numberValue(formData, "capacity"),
       status: recordStatus(formData, "status", RecordStatus.ACTIVE),
       driverName: optional(formData, "driverName"),
-      driverPhone: formatPhoneTR(text(formData, "driverPhone"))
+      driverPhone: formatPhoneTR(text(formData, "driverPhone")),
+      fleetTrackingEnabled: formData.get("fleetTrackingEnabled") === "on"
     }
   });
   redirect(returnTo(formData, "/transitos/vehicles"));
@@ -383,7 +385,8 @@ export async function updateVehicle(formData: FormData) {
       capacity: numberValue(formData, "capacity"),
       status: recordStatus(formData, "status", RecordStatus.ACTIVE),
       driverName: optional(formData, "driverName"),
-      driverPhone: formatPhoneTR(text(formData, "driverPhone"))
+      driverPhone: formatPhoneTR(text(formData, "driverPhone")),
+      fleetTrackingEnabled: formData.get("fleetTrackingEnabled") === "on"
     }
   });
   redirect(returnTo(formData, "/transitos/vehicles"));
@@ -402,7 +405,7 @@ export async function deleteVehicle(formData: FormData) {
 async function companyVehicleId(formData: FormData) {
   const vehicleId = text(formData, "vehicleId");
   const vehicle = await prisma.vehicle.findFirst({
-    where: { id: vehicleId, subcontractorId: null },
+    where: { id: vehicleId, fleetTrackingEnabled: true },
     select: { id: true }
   });
   return vehicle?.id ?? null;
@@ -436,7 +439,7 @@ export async function updateVehicleMaintenance(formData: FormData) {
   if (!vehicleId) redirect("/transitos/maintenance" as never);
 
   const existing = await prisma.vehicleMaintenance.findFirst({
-    where: { id, vehicle: { subcontractorId: null } },
+    where: { id, vehicle: { fleetTrackingEnabled: true } },
     select: { id: true }
   });
   if (!existing) redirect(`/transitos/maintenance?vehicle=${encodeURIComponent(vehicleId)}` as never);
@@ -462,7 +465,7 @@ export async function deleteVehicleMaintenance(formData: FormData) {
   await requireUserManager();
   const id = text(formData, "id");
   const record = await prisma.vehicleMaintenance.findFirst({
-    where: { id, vehicle: { subcontractorId: null } },
+    where: { id, vehicle: { fleetTrackingEnabled: true } },
     select: { id: true, vehicleId: true }
   });
   if (!record) redirect("/transitos/maintenance" as never);
@@ -815,7 +818,6 @@ export async function copyPreviousMonthAssignments(formData: FormData) {
     })
   ]);
 
-  const lastDay = target.endDate.getDate();
   const existingKeys = new Set(existing.map((item) => `${item.routeId}|${dateKey(item.serviceDate)}|${item.vehicleId}|${item.direction}|${item.serviceTime.getHours()}:${item.serviceTime.getMinutes()}`));
   const occupiedVehicleSlots = new Set(existing.map((item) => `${dateKey(item.serviceDate)}|${item.vehicleId}|${item.serviceTime.getHours()}:${item.serviceTime.getMinutes()}`));
   const occupiedRouteSlots = new Set(existing.map((item) => `${dateKey(item.serviceDate)}|${item.routeId}|${item.serviceTime.getHours()}:${item.serviceTime.getMinutes()}`));
@@ -823,9 +825,8 @@ export async function copyPreviousMonthAssignments(formData: FormData) {
   const records: Prisma.ServiceAssignmentCreateManyInput[] = [];
 
   for (const item of source) {
-    const day = item.serviceDate.getDate();
-    if (day > lastDay) continue;
-    const serviceDate = new Date(target.startDate.getFullYear(), target.startDate.getMonth(), day, 12, 0, 0, 0);
+    const serviceDate = mapToEquivalentWeekday(item.serviceDate, target.startDate.getFullYear(), target.startDate.getMonth());
+    if (!serviceDate) continue;
     const serviceTime = new Date(serviceDate);
     serviceTime.setHours(item.serviceTime.getHours(), item.serviceTime.getMinutes(), 0, 0);
     const key = `${routeId}|${dateKey(serviceDate)}|${item.vehicleId}|${item.direction}|${serviceTime.getHours()}:${serviceTime.getMinutes()}`;
@@ -838,7 +839,7 @@ export async function copyPreviousMonthAssignments(formData: FormData) {
     if (!seriesIds.has(sourceSeries)) seriesIds.set(sourceSeries, randomUUID());
     records.push({
       seriesId: seriesIds.get(sourceSeries),
-      submissionKey: randomUUID(),
+      submissionKey: `monthly-transfer:${routeId}:${target.monthKey}:${item.id}`,
       projectId: route.projectId,
       routeId,
       vehicleId: item.vehicleId,

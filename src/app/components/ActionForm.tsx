@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { notifyOperationFinish } from "@/app/components/GlobalOperationOverlay";
 
 export function ActionForm({
@@ -19,6 +20,7 @@ export function ActionForm({
   requiredSelectionMessage?: string;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   async function submit(formData: FormData) {
@@ -30,6 +32,7 @@ export function ActionForm({
     }
     try {
       await action(formData);
+      router.refresh();
       formRef.current?.dispatchEvent(new CustomEvent("transitos:form-success", { bubbles: true }));
     } catch {
       releaseForm();

@@ -5991,6 +5991,494 @@ body {
   }
 }
 
+/* 2026 final interface: restrained corporate hierarchy and mobile stability. */
+:root {
+  --transitos-ink: #0b1f33;
+  --transitos-muted: #5d6d7e;
+  --transitos-line: #dbe3ea;
+  --transitos-surface: #ffffff;
+  --transitos-canvas: #f4f6f8;
+  --transitos-blue: #175f8e;
+  --transitos-red: #c6243b;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.transitos-shell,
+.transitos-shell .content {
+  color: var(--transitos-ink) !important;
+  background: var(--transitos-canvas) !important;
+}
+
+.transitos-shell .content {
+  width: min(100%, 1600px) !important;
+  min-width: 0 !important;
+  padding: 24px 28px 88px !important;
+}
+
+.transitos-shell .topbar {
+  min-height: 76px !important;
+  margin-bottom: 22px !important;
+  padding: 16px 20px !important;
+  border: 1px solid var(--transitos-line) !important;
+  border-radius: 16px !important;
+  background: var(--transitos-surface) !important;
+  box-shadow: 0 6px 20px rgba(11, 31, 51, .055) !important;
+}
+
+.transitos-shell .title {
+  margin: 0 !important;
+  color: var(--transitos-ink) !important;
+  font-size: clamp(1.45rem, 2vw, 2rem) !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.025em !important;
+}
+
+.transitos-shell :is(.card, .section, .project-accordion, .vehicle-accordion, .route-card, .dashboard-calendar, .dashboard-timeline, .maintenance-selection-state, .maintenance-history-section) {
+  border-color: var(--transitos-line) !important;
+  border-radius: 18px !important;
+  background: var(--transitos-surface) !important;
+  box-shadow: 0 8px 24px rgba(11, 31, 51, .05) !important;
+}
+
+.transitos-shell :is(.card, .section)::before,
+.transitos-shell :is(.card, .section)::after {
+  display: none !important;
+}
+
+.transitos-shell :is(h1, h2, h3, h4, strong) {
+  color: var(--transitos-ink);
+}
+
+.transitos-shell .muted {
+  color: var(--transitos-muted) !important;
+}
+
+.transitos-shell :is(button, a, input, select, textarea, summary) {
+  touch-action: manipulation;
+}
+
+.transitos-shell :is(button, .primary, .ghost, .compact-button, input, select) {
+  min-height: 46px;
+}
+
+.transitos-shell :is(input, select, textarea) {
+  max-width: 100%;
+  border-color: #cfd9e2 !important;
+  border-radius: 12px !important;
+  color: var(--transitos-ink) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  font-size: 1rem !important;
+}
+
+.transitos-shell :is(input, select, textarea):focus-visible {
+  border-color: var(--transitos-blue) !important;
+  outline: 3px solid rgba(23, 95, 142, .16) !important;
+  outline-offset: 1px;
+}
+
+.transitos-shell .primary {
+  border: 1px solid #0f4f79 !important;
+  color: #fff !important;
+  background: #145f8e !important;
+  box-shadow: none !important;
+}
+
+.transitos-shell .ghost {
+  border: 1px solid #cfd9e2 !important;
+  color: #173b57 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.transitos-shell .sidebar {
+  background: #fff !important;
+  border-right: 1px solid var(--transitos-line) !important;
+}
+
+.transitos-shell .nav a,
+.transitos-shell .site-return-link,
+.transitos-shell .sidebar-logout-button {
+  min-height: 46px !important;
+  border-radius: 10px !important;
+  color: #40566b !important;
+  transition: color 140ms ease, background-color 140ms ease !important;
+}
+
+.transitos-shell .nav a.active {
+  color: #0d4e78 !important;
+  background: #eaf2f7 !important;
+}
+
+.dashboard-timeline {
+  display: grid;
+  gap: 16px;
+  padding: 22px !important;
+}
+
+.dashboard-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dashboard-section-head h2 {
+  margin: 3px 0 0;
+}
+
+.dashboard-kicker {
+  color: var(--transitos-blue);
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.dashboard-timeline .timeline-list {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding-left: 20px;
+}
+
+.dashboard-timeline .timeline-list::before {
+  content: "";
+  position: absolute;
+  inset: 8px auto 8px 5px;
+  width: 2px;
+  border-radius: 2px;
+  background: #d7e2ea;
+}
+
+.dashboard-timeline .calendar-mini-panel {
+  position: relative;
+  min-width: 0;
+  border: 1px solid #e0e7ed !important;
+  background: #fbfcfd !important;
+}
+
+.dashboard-timeline .calendar-mini-panel::before {
+  content: "";
+  position: absolute;
+  left: -21px;
+  top: 22px;
+  width: 10px;
+  height: 10px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--transitos-blue);
+  box-shadow: 0 0 0 1px #bfcfdc;
+}
+
+.dashboard-empty {
+  margin: 0;
+  padding: 20px;
+  color: var(--transitos-muted);
+  border: 1px dashed #cbd7e0;
+  border-radius: 12px;
+  background: #fafcfd;
+}
+
+.dashboard-columns {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.fleet-tracking-toggle {
+  grid-column: 1 / -1;
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 14px;
+  border: 1px solid #d6e0e8;
+  border-radius: 14px;
+  background: #f7fafc;
+  cursor: pointer;
+}
+
+.fleet-tracking-toggle input {
+  flex: 0 0 auto;
+  width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  accent-color: var(--transitos-blue);
+}
+
+.fleet-tracking-toggle span {
+  display: grid;
+  gap: 3px;
+}
+
+.fleet-tracking-toggle small {
+  color: var(--transitos-muted);
+}
+
+.day-box.night b,
+.legend-dot.night {
+  color: #111827 !important;
+}
+
+.day-box.done b,
+.legend-dot.done {
+  color: #15803d !important;
+}
+
+.day-box.overtime b,
+.legend-dot.overtime {
+  color: #c81e36 !important;
+}
+
+.market-strip {
+  color: #f8fafc !important;
+  border-color: #173b57 !important;
+  background: #0b2238 !important;
+}
+
+.market-strip-item {
+  color: #f8fafc !important;
+  opacity: 1 !important;
+}
+
+.modal-backdrop {
+  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) !important;
+  background: rgba(6, 18, 30, .58) !important;
+  backdrop-filter: blur(5px);
+}
+
+.modal-window {
+  width: min(920px, calc(100vw - 24px)) !important;
+  max-height: calc(100dvh - 24px) !important;
+  border: 1px solid #d6e0e8 !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 24px 70px rgba(5, 21, 35, .22) !important;
+}
+
+.modal-head {
+  min-height: 64px;
+  padding: 14px 18px !important;
+  border-bottom: 1px solid #e1e7ec;
+  background: #fff !important;
+}
+
+.modal-body {
+  min-width: 0;
+  overflow-x: clip;
+  padding: 18px !important;
+}
+
+.calendar-picker,
+.calendar-grid,
+.fixed-calendar-form,
+.service-form,
+.form-section,
+.field-row {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.calendar-grid {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+.calendar-day {
+  min-width: 0 !important;
+  aspect-ratio: 1 / 1;
+  height: auto !important;
+  padding: 4px !important;
+  font-size: clamp(.78rem, 2.6vw, 1rem) !important;
+}
+
+.table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.new-site-page,
+.new-gateway {
+  color: #0b1f33 !important;
+  background: #fff !important;
+}
+
+.new-site-page :is(.new-site-card, .new-company-card, .new-service-card, .new-fleet-card, .new-privilege-card, .site-photo-card),
+.new-gateway :is(.new-entry-panel, .new-entry-card) {
+  border: 1px solid #dfe5ea !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 10px 28px rgba(11, 31, 51, .06) !important;
+}
+
+.new-site-page :is(h1, h2, h3, p, span),
+.new-gateway :is(h1, h2, h3, p, span) {
+  text-shadow: none !important;
+}
+
+@media (max-width: 760px) {
+  .transitos-shell .content {
+    width: 100% !important;
+    padding: 12px 12px max(84px, calc(env(safe-area-inset-bottom) + 72px)) !important;
+  }
+
+  .transitos-mobile-chrome {
+    min-height: 64px !important;
+    padding: max(8px, env(safe-area-inset-top)) 12px 8px !important;
+    border-bottom: 1px solid var(--transitos-line) !important;
+    background: rgba(255, 255, 255, .98) !important;
+    box-shadow: 0 5px 16px rgba(11, 31, 51, .06) !important;
+  }
+
+  .transitos-shell .mobile-drawer-open {
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 0 12px !important;
+    border: 1px solid #d3dde5 !important;
+    border-radius: 12px !important;
+    color: var(--transitos-ink) !important;
+    background: #fff !important;
+  }
+
+  .transitos-shell .mobile-drawer-backdrop,
+  .transitos-shell .mobile-drawer-panel {
+    transition-duration: 160ms !important;
+  }
+
+  .transitos-shell .mobile-drawer-panel {
+    width: min(86vw, 340px) !important;
+    padding-bottom: max(18px, env(safe-area-inset-bottom)) !important;
+    background: #fff !important;
+  }
+
+  .transitos-shell .topbar {
+    min-height: 64px !important;
+    margin-bottom: 14px !important;
+    padding: 14px 16px !important;
+    border-radius: 14px !important;
+  }
+
+  .transitos-shell .topbar-actions {
+    display: none !important;
+  }
+
+  .transitos-shell > .content > .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  .transitos-shell > .content > .grid > .metric {
+    min-height: 96px !important;
+    padding: 14px !important;
+  }
+
+  .dashboard-timeline,
+  .dashboard-calendar {
+    padding: 16px 13px !important;
+  }
+
+  .dashboard-calendar-head,
+  .dashboard-section-head,
+  .record-head {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  .dashboard-calendar-grid {
+    gap: 5px !important;
+  }
+
+  .dashboard-calendar-day {
+    min-width: 0 !important;
+    min-height: 52px !important;
+    padding: 6px 2px !important;
+  }
+
+  .dashboard-calendar-day span {
+    font-size: .62rem !important;
+  }
+
+  .form-section,
+  .field-row,
+  .service-planner,
+  .service-group-edit-form {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .modal-window {
+    width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+    border-radius: 16px !important;
+  }
+
+  .modal-head {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+  }
+
+  .modal-body {
+    padding: 14px !important;
+  }
+
+  .calendar-toolbar,
+  .calendar-toolbar-actions {
+    align-items: stretch !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .calendar-toolbar-actions > * {
+    width: 100% !important;
+  }
+
+  .transfer-row {
+    min-width: 0;
+  }
+
+  .transfer-row-main,
+  .transfer-row-status {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .market-strip-app {
+    min-height: 38px !important;
+    max-height: 38px !important;
+    border-radius: 10px 10px 0 0 !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .transitos-shell > .content > .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .calendar-day {
+    font-size: .75rem !important;
+  }
+
+  .transitos-shell .title {
+    font-size: 1.35rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transitos-shell *,
+  .new-site-page *,
+  .new-gateway * {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
 /* Projects and vehicles: simple selection-first hierarchy. */
 .transitos-shell .project-accordion,
 .transitos-shell .vehicle-accordion {
@@ -23393,4 +23881,126 @@ body .modal-window .service-create-modal-content .fixed-calendar-form > * {
   }
 
   .transfer-preview .field-row select { width: 100%; min-height: 48px; }
+}
+
+/* Final cascade authority — keep cross-platform layout predictable. */
+.transitos-shell .content {
+  min-width: 0 !important;
+  color: #0b1f33 !important;
+  background: #f4f6f8 !important;
+}
+.transitos-shell .topbar {
+  min-height: 76px !important;
+  padding: 16px 20px !important;
+  border: 1px solid #dbe3ea !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 6px 20px rgba(11, 31, 51, .055) !important;
+}
+.transitos-shell :is(.card, .section, .project-accordion, .vehicle-accordion, .route-card, .dashboard-calendar, .dashboard-timeline) {
+  border-color: #dbe3ea !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 24px rgba(11, 31, 51, .05) !important;
+}
+.transitos-shell :is(input, select, textarea) {
+  max-width: 100% !important;
+  color: #0b1f33 !important;
+  background: #fff !important;
+}
+.day-box.night b, .legend-dot.night { color: #111827 !important; }
+.day-box.done b, .legend-dot.done { color: #15803d !important; }
+.day-box.overtime b, .legend-dot.overtime { color: #c81e36 !important; }
+.market-strip, .market-strip-item { color: #fff !important; opacity: 1 !important; }
+.market-strip { background: #0b2238 !important; }
+.modal-window {
+  width: min(920px, calc(100vw - 24px)) !important;
+  max-height: calc(100dvh - 24px) !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+}
+.calendar-grid { grid-template-columns: repeat(7, minmax(0, 1fr)) !important; }
+.calendar-day { min-width: 0 !important; max-width: 100% !important; }
+.fleet-tracking-toggle { grid-column: 1 / -1 !important; }
+
+@media (max-width: 760px) {
+  .transitos-shell .content {
+    width: 100% !important;
+    padding: 12px 12px max(84px, calc(env(safe-area-inset-bottom) + 72px)) !important;
+  }
+  .transitos-shell .topbar {
+    min-height: 62px !important;
+    padding: 14px 16px !important;
+    border-radius: 14px !important;
+  }
+  .transitos-shell .topbar-actions { display: none !important; }
+  .transitos-shell .mobile-drawer-backdrop,
+  .transitos-shell .mobile-drawer-panel { transition-duration: 160ms !important; }
+  .transitos-shell .mobile-drawer-panel {
+    width: min(86vw, 340px) !important;
+    background: #fff !important;
+  }
+  .transitos-shell > .content > .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+  .dashboard-timeline, .dashboard-calendar { padding: 16px 13px !important; }
+  .dashboard-calendar-grid { gap: 5px !important; }
+  .dashboard-calendar-day {
+    min-width: 0 !important;
+    min-height: 52px !important;
+    padding: 5px 2px !important;
+  }
+  .modal-window {
+    width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+  .modal-body { min-width: 0 !important; overflow-x: clip !important; padding: 14px !important; }
+  .form-section, .field-row, .service-planner, .service-group-edit-form {
+    grid-template-columns: minmax(0, 1fr) !important;
+    min-width: 0 !important;
+  }
+  .calendar-picker, .calendar-toolbar, .calendar-grid, .fixed-calendar-form {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  .calendar-day {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1;
+    padding: 3px !important;
+    font-size: .84rem !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .transitos-shell > .content > .grid { grid-template-columns: 1fr !important; }
+}
+
+/* Modal actions stay in document flow so calendars and fields are never hidden. */
+body .modal-window form.stack > .actions,
+body .modal-window .fixed-calendar-form > .actions {
+  position: static !important;
+  inset: auto !important;
+  z-index: auto !important;
+  width: 100% !important;
+  margin-top: 18px !important;
+  padding: 0 !important;
+  transform: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body .mobile-drawer-backdrop,
+body .mobile-drawer-panel {
+  transition-duration: 140ms !important;
+}
+
+body .mobile-drawer-panel {
+  will-change: transform;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }

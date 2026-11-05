@@ -32,7 +32,7 @@ export default async function MaintenancePage({
   const user = sessionCookie ? await readSessionToken(sessionCookie).catch(() => null) : null;
   const canView = isManager(user);
   const vehicles = canView ? await prisma.vehicle.findMany({
-    where: { subcontractorId: null },
+    where: { fleetTrackingEnabled: true },
     include: {
       maintenanceRecords: {
         orderBy: [{ serviceDate: "desc" }, { createdAt: "desc" }]
@@ -84,10 +84,10 @@ export default async function MaintenancePage({
               <div className="maintenance-selection-copy">
                 <CarFront size={30} aria-hidden="true" />
                 <div>
-                  <h2>{vehicles.length ? "Bir şirket aracı seçin" : "Şirket aracı bulunamadı"}</h2>
+                  <h2>{vehicles.length ? "Bir araç seçin" : "Filo takip aracı bulunamadı"}</h2>
                   <p>{vehicles.length
                     ? "Bakım kayıtları yalnızca seçtiğiniz araç için açılır; diğer araçların bilgileri ekranda kalabalık oluşturmaz."
-                    : "Araçlar panelinde “Şirket filosuna ekle” seçeneğiyle bakım takibine başlayabilirsiniz."}</p>
+                    : "Araç kaydında “Filo Takip Sistemine dahil et” seçeneğini açarak bakım takibine başlayabilirsiniz."}</p>
                 </div>
               </div>
               {vehicles.length ? (
@@ -111,7 +111,7 @@ export default async function MaintenancePage({
                 <div className="maintenance-vehicle-identity">
                   <span className="maintenance-fleet-icon large"><CarFront size={25} aria-hidden="true" /></span>
                   <div>
-                    <span className="project-detail-eyebrow">Seçili şirket aracı</span>
+                    <span className="project-detail-eyebrow">Seçili araç</span>
                     <h2>{selectedVehicle.fleetNumber} · {selectedVehicle.plateNumber}</h2>
                     <p>{selectedVehicle.make ?? "Marka belirtilmedi"} {selectedVehicle.model ?? ""} {selectedVehicle.modelYear ? `· ${selectedVehicle.modelYear}` : ""}</p>
                   </div>

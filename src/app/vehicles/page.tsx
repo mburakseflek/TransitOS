@@ -304,8 +304,12 @@ function VehicleFields({ vehicle, subcontractors }: { vehicle?: any; subcontract
       <FormSection title="Araç bilgileri" description="Aracı tanımlayan zorunlu bilgileri girin.">
         <Field label="Araç kodu" hint="Kendi kullandığınız mevcut filo kodu."><input name="fleetNumber" defaultValue={vehicle?.fleetNumber ?? ""} required /></Field>
         <Field label="Plaka" hint="Resmi araç plakası."><input name="plateNumber" defaultValue={vehicle?.plateNumber ?? ""} required /></Field>
-        <Field label="Filo seçimi" hint="Kendi araçlarınız için şirket filosunu seçin."><select name="subcontractorId" defaultValue={vehicle?.subcontractorId ?? ""}><option value="">Şirket filosuna ekle</option>{subcontractors.map((item) => <option key={item.id} value={item.id}>{item.companyName}</option>)}</select></Field>
+        <Field label="Araç sahibi" hint="Şeflek Tur veya kayıtlı taşeron."><select name="subcontractorId" defaultValue={vehicle?.subcontractorId ?? ""}><option value="">Şeflek Tur</option>{subcontractors.map((item) => <option key={item.id} value={item.id}>{item.companyName}</option>)}</select></Field>
         <Field label="Durum" hint="Aktif, pasif veya bakımda."><select name="status" defaultValue={vehicle?.status ?? "ACTIVE"}><option value="ACTIVE">Aktif</option><option value="PASSIVE">Pasif</option><option value="MAINTENANCE">Bakımda</option></select></Field>
+        <label className="fleet-tracking-toggle">
+          <input name="fleetTrackingEnabled" type="checkbox" defaultChecked={vehicle?.fleetTrackingEnabled ?? false} />
+          <span><strong>Filo Takip Sistemine dahil et</strong><small>Bakım ve servis geçmişi bu araç için tutulur.</small></span>
+        </label>
       </FormSection>
       <FormSection title="Teknik bilgiler" description="Model ve kapasite bilgilerini ekleyin." optional>
         <Field label="Marka" hint="Araç markası."><input name="make" defaultValue={vehicle?.make ?? ""} /></Field>

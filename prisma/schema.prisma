@@ -93,25 +93,28 @@ model Subcontractor {
 }
 
 model Vehicle {
-  id                 String                  @id @default(cuid())
-  subcontractorId    String?
-  subcontractor      Subcontractor?          @relation(fields: [subcontractorId], references: [id])
-  fleetNumber        String
-  plateNumber        String
-  make               String?
-  model              String?
-  modelYear          Int?
-  capacity           Int                     @default(0)
-  status             RecordStatus            @default(ACTIVE)
-  driverName         String?
-  driverPhone        String?
-  documents          DriverDocument[]
-  assignments        ServiceAssignment[]
-  expenses           Expense[]
-  maintenanceRecords VehicleMaintenance[]
-  surveyResponses    VehicleSurveyResponse[]
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  id                   String                  @id @default(cuid())
+  subcontractorId      String?
+  subcontractor        Subcontractor?          @relation(fields: [subcontractorId], references: [id])
+  fleetNumber          String
+  plateNumber          String
+  make                 String?
+  model                String?
+  modelYear            Int?
+  capacity             Int                     @default(0)
+  status               RecordStatus            @default(ACTIVE)
+  driverName           String?
+  driverPhone          String?
+  fleetTrackingEnabled Boolean                 @default(false)
+  documents            DriverDocument[]
+  assignments          ServiceAssignment[]
+  expenses             Expense[]
+  maintenanceRecords   VehicleMaintenance[]
+  surveyResponses      VehicleSurveyResponse[]
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+
+  @@index([fleetTrackingEnabled])
 }
 
 model VehicleMaintenance {

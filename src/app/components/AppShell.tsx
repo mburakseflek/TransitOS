@@ -40,7 +40,7 @@ const navItems = [
 export async function AppShell({
   active,
   title,
-  subtitle,
+  subtitle: _subtitle,
   children
 }: {
   active: string;
@@ -132,7 +132,6 @@ export async function AppShell({
         <div className="topbar">
           <div>
             <h1 className="title">{title}</h1>
-            <p className="muted">{subtitle}</p>
           </div>
           <div className="topbar-actions">
             <ExpandableProfileCard

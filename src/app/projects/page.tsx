@@ -34,6 +34,7 @@ import { readSessionToken } from "@/lib/auth";
 import { formatTRY } from "@/lib/format";
 import { parsePeriod, periodDateWhere } from "@/lib/period";
 import { assignmentAccessWhere, canEditOperations, isManager, isProjectOwner, isSubcontractor, projectAccessWhere, routeAccessWhere, vehicleAccessWhere } from "@/lib/permissions";
+import { mapToEquivalentWeekday } from "@/lib/monthly-transfer";
 
 export const dynamic = "force-dynamic";
 
@@ -345,9 +346,7 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
           >
             <section className="service-planner service-create-modal-content section">
               <div>
-                <span className="badge blue">Yeni servis planı</span>
                 <h3>Takvim ve ücretlendirme</h3>
-                <p className="muted">Takvimden günleri seçin. Soluk mavi günler, bu güzergâhta daha önce planlanmış araçları gösterir.</p>
               </div>
               <ServiceCalendarForm className="stack service-form fixed-calendar-form" action={createBulkAssignments} occupiedDays={occupiedDays}>
                 <input type="hidden" name="projectId" value={project.id} />
@@ -367,7 +366,6 @@ function RouteCard({ route, project, defaultOpen, vehicles, endOfToday, canEdit,
 
 function PreviousMonthTransfer({ route, projectId, targetMonth, returnTo, sourceAssignments, currentAssignments }: { route: any; projectId: string; targetMonth: string; returnTo: string; sourceAssignments: any[]; currentAssignments: any[] }) {
   const [targetYear, targetMonthNumber] = targetMonth.split("-").map(Number);
-  const targetLastDay = new Date(targetYear, targetMonthNumber, 0).getDate();
   const sameDayCounts = new Map<number, number>();
   for (const assignment of sourceAssignments) {
     const day = assignment.serviceDate.getDate();
@@ -383,8 +381,8 @@ function PreviousMonthTransfer({ route, projectId, targetMonth, returnTo, source
 
   const rows = sourceAssignments.map((assignment) => {
     const day = assignment.serviceDate.getDate();
-    if (day > targetLastDay) return { assignment, day, targetDate: null, exactDuplicate: false, vehicleConflict: false, routeSlotConflict: false };
-    const targetDate = new Date(targetYear, targetMonthNumber - 1, day, 12, 0, 0, 0);
+    const targetDate = mapToEquivalentWeekday(assignment.serviceDate, targetYear, targetMonthNumber - 1);
+    if (!targetDate) return { assignment, day, targetDate: null, exactDuplicate: false, vehicleConflict: false, routeSlotConflict: false };
     const sameTime = currentByTime.get(`${dateInputValue(targetDate)}|${timeInputValue(assignment.serviceTime)}`) ?? [];
     return {
       assignment,
@@ -421,7 +419,7 @@ function PreviousMonthTransfer({ route, projectId, targetMonth, returnTo, source
           <ShieldCheck size={22} aria-hidden="true" />
           <div>
             <strong>{previousMonthTitle} → {targetMonthTitle}</strong>
-            <p>{selectableCount} kayıt aktarılabilir{blockedCount ? `, ${blockedCount} kayıt güvenlik nedeniyle kapalı` : ""}.</p>
+            <p>Haftanın günü ve ay içindeki sırası korunur. {selectableCount} kayıt aktarılabilir{blockedCount ? `, ${blockedCount} kayıt güvenlik nedeniyle kapalı` : ""}.</p>
           </div>
         </div>
 
@@ -712,7 +710,6 @@ function AssignmentOptions({ vehicles }: { vehicles: { id: string; fleetNumber: 
 function BulkAssignmentFields({ vehicles, defaultMonth, occupiedDays = [] }: { vehicles: { id: string; fleetNumber: string; plateNumber: string }[]; defaultMonth: string; occupiedDays?: { date: string; vehicleName: string }[] }) {
   return (
     <>
-      <p className="muted">Ay tablosunda tıkladığınız günler planlanır; sürükleyerek aralık seçebilirsiniz. Hakediş ve fatura yalnızca tarihi gelen taşınmış servislerden hesaplanır.</p>
       <div className="service-create-layout">
         <div className="service-create-calendar-panel">
           <Field label="Servis günleri" hint="Seçilen her gün için bir servis kaydı oluşturulur.">

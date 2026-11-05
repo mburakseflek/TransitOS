@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { notifyOperationFinish } from "@/app/components/GlobalOperationOverlay";
 
 export function ServiceCalendarForm({
@@ -15,6 +16,7 @@ export function ServiceCalendarForm({
   children: ReactNode;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const submissionKeyRef = useRef<HTMLInputElement>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -28,6 +30,7 @@ export function ServiceCalendarForm({
     try {
       await action(formData);
       formRef.current?.reset();
+      router.refresh();
       formRef.current?.dispatchEvent(new CustomEvent("transitos:form-success", { bubbles: true }));
     } catch {
       releaseForm();

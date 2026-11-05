@@ -1,8 +1,8 @@
-import { AlertTriangle, Bus, CalendarDays, Clock3, FolderKanban, MapPinned, Users } from "lucide-react";
+import { AlertTriangle, Bus, CalendarDays, FolderKanban, MapPinned, Users } from "lucide-react";
 import { FinancialDocumentType } from "@prisma/client";
 import { AppShell, ModalAction } from "@/app/components/AppShell";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
-import { CalendarMiniPanel, OnboardingScreen, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
+import { CalendarMiniPanel, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { YandexTrafficMap } from "@/app/components/YandexTrafficMap";
 import { prisma } from "@/lib/db";
 import { formatTRY } from "@/lib/format";
@@ -46,7 +46,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   const assignmentScope = assignmentAccessWhere(user);
   const projectScope = projectAccessWhere(user);
 
-  const [subcontractors, vehicles, activeProjects, todayAssignments, completedAssignments, trafficSnapshot, pendingPreviousEarnings, monthAssignments] = await Promise.all([
+  const [subcontractors, vehicles, activeProjects, todayAssignments, trafficSnapshot, pendingPreviousEarnings, monthAssignments] = await Promise.all([
     projectOwnerView || subcontractorView ? Promise.resolve(0) : prisma.subcontractor.count(),
     prisma.vehicle.count({ where: vehicleScope }),
     prisma.project.count({ where: { status: "ACTIVE", ...projectScope } }),
@@ -54,12 +54,6 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
       where: { serviceDate: { gte: today, lt: tomorrow }, ...assignmentScope },
       include: { route: true, vehicle: true, project: true },
       orderBy: { serviceTime: "asc" }
-    }),
-    prisma.serviceAssignment.findMany({
-      where: { serviceDate: { lt: tomorrow }, ...assignmentScope },
-      include: { route: true, vehicle: true, project: true },
-      orderBy: { serviceDate: "desc" },
-      take: 12
     }),
     getFastTrafficSnapshot(),
     isManager(user) ? prisma.subcontractor.findMany({
@@ -127,6 +121,26 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         </section>
       ) : null}
 
+      <section className="dashboard-timeline section" aria-labelledby="daily-timeline-title">
+        <div className="dashboard-section-head">
+          <div>
+            <span className="dashboard-kicker">Bugün</span>
+            <h2 id="daily-timeline-title">Operasyon akışı</h2>
+          </div>
+          <span className="badge blue">{todayAssignments.length} servis</span>
+        </div>
+        <div className="timeline-list">
+          {todayAssignments.map((service) => (
+            <CalendarMiniPanel
+              key={service.id}
+              title={`${service.serviceTime.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })} · ${service.route.name}`}
+              body={`${service.project?.name ?? "Tek seferlik iş"} · ${service.vehicle.fleetNumber} · ${serviceDirectionTitle(service.direction)}`}
+            />
+          ))}
+          {todayAssignments.length === 0 ? <p className="dashboard-empty">Bugün için planlanmış servis bulunmuyor.</p> : null}
+        </div>
+      </section>
+
       <section className="dashboard-calendar section" aria-labelledby="dashboard-calendar-title">
         <div className="dashboard-calendar-head">
           <div>
@@ -163,81 +177,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         {canEdit ? <a className="dashboard-project-link" href={`/transitos/projects?month=${period.month}&range=1`}>Servis planlamaya git</a> : null}
       </section>
 
-      <OnboardingScreen
-        eyebrow="Günlük Operasyon"
-        title="Bugünün akışı net, kısa ve rol bazlı görünür."
-        body="Panel artık liste kalabalığı yerine yaklaşan servis, trafik ve aktif operasyon durumunu öne çıkarır."
-        compact
-        steps={[
-          { title: "Servis timeline", body: "Bugünün servisleri saat sırasına göre görüntülenir." },
-          { title: "Canlı trafik", body: "İstanbul trafik haritası ve yoğunluk bölgeleri ayrı modülde yer alır." },
-          { title: "Rol bazlı özet", body: "Taşeron ve proje sahibi sadece kendi kapsamındaki kayıtları görür." }
-        ]}
-      />
-
-      {subcontractorView ? (
-        <section className="card section">
-          <h2 style={{ marginTop: 0 }}>Gidilmiş İşlerim</h2>
-          <table className="table">
-            <thead><tr><th>Tarih</th><th>Saat</th><th>Proje</th><th>Güzergah</th><th>Araç</th><th>Tür</th></tr></thead>
-            <tbody>
-              {completedAssignments.map((service) => (
-                <tr key={service.id}>
-                  <td>{service.serviceDate.toLocaleDateString("tr-TR")}</td>
-                  <td>{service.serviceTime.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}</td>
-                  <td>{service.project?.name ?? "Tek seferlik iş"}</td>
-                  <td>{service.route.name}</td>
-                  <td>{service.vehicle.fleetNumber}</td>
-                  <td><span className={directionBadgeClass(service.direction)}>{serviceDirectionTitle(service.direction)}</span></td>
-                </tr>
-              ))}
-              {completedAssignments.length === 0 ? <tr><td colSpan={6}>Henüz gidilmiş iş yok.</td></tr> : null}
-            </tbody>
-          </table>
-        </section>
-      ) : projectOwnerView ? (
-        <section className="card section">
-          <div className="record-head">
-            <div>
-              <h2 style={{ marginTop: 0 }}>Proje Sahibi Özeti</h2>
-              <p className="muted">Kendi projeleriniz, güzergahlarınız, tahsis edilen araç/şoförler ve fatura detayları görüntülenir.</p>
-            </div>
-            <span className="badge blue">Müşteri görünümü</span>
-          </div>
-        </section>
-      ) : (
-        <section className="card section">
-          <div className="record-head">
-            <div>
-              <h2 style={{ marginTop: 0 }}>Yönetici Özeti</h2>
-              <p className="muted">Detaylı plan, rota, gider ve hakediş verileri kendi panellerinde görüntülenir.</p>
-            </div>
-            <span className="badge green">Aktif</span>
-          </div>
-        </section>
-      )}
-
       <section className="dashboard-columns section">
-        <article className="card">
-          <div className="record-head">
-            <div>
-              <h2 style={{ marginTop: 0 }}>Bugünkü Servis Timeline</h2>
-              <p className="muted">Günün sıradaki servisleri ve araç bağlantıları.</p>
-            </div>
-            <Clock3 color="var(--cyan)" />
-          </div>
-          <div className="timeline-list section">
-            {todayAssignments.map((service) => (
-              <CalendarMiniPanel
-                key={service.id}
-                title={`${service.serviceTime.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })} · ${service.route.name}`}
-                body={`${service.project?.name ?? "Tek seferlik iş"} · ${service.vehicle.fleetNumber} · ${serviceDirectionTitle(service.direction)}`}
-              />
-            ))}
-            {todayAssignments.length === 0 ? <p className="muted">Bugün için planlanmış servis görünmüyor.</p> : null}
-          </div>
-        </article>
-
         <article className="card">
           <div className="record-head">
             <div>
@@ -291,25 +231,9 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         </article>
       </section>
 
-      <section className="card section">
-        <div className="record-head">
-          <div>
-            <h2 style={{ marginTop: 0 }}>Operasyon Notları</h2>
-            <p className="muted">Web sürümünde yapay zeka paneli kapalıdır; kritik takipler net operasyon kartlarıyla gösterilir.</p>
-          </div>
-          <span className="badge green">Aktif takip</span>
-        </div>
-        <div className="grid section">
-          <article className="card metric"><span className="muted">Bugünkü yoğunluk</span><strong>{todayAssignments.length}</strong><small className="muted">Servis timeline’da görüntülenir.</small></article>
-          <article className="card metric"><span className="muted">Rota kontrolü</span><strong>Google</strong><small className="muted">Duraklı rota linkleri rota panelinde.</small></article>
-          <article className="card metric"><span className="muted">Hakediş</span><strong>Aylık</strong><small className="muted">Yalnız tamamlanan günler hesaplanır.</small></article>
-          <article className="card metric"><span className="muted">Gece servisi</span><strong>Aktif</strong><small className="muted">Sabah, akşam, gece ve mesai ayrı izlenir.</small></article>
-        </div>
-      </section>
     </AppShell>
   );
 }
-
 function localDateKey(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
@@ -322,11 +246,4 @@ function Metric({ title, value, icon }: { title: string; value: string | number;
       <strong>{value}</strong>
     </article>
   );
-}
-
-function directionBadgeClass(value: string) {
-  if (value === "OVERTIME") return "badge red";
-  if (value === "ONE_OFF") return "badge gray";
-  if (value === "NIGHT") return "badge blue";
-  return "badge green";
 }

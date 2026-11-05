@@ -240,7 +240,7 @@ export function PrintReportButton({
             }
             .day-box.done b { color: #16a34a; }
             .day-box.overtime b { color: #dc2626; }
-            .day-box.night b { color: #7c3aed; }
+            .day-box.night b { color: #111827; }
             .day-box.oneoff b { color: #94a3b8; }
             .day-box.disabled { opacity: .28; }
             .expense-card-list {
@@ -271,7 +271,7 @@ export function PrintReportButton({
             }
             .legend-dot.done { color: #16a34a; }
             .legend-dot.overtime { color: #dc2626; }
-            .legend-dot.night { color: #7c3aed; }
+            .legend-dot.night { color: #111827; }
             .legend-dot.oneoff { color: #64748b; }
             .one-off-line-list {
               display: grid;

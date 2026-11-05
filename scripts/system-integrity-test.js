@@ -29,7 +29,7 @@ async function main() {
       }
     }),
     prisma.vehicleMaintenance.findMany({
-      where: { vehicle: { subcontractorId: { not: null } } },
+      where: { vehicle: { fleetTrackingEnabled: false } },
       select: { id: true }
     }),
     prisma.user.findMany({
@@ -49,7 +49,7 @@ async function main() {
   const wrongMonths = assignments.filter((item) => item.monthKey !== localMonthKey(item.serviceDate));
   check("Servislerin ay anahtarları tarihleriyle uyumlu", wrongMonths.length === 0, `${wrongMonths.length} sorun`);
 
-  check("Taşeron araçlarında şirket bakım kaydı yok", maintenanceRecords.length === 0, `${maintenanceRecords.length} sorun`);
+  check("Bakım kayıtları yalnız filo takibindeki araçlara bağlı", maintenanceRecords.length === 0, `${maintenanceRecords.length} sorun`);
 
   const incompleteProjects = projects.filter((project) => !project.name.trim() || !project.projectCompanyId);
   check("Projelerin adı ve proje şirketi tanımlı", incompleteProjects.length === 0, `${incompleteProjects.length} sorun`);

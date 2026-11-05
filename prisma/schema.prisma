@@ -141,8 +141,12 @@ model VehicleMaintenance {
   vehicleId       String
   vehicle         Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   serviceProvider String
+  maintenanceType String   @default("Periyodik Bakım")
   serviceDate     DateTime
   odometerKm      Int
+  nextServiceDate DateTime?
+  nextServiceOdometer Int?
+  invoiceNumber   String?
   workPerformed   String
   replacedParts   String?
   amount          Decimal  @default(0)
@@ -152,6 +156,7 @@ model VehicleMaintenance {
 
   @@index([vehicleId, serviceDate])
   @@index([serviceDate])
+  @@index([nextServiceDate])
 }
 
 model DriverDocument {

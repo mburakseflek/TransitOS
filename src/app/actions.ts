@@ -69,6 +69,11 @@ function dateValue(formData: FormData, key: string) {
   return value ? new Date(`${value}T12:00:00`) : new Date();
 }
 
+function optionalDateValue(formData: FormData, key: string) {
+  const value = text(formData, key);
+  return value ? new Date(`${value}T12:00:00`) : null;
+}
+
 function dateKey(date: Date) {
   return [
     date.getFullYear(),
@@ -424,8 +429,12 @@ export async function createVehicleMaintenance(formData: FormData) {
     data: {
       vehicleId,
       serviceProvider: text(formData, "serviceProvider"),
+      maintenanceType: text(formData, "maintenanceType") || "Periyodik Bakım",
       serviceDate: dateValue(formData, "serviceDate"),
       odometerKm: Math.max(0, Math.round(numberValue(formData, "odometerKm"))),
+      nextServiceDate: optionalDateValue(formData, "nextServiceDate"),
+      nextServiceOdometer: numberValue(formData, "nextServiceOdometer") || null,
+      invoiceNumber: optional(formData, "invoiceNumber"),
       workPerformed: text(formData, "workPerformed"),
       replacedParts: optional(formData, "replacedParts"),
       amount: moneyValue(formData, "amount"),
@@ -455,8 +464,12 @@ export async function updateVehicleMaintenance(formData: FormData) {
     data: {
       vehicleId,
       serviceProvider: text(formData, "serviceProvider"),
+      maintenanceType: text(formData, "maintenanceType") || "Periyodik Bakım",
       serviceDate: dateValue(formData, "serviceDate"),
       odometerKm: Math.max(0, Math.round(numberValue(formData, "odometerKm"))),
+      nextServiceDate: optionalDateValue(formData, "nextServiceDate"),
+      nextServiceOdometer: numberValue(formData, "nextServiceOdometer") || null,
+      invoiceNumber: optional(formData, "invoiceNumber"),
       workPerformed: text(formData, "workPerformed"),
       replacedParts: optional(formData, "replacedParts"),
       amount: moneyValue(formData, "amount"),

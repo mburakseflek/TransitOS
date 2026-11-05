@@ -362,6 +362,31 @@ export function PrintReportButton({
               font-weight: 750;
               text-align: center;
             }
+            .request-card,.maintenance-history-card,.maintenance-report {
+              display: block;
+              width: 100%;
+              padding: 18px;
+              border: 1px solid #d7dee3;
+              border-radius: 12px;
+              background: #fff;
+              break-inside: avoid;
+            }
+            .request-card::before,.maintenance-history-card::before,.maintenance-report::before {
+              content: "ŞEFLEK TUR · KURUMSAL RAPOR";
+              display: block;
+              margin-bottom: 18px;
+              padding-bottom: 10px;
+              border-bottom: 3px solid #0b2946;
+              color: #0b2946;
+              font-size: 13px;
+              font-weight: 900;
+              letter-spacing: .12em;
+            }
+            .request-card-head { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
+            .request-card-head strong,.request-card-head span { display: block; }.request-card-head span { color: #64748b; font-size: 10px; }
+            .request-card dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+            .request-card dl div { padding: 10px; border: 1px solid #e5eaf0; border-radius: 8px; }.request-card dl .wide { grid-column: 1 / -1; }.request-card dt { color: #64748b; font-size: 8px; font-weight: 900; text-transform: uppercase; }.request-card dd { margin: 4px 0 0; font-size: 11px; font-weight: 750; }
+            .maintenance-history-card > div { margin-bottom: 12px; }.maintenance-history-card h3 { margin: 7px 0; }.maintenance-history-card svg,.request-card svg { display: none; }.badge { display: inline-block; margin-right: 5px; padding: 4px 7px; border: 1px solid #d8e0e6; border-radius: 999px; font-size: 8px; font-weight: 800; }
             .no-print { display: none !important; }
           </style>
         </head>

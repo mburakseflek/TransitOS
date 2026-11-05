@@ -3,6 +3,7 @@ import {
   CalendarDays,
   CarFront,
   ChevronRight,
+  ClockAlert,
   Gauge,
   MapPin,
   PackageCheck,
@@ -45,6 +46,11 @@ export default async function MaintenancePage({
   const records = selectedVehicle?.maintenanceRecords ?? [];
   const totalExpense = records.reduce((sum, record) => sum + Number(record.amount), 0);
   const latestOdometer = records.reduce((highest, record) => Math.max(highest, record.odometerKm), 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const warningLimit = new Date(today);
+  warningLimit.setDate(warningLimit.getDate() + 30);
+  const dueRecords = records.filter((record) => record.nextServiceDate && record.nextServiceDate <= warningLimit);
 
   return (
     <AppShell
@@ -130,6 +136,7 @@ export default async function MaintenancePage({
                 <article><Gauge size={20} aria-hidden="true" /><span>Son kilometre</span><strong>{latestOdometer.toLocaleString("tr-TR")} km</strong></article>
                 <article><ReceiptText size={20} aria-hidden="true" /><span>Toplam bakım gideri</span><strong>{formatTRY(totalExpense)}</strong></article>
                 <article><CalendarDays size={20} aria-hidden="true" /><span>Son bakım</span><strong>{records[0] ? formatDate(records[0].serviceDate) : "Kayıt yok"}</strong></article>
+                <article className={dueRecords.length ? "maintenance-warning-metric" : ""}><ClockAlert size={20} aria-hidden="true" /><span>Yaklaşan / geciken</span><strong>{dueRecords.length}</strong></article>
               </section>
 
               <section className="maintenance-history-section">
@@ -139,11 +146,12 @@ export default async function MaintenancePage({
                     <h2>Tüm bakım kayıtları</h2>
                     <p>En yeni servis kaydı ilk sırada gösterilir.</p>
                   </div>
-                  <span className="badge blue">{records.length} kayıt</span>
+                  <div className="maintenance-heading-actions"><PrintReportButton targetId="vehicle-maintenance-history" label="Bakım geçmişini yazdır" /><span className="badge blue">{records.length} kayıt</span></div>
                 </div>
 
                 {records.length ? (
-                  <div className="maintenance-history-list">
+                  <div className="maintenance-history-list" id="vehicle-maintenance-history">
+                    <div className="maintenance-print-summary"><h2>{selectedVehicle.fleetNumber} · {selectedVehicle.plateNumber}</h2><p>Toplam {records.length} kayıt · {formatTRY(totalExpense)} bakım gideri · Son kilometre {latestOdometer.toLocaleString("tr-TR")} km</p></div>
                     {records.map((record) => (
                       <article className="maintenance-history-card" key={record.id}>
                         <div className="maintenance-date-block">
@@ -153,8 +161,10 @@ export default async function MaintenancePage({
                         </div>
                         <div className="maintenance-card-copy">
                           <span className="maintenance-provider"><MapPin size={16} aria-hidden="true" /> {record.serviceProvider}</span>
+                          <div className="chip-row"><span className="badge blue">{record.maintenanceType}</span>{maintenanceStatus(record.nextServiceDate, today)}</div>
                           <h3>{record.workPerformed}</h3>
                           <p><PackageCheck size={16} aria-hidden="true" /> {record.replacedParts || "Parça değişimi belirtilmedi"}</p>
+                          {record.nextServiceDate || record.nextServiceOdometer ? <p className="maintenance-next-service"><ClockAlert size={16} /> Sonraki bakım: {record.nextServiceDate ? formatDate(record.nextServiceDate) : "Tarih belirtilmedi"}{record.nextServiceOdometer ? ` · ${record.nextServiceOdometer.toLocaleString("tr-TR")} km` : ""}</p> : null}
                         </div>
                         <div className="maintenance-card-action">
                           <strong>{formatTRY(Number(record.amount))}</strong>
@@ -202,16 +212,20 @@ function MaintenanceFields({ record }: { record?: any }) {
   return (
     <>
       <FormSection title="Servis bilgileri" description="Bakımın nerede ve ne zaman yapıldığını kaydedin.">
+        <Field label="Bakım türü" hint="Kaydı raporlarda sınıflandırır."><select name="maintenanceType" defaultValue={record?.maintenanceType ?? "Periyodik Bakım"}><option>Periyodik Bakım</option><option>Arıza / Onarım</option><option>Lastik</option><option>Muayene Hazırlığı</option><option>Kaporta / Boya</option><option>Elektrik / Elektronik</option><option>Diğer</option></select></Field>
         <Field label="Servis / tamirhane" hint="İşlemi yapan firma veya usta."><input name="serviceProvider" defaultValue={record?.serviceProvider ?? ""} required /></Field>
         <Field label="Bakım tarihi" hint="Aracın servise girdiği tarih."><input name="serviceDate" type="date" defaultValue={dateInputValue(record?.serviceDate)} required /></Field>
         <Field label="Araç kilometresi" hint="Bakım anındaki kilometre."><input name="odometerKm" type="number" inputMode="numeric" min="0" step="1" defaultValue={record?.odometerKm ?? ""} required /></Field>
         <Field label="Toplam masraf" hint="Nokta otomatik eklenir; kuruş için virgül kullanılır."><MoneyInput name="amount" label="₺ Bakım masrafı" defaultValue={record ? Number(record.amount) : 0} required /></Field>
+        <Field label="Fatura / fiş no" hint="Masraf belgesi referansı."><input name="invoiceNumber" defaultValue={record?.invoiceNumber ?? ""} /></Field>
       </FormSection>
       <FormSection title="Yapılan işlemler" description="Bakım kapsamını ve değişen parçaları ayrıntılı yazın.">
         <Field label="Yapılan bakımlar" hint="Yağ değişimi, fren kontrolü, motor işlemleri gibi."><textarea name="workPerformed" rows={4} defaultValue={record?.workPerformed ?? ""} required /></Field>
         <Field label="Değişen parçalar" hint="Parça adı, marka veya adet bilgileri."><textarea name="replacedParts" rows={3} defaultValue={record?.replacedParts ?? ""} /></Field>
       </FormSection>
       <FormSection title="Ek notlar" description="Garanti, sonraki kontrol veya fatura bilgileri." optional>
+        <Field label="Sonraki bakım tarihi" hint="Yaklaşan bakım uyarısı oluşturur."><input name="nextServiceDate" type="date" defaultValue={dateInputValue(record?.nextServiceDate)} /></Field>
+        <Field label="Sonraki bakım kilometresi" hint="Kilometre bazlı bakım hedefi."><input name="nextServiceOdometer" type="number" inputMode="numeric" min="0" step="1" defaultValue={record?.nextServiceOdometer ?? ""} /></Field>
         <Field label="Not" hint="İsteğe bağlı açıklama."><textarea name="notes" rows={3} defaultValue={record?.notes ?? ""} /></Field>
       </FormSection>
     </>
@@ -230,10 +244,13 @@ function MaintenanceReport({ vehicle, record }: { vehicle: any; record: any }) {
         <Wrench size={30} aria-hidden="true" />
       </header>
       <div className="maintenance-report-grid">
+        <ReportItem label="Bakım türü" value={record.maintenanceType} />
         <ReportItem label="Bakım tarihi" value={formatDate(record.serviceDate)} />
         <ReportItem label="Kilometre" value={`${record.odometerKm.toLocaleString("tr-TR")} km`} />
         <ReportItem label="Servis / tamirhane" value={record.serviceProvider} />
         <ReportItem label="Toplam masraf" value={formatTRY(Number(record.amount))} />
+        <ReportItem label="Fatura / fiş no" value={record.invoiceNumber || "-"} />
+        <ReportItem label="Sonraki bakım" value={[record.nextServiceDate ? formatDate(record.nextServiceDate) : "", record.nextServiceOdometer ? `${record.nextServiceOdometer.toLocaleString("tr-TR")} km` : ""].filter(Boolean).join(" · ") || "Planlanmadı"} />
       </div>
       <ReportSection title="Yapılan bakımlar" value={record.workPerformed} />
       <ReportSection title="Değişen parçalar" value={record.replacedParts || "Parça değişimi belirtilmedi."} />
@@ -257,4 +274,12 @@ function dateInputValue(date?: Date) {
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric" });
+}
+
+function maintenanceStatus(nextDate: Date | null, today: Date) {
+  if (!nextDate) return null;
+  const days = Math.ceil((nextDate.getTime() - today.getTime()) / 86_400_000);
+  if (days < 0) return <span className="badge red">{Math.abs(days)} gün gecikti</span>;
+  if (days <= 30) return <span className="badge yellow">{days === 0 ? "Bugün" : `${days} gün kaldı`}</span>;
+  return <span className="badge green">Planlı</span>;
 }

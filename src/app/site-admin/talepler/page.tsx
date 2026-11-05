@@ -3,6 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { ArrowLeft, Building2, CarFront, FileText, Mail, Phone } from "lucide-react";
+import { CorporatePagePrintButton } from "@/app/components/CorporatePagePrintButton";
+import { PrintReportButton } from "@/app/components/PrintReportButton";
 import { canManageSite, readSessionToken } from "@/lib/auth";
 import { readJsonRecords } from "@/lib/site-content";
 
@@ -22,6 +24,7 @@ export default async function SiteRequestsPage() {
 
   return (
     <main className="admin-requests-page">
+      <div className="corporate-print-masthead" aria-hidden="true"><img src="/brand/seflek-logo-navy.png" alt="" /><div><strong>ŞEFLEK TUR</strong><span>Kurumsal Başvuru Raporu</span></div></div>
       <header className="admin-requests-topbar">
         <Link className="navy-brand" href="/site-admin">
           <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
@@ -29,6 +32,7 @@ export default async function SiteRequestsPage() {
         <div>
           <Link className="ghost" href="/site-admin"><ArrowLeft size={16} /> Site düzenlemeye dön</Link>
           <Link className="new-primary" href="/seflektur">Siteyi görüntüle</Link>
+          <CorporatePagePrintButton />
         </div>
       </header>
 
@@ -69,8 +73,9 @@ function RequestColumn({
         <span>{records.length} kayıt</span>
       </div>
       <div className="request-card-list">
-        {records.map((record, index) => (
-          <article className="request-card hover-card" key={`${record.createdAt}-${index}`}>
+        {records.map((record, index) => {
+          const reportId = `application-report-${type}-${index}`;
+          return <article className="request-card hover-card" id={reportId} key={`${record.createdAt}-${index}`}>
             <div className="request-card-head">
               <Building2 size={20} />
               <div>
@@ -99,11 +104,12 @@ function RequestColumn({
               <div className="wide"><dt>Not</dt><dd>{record.note || "-"}</dd></div>
             </dl>
             <div className="request-actions">
+              <PrintReportButton targetId={reportId} label="A4 PDF / Yazdır" />
               {record.phone ? <a className="new-secondary" href={`tel:${record.phone}`}><Phone size={15} /> Ara</a> : null}
               {record.email ? <a className="new-secondary" href={`mailto:${record.email}`}><Mail size={15} /> Mail</a> : null}
             </div>
-          </article>
-        ))}
+          </article>;
+        })}
         {records.length === 0 ? <p className="request-empty">Henüz kayıt yok.</p> : null}
       </div>
     </section>

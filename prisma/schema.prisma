@@ -68,8 +68,27 @@ model User {
   ownerProjects      Project[]           @relation("ProjectOwnerProjects")
   ownerCompanies     ProjectCompany[]    @relation("ProjectCompanyOwners")
   financialDocuments FinancialDocument[] @relation("FinancialDocumentCreator")
+  auditLogs          AuditLog[]          @relation("AuditLogActor")
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  actor       User?    @relation("AuditLogActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorName   String
+  actorRole   String
+  action      String
+  entityType  String
+  entityId    String?
+  summary     String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([entityType, entityId])
 }
 
 model Subcontractor {

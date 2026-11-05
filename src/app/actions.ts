@@ -11,6 +11,7 @@ import { formatPhoneTR, monthKey, normalizePhoneDigitsTR, parseTurkishMoney } fr
 import { readSessionToken } from "@/lib/auth";
 import { expenseCategoryTitle, serviceDirectionTitle } from "@/lib/labels";
 import { mapToEquivalentWeekday } from "@/lib/monthly-transfer";
+import { recordAudit } from "@/lib/audit";
 import {
   assignmentAccessWhere,
   canEditOperations,
@@ -351,8 +352,8 @@ export async function deleteSubcontractor(formData: FormData) {
 }
 
 export async function createVehicle(formData: FormData) {
-  await requireOperationsEditor();
-  await prisma.vehicle.create({
+  const user = await requireOperationsEditor();
+  const vehicle = await prisma.vehicle.create({
     data: {
       subcontractorId: optional(formData, "subcontractorId"),
       fleetNumber: text(formData, "fleetNumber"),
@@ -367,11 +368,12 @@ export async function createVehicle(formData: FormData) {
       fleetTrackingEnabled: formData.get("fleetTrackingEnabled") === "on"
     }
   });
+  await recordAudit(user, { action: "CREATE", entityType: "VEHICLE", entityId: vehicle.id, summary: `${vehicle.plateNumber} plakalı araç eklendi` });
   redirect(returnTo(formData, "/transitos/vehicles"));
 }
 
 export async function updateVehicle(formData: FormData) {
-  await requireOperationsEditor();
+  const user = await requireOperationsEditor();
   const id = text(formData, "id");
   await prisma.vehicle.update({
     where: { id },
@@ -389,16 +391,18 @@ export async function updateVehicle(formData: FormData) {
       fleetTrackingEnabled: formData.get("fleetTrackingEnabled") === "on"
     }
   });
+  await recordAudit(user, { action: "UPDATE", entityType: "VEHICLE", entityId: id, summary: `${text(formData, "plateNumber")} plakalı araç güncellendi` });
   redirect(returnTo(formData, "/transitos/vehicles"));
 }
 
 export async function deleteVehicle(formData: FormData) {
-  await requireOperationsEditor();
+  const user = await requireOperationsEditor();
   const id = text(formData, "id");
   await prisma.serviceAssignment.deleteMany({ where: { vehicleId: id } });
   await prisma.expense.deleteMany({ where: { vehicleId: id } });
   await prisma.driverDocument.deleteMany({ where: { vehicleId: id } });
   await prisma.vehicle.delete({ where: { id } });
+  await recordAudit(user, { action: "DELETE", entityType: "VEHICLE", entityId: id, summary: "Araç kaydı silindi" });
   redirect(returnTo(formData, "/transitos/vehicles"));
 }
 
@@ -412,11 +416,11 @@ async function companyVehicleId(formData: FormData) {
 }
 
 export async function createVehicleMaintenance(formData: FormData) {
-  await requireUserManager();
+  const user = await requireUserManager();
   const vehicleId = await companyVehicleId(formData);
   if (!vehicleId) redirect("/transitos/maintenance" as never);
 
-  await prisma.vehicleMaintenance.create({
+  const maintenance = await prisma.vehicleMaintenance.create({
     data: {
       vehicleId,
       serviceProvider: text(formData, "serviceProvider"),
@@ -428,12 +432,13 @@ export async function createVehicleMaintenance(formData: FormData) {
       notes: optional(formData, "notes")
     }
   });
+  await recordAudit(user, { action: "CREATE", entityType: "MAINTENANCE", entityId: maintenance.id, summary: "Yeni araç bakım kaydı eklendi", metadata: { vehicleId, amount: Number(maintenance.amount) } });
   revalidatePath("/transitos/maintenance", "page");
   redirect(`/transitos/maintenance?vehicle=${encodeURIComponent(vehicleId)}` as never);
 }
 
 export async function updateVehicleMaintenance(formData: FormData) {
-  await requireUserManager();
+  const user = await requireUserManager();
   const id = text(formData, "id");
   const vehicleId = await companyVehicleId(formData);
   if (!vehicleId) redirect("/transitos/maintenance" as never);
@@ -442,6 +447,7 @@ export async function updateVehicleMaintenance(formData: FormData) {
     where: { id, vehicle: { fleetTrackingEnabled: true } },
     select: { id: true }
   });
+  await recordAudit(user, { action: "UPDATE", entityType: "MAINTENANCE", entityId: id, summary: "Araç bakım kaydı güncellendi" });
   if (!existing) redirect(`/transitos/maintenance?vehicle=${encodeURIComponent(vehicleId)}` as never);
 
   await prisma.vehicleMaintenance.update({
@@ -462,7 +468,7 @@ export async function updateVehicleMaintenance(formData: FormData) {
 }
 
 export async function deleteVehicleMaintenance(formData: FormData) {
-  await requireUserManager();
+  const user = await requireUserManager();
   const id = text(formData, "id");
   const record = await prisma.vehicleMaintenance.findFirst({
     where: { id, vehicle: { fleetTrackingEnabled: true } },
@@ -471,15 +477,16 @@ export async function deleteVehicleMaintenance(formData: FormData) {
   if (!record) redirect("/transitos/maintenance" as never);
 
   await prisma.vehicleMaintenance.delete({ where: { id: record.id } });
+  await recordAudit(user, { action: "DELETE", entityType: "MAINTENANCE", entityId: record.id, summary: "Araç bakım kaydı silindi" });
   revalidatePath("/transitos/maintenance", "page");
   redirect(`/transitos/maintenance?vehicle=${encodeURIComponent(record.vehicleId)}` as never);
 }
 
 export async function createProject(formData: FormData) {
-  await requireUserManager();
+  const user = await requireUserManager();
   const company = await prisma.projectCompany.findUnique({ where: { id: text(formData, "projectCompanyId") } });
   if (!company) redirect(returnTo(formData, "/transitos/projects"));
-  await prisma.project.create({
+  const project = await prisma.project.create({
     data: {
       name: text(formData, "name"),
       clientCompany: company.name,
@@ -488,6 +495,7 @@ export async function createProject(formData: FormData) {
       status: recordStatus(formData, "status", RecordStatus.PLANNING)
     }
   });
+  await recordAudit(user, { action: "CREATE", entityType: "PROJECT", entityId: project.id, summary: `${project.name} projesi eklendi` });
   redirect(returnTo(formData, "/transitos/projects"));
 }
 
@@ -507,6 +515,7 @@ export async function updateProject(formData: FormData) {
       status: recordStatus(formData, "status", RecordStatus.PLANNING)
     }
   });
+  await recordAudit(user, { action: "UPDATE", entityType: "PROJECT", entityId: projectId, summary: `${text(formData, "name")} projesi güncellendi` });
   redirect(returnTo(formData, `/transitos/projects?project=${text(formData, "id")}`));
 }
 
@@ -1090,7 +1099,7 @@ export async function issueSubcontractorEarningDocument(formData: FormData) {
   ]);
 
   if (!subcontractor) {
-    redirect(returnTo(formData, "/transitos/finance"));
+    redirect(returnTo(formData, "/transitos/earnings"));
   }
 
   const grossAmount = assignments.reduce((sum, item) => sum + Number(item.pricePerService) * item.serviceCount, 0);
@@ -1105,7 +1114,7 @@ export async function issueSubcontractorEarningDocument(formData: FormData) {
     }
   });
 
-  await prisma.financialDocument.create({
+  const document = await prisma.financialDocument.create({
     data: {
       type: FinancialDocumentType.SUBCONTRACTOR_EARNING,
       monthKey: period.monthKey,
@@ -1148,7 +1157,8 @@ export async function issueSubcontractorEarningDocument(formData: FormData) {
       }
     }
   });
-  redirect(returnTo(formData, `/transitos/finance?month=${period.monthKey}`));
+  await recordAudit(user, { action: "ISSUE", entityType: "SUBCONTRACTOR_EARNING", entityId: document.id, summary: `${subcontractor.companyName} için ${period.monthKey} hakedişi kesildi`, metadata: { netAmount } });
+  redirect(returnTo(formData, `/transitos/earnings?month=${period.monthKey}`));
 }
 
 export async function issueProjectInvoiceDocument(formData: FormData) {
@@ -1177,7 +1187,7 @@ export async function issueProjectInvoiceDocument(formData: FormData) {
   ]);
 
   if (!company) {
-    redirect(returnTo(formData, "/transitos/finance"));
+    redirect(returnTo(formData, "/transitos/earnings"));
   }
 
   const grossAmount = assignments.reduce((sum, item) => sum + Number(item.clientPricePerService) * item.serviceCount, 0);
@@ -1193,7 +1203,7 @@ export async function issueProjectInvoiceDocument(formData: FormData) {
     }
   });
 
-  await prisma.financialDocument.create({
+  const document = await prisma.financialDocument.create({
     data: {
       type: FinancialDocumentType.PROJECT_INVOICE,
       monthKey: period.monthKey,
@@ -1223,7 +1233,8 @@ export async function issueProjectInvoiceDocument(formData: FormData) {
       }
     }
   });
-  redirect(returnTo(formData, `/transitos/finance?month=${period.monthKey}`));
+  await recordAudit(user, { action: "ISSUE", entityType: "PROJECT_INVOICE", entityId: document.id, summary: `${company.name} için ${period.monthKey} toplu faturası kesildi`, metadata: { grossAmount } });
+  redirect(returnTo(formData, `/transitos/earnings?month=${period.monthKey}`));
 }
 
 export async function cancelSubcontractorEarningDocument(formData: FormData) {
@@ -1232,13 +1243,15 @@ export async function cancelSubcontractorEarningDocument(formData: FormData) {
     redirect("/transitos/earnings");
   }
 
+  const documentId = text(formData, "documentId");
   await prisma.financialDocument.deleteMany({
     where: {
-      id: text(formData, "documentId"),
+      id: documentId,
       type: FinancialDocumentType.SUBCONTRACTOR_EARNING
     }
   });
-  redirect(returnTo(formData, "/transitos/finance"));
+  await recordAudit(user, { action: "CANCEL", entityType: "SUBCONTRACTOR_EARNING", entityId: documentId, summary: "Taşeron hakedişi düzenleme için iptal edildi" });
+  redirect(returnTo(formData, "/transitos/earnings"));
 }
 
 export async function cancelProjectInvoiceDocument(formData: FormData) {
@@ -1247,21 +1260,23 @@ export async function cancelProjectInvoiceDocument(formData: FormData) {
     redirect("/transitos/earnings");
   }
 
+  const documentId = text(formData, "documentId");
   await prisma.financialDocument.deleteMany({
     where: {
-      id: text(formData, "documentId"),
+      id: documentId,
       type: FinancialDocumentType.PROJECT_INVOICE
     }
   });
-  redirect(returnTo(formData, "/transitos/finance"));
+  await recordAudit(user, { action: "CANCEL", entityType: "PROJECT_INVOICE", entityId: documentId, summary: "Proje şirketi faturası düzenleme için iptal edildi" });
+  redirect(returnTo(formData, "/transitos/earnings"));
 }
 
 export async function createExpense(formData: FormData) {
-  await requireUserManager();
+  const user = await requireUserManager();
   const expenseDate = dateValue(formData, "expenseDate");
   const subcontractorId = text(formData, "subcontractorId");
   const vehicleId = await expenseVehicleId(subcontractorId, optionalId(formData, "vehicleId"));
-  await prisma.expense.create({
+  const expense = await prisma.expense.create({
     data: {
       subcontractorId,
       vehicleId,
@@ -1272,11 +1287,12 @@ export async function createExpense(formData: FormData) {
       notes: optional(formData, "notes")
     }
   });
+  await recordAudit(user, { action: "CREATE", entityType: "EXPENSE", entityId: expense.id, summary: `${monthKey(expenseDate)} dönemine yeni gider eklendi`, metadata: { amount: Number(expense.amount) } });
   redirect(returnTo(formData, "/transitos/expenses"));
 }
 
 export async function updateExpense(formData: FormData) {
-  await requireUserManager();
+  const user = await requireUserManager();
   const expenseDate = dateValue(formData, "expenseDate");
   const subcontractorId = text(formData, "subcontractorId");
   const vehicleId = await expenseVehicleId(subcontractorId, optionalId(formData, "vehicleId"));
@@ -1292,12 +1308,15 @@ export async function updateExpense(formData: FormData) {
       notes: optional(formData, "notes")
     }
   });
+  await recordAudit(user, { action: "UPDATE", entityType: "EXPENSE", entityId: text(formData, "id"), summary: "Gider kaydı güncellendi" });
   redirect(returnTo(formData, "/transitos/expenses"));
 }
 
 export async function deleteExpense(formData: FormData) {
-  await requireUserManager();
-  await prisma.expense.delete({ where: { id: text(formData, "id") } });
+  const user = await requireUserManager();
+  const id = text(formData, "id");
+  await prisma.expense.delete({ where: { id } });
+  await recordAudit(user, { action: "DELETE", entityType: "EXPENSE", entityId: id, summary: "Gider kaydı silindi" });
   redirect(returnTo(formData, "/transitos/expenses"));
 }
 

@@ -1,303 +1,65 @@
 import { cookies } from "next/headers";
 import { FinancialDocumentType } from "@prisma/client";
-import { PencilLine } from "lucide-react";
-import { AppShell, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
-import { AddCashDisclosure } from "@/app/components/RegistryInterfaceKit";
-import {
-  FinancialDocumentReport,
-  MonthlyExpenseReviewCards,
-  MonthlyServiceReviewCards
-} from "@/app/components/FinancialDocumentView";
+import { AppShell } from "@/app/components/AppShell";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
-import { PrintReportButton } from "@/app/components/PrintReportButton";
-import {
-  cancelProjectInvoiceDocument,
-  cancelSubcontractorEarningDocument,
-  issueProjectInvoiceDocument,
-  issueSubcontractorEarningDocument
-} from "@/app/actions";
 import { readSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatTRY } from "@/lib/format";
 import { parsePeriod, periodDateWhere } from "@/lib/period";
-import { isManager, isServiceSupervisor } from "@/lib/permissions";
+import { isManager } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
-export default async function FinancePage({
-  searchParams
-}: {
-  searchParams?: Promise<{ month?: string; range?: string }>;
-}) {
+export default async function FinancePage({ searchParams }: { searchParams?: Promise<{ month?: string; range?: string }> }) {
   const params = await searchParams;
   const period = parsePeriod(params);
-  const sessionCookie = (await cookies()).get("transitos_session")?.value;
-  const user = sessionCookie ? await readSessionToken(sessionCookie).catch(() => null) : null;
-  const canManageFinance = isManager(user);
-  const canIssueSubcontractor = isManager(user) || isServiceSupervisor(user);
-  const endOfCurrentDay = new Date();
-  endOfCurrentDay.setHours(23, 59, 59, 999);
-  const completedUntil = new Date(Math.min(period.endDate.getTime(), endOfCurrentDay.getTime()));
+  const token = (await cookies()).get("transitos_session")?.value;
+  const user = token ? await readSessionToken(token).catch(() => null) : null;
+  if (!isManager(user)) return <AppShell active="/transitos/finance" title="Finans" subtitle="Şeflek Tur iş ve kârlılık özeti."><section className="card muted">Bu panel yalnızca yöneticilere açıktır.</section></AppShell>;
 
-  if (!canManageFinance && !canIssueSubcontractor) {
-    return (
-      <AppShell active="/transitos/finance" title="Finans" subtitle="Gelir, gider, fatura ve hakediş belgeleri.">
-        <section className="card muted">Bu panel için yetkiniz bulunmuyor.</section>
-      </AppShell>
-    );
-  }
-
-  const [projectCompanies, subcontractors] = await Promise.all([
-    canManageFinance ? prisma.projectCompany.findMany({
-      include: {
-        financialDocuments: {
-          where: { type: FinancialDocumentType.PROJECT_INVOICE, monthKey: period.month },
-          include: { lines: { orderBy: { serviceDate: "asc" } }, createdBy: true }
-        },
-        projects: {
-          include: {
-            assignments: {
-              where: { serviceDate: { gte: period.startDate, lte: completedUntil } },
-              include: { route: true, vehicle: true, project: true },
-              orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
-            }
-          },
-          orderBy: { name: "asc" }
-        }
-      },
-      orderBy: { name: "asc" }
-    }) : Promise.resolve([]),
-    prisma.subcontractor.findMany({
-      include: {
-        financialDocuments: {
-          where: { type: FinancialDocumentType.SUBCONTRACTOR_EARNING, monthKey: period.month },
-          include: { lines: { orderBy: { serviceDate: "asc" } }, createdBy: true }
-        },
-        vehicles: {
-          include: {
-            assignments: {
-              where: { serviceDate: { gte: period.startDate, lte: completedUntil } },
-              include: { route: true, project: true, vehicle: true },
-              orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }]
-            }
-          }
-        },
-        expenses: {
-          where: { expenseDate: periodDateWhere(period) },
-          include: { vehicle: true },
-          orderBy: { expenseDate: "asc" }
-        }
-      },
-      orderBy: { companyName: "asc" }
-    })
+  const [assignments, expenses, maintenance, documents, vehicleStats] = await Promise.all([
+    prisma.serviceAssignment.findMany({ where: { serviceDate: periodDateWhere(period) }, select: { clientPricePerService: true, pricePerService: true, serviceCount: true } }),
+    prisma.expense.findMany({ where: { expenseDate: periodDateWhere(period) }, select: { amount: true } }),
+    prisma.vehicleMaintenance.findMany({ where: { serviceDate: periodDateWhere(period) }, select: { amount: true } }),
+    prisma.financialDocument.findMany({ where: { monthKey: period.month }, select: { type: true, netAmount: true } }),
+    prisma.vehicle.groupBy({ by: ["fleetTrackingEnabled", "status"], _count: { _all: true } })
   ]);
 
-  const issuedIncome = projectCompanies.reduce((sum, company) => sum + company.financialDocuments.reduce((total, document) => total + Number(document.netAmount), 0), 0);
-  const pendingIncome = projectCompanies.reduce((sum, company) => {
-    if (company.financialDocuments.length) return sum;
-    return sum + company.projects.flatMap((project) => project.assignments).reduce((total, item) => total + Number(item.clientPricePerService) * item.serviceCount, 0);
-  }, 0);
-  const issuedExpense = subcontractors.reduce((sum, subcontractor) => sum + Number(subcontractor.financialDocuments[0]?.netAmount ?? 0), 0);
-  const pendingExpense = subcontractors.reduce((sum, subcontractor) => {
-    if (subcontractor.financialDocuments.length) return sum;
-    const assignments = subcontractor.vehicles.flatMap((vehicle) => vehicle.assignments);
-    const gross = assignments.reduce((total, item) => total + Number(item.pricePerService) * item.serviceCount, 0);
-    const expenses = subcontractor.expenses.reduce((total, item) => total + Number(item.amount), 0);
-    return sum + gross - expenses;
-  }, 0);
+  const projectedRevenue = assignments.reduce((sum, x) => sum + Number(x.clientPricePerService) * x.serviceCount, 0);
+  const carrierCost = assignments.reduce((sum, x) => sum + Number(x.pricePerService) * x.serviceCount, 0);
+  const operatingExpense = expenses.reduce((sum, x) => sum + Number(x.amount), 0);
+  const maintenanceCost = maintenance.reduce((sum, x) => sum + Number(x.amount), 0);
+  const grossProfit = projectedRevenue - carrierCost - operatingExpense - maintenanceCost;
+  const margin = projectedRevenue ? (grossProfit / projectedRevenue) * 100 : 0;
+  const invoiced = documents.filter((x) => x.type === FinancialDocumentType.PROJECT_INVOICE).reduce((sum, x) => sum + Number(x.netAmount), 0);
+  const paidEarnings = documents.filter((x) => x.type === FinancialDocumentType.SUBCONTRACTOR_EARNING).reduce((sum, x) => sum + Number(x.netAmount), 0);
+  const fleetTotal = vehicleStats.reduce((sum, x) => sum + x._count._all, 0);
+  const trackedFleet = vehicleStats.filter((x) => x.fleetTrackingEnabled).reduce((sum, x) => sum + x._count._all, 0);
+  const maxBar = Math.max(projectedRevenue, carrierCost + operatingExpense + maintenanceCost, 1);
 
   return (
-    <AppShell active="/transitos/finance" title="Finans" subtitle="Şirket gelirleri, taşıyıcı giderleri, kesilen faturalar ve hakediş belgeleri.">
+    <AppShell active="/transitos/finance" title="Finans" subtitle="Gelir, maliyet, kârlılık ve filo etkisini tek görünümde izleyin.">
       <PeriodFilter searchParams={params} />
-
-      <section className="grid">
-        {canManageFinance ? <Metric title="Kesilmiş Gelir" value={formatTRY(issuedIncome)} tone="green" /> : null}
-        {canManageFinance ? <Metric title="Kesilmeyi Bekleyen Gelir" value={formatTRY(pendingIncome)} tone="blue" /> : null}
-        <Metric title="Kesilmiş Taşıyıcı Gideri" value={formatTRY(issuedExpense)} tone="yellow" />
-        <Metric title="Kesilmeyi Bekleyen Gider" value={formatTRY(pendingExpense)} tone="gray" />
-        {canManageFinance ? <Metric title="Kesilmiş Net Durum" value={formatTRY(issuedIncome - issuedExpense)} tone="green" /> : null}
-      </section>
-
-      <section className="section stack">
-        <AddCashDisclosure
-          title="Dönem finans özeti"
-          amount={formatTRY((issuedIncome + pendingIncome) - (issuedExpense + pendingExpense))}
-          description="Kesilmiş ve bekleyen gelir/giderler birlikte okunur."
-          tone={((issuedIncome + pendingIncome) - (issuedExpense + pendingExpense)) >= 0 ? "green" : "red"}
-        >
-          <span>Gelir toplamı: {formatTRY(issuedIncome + pendingIncome)}</span>
-          <span>Taşıyıcı gider toplamı: {formatTRY(issuedExpense + pendingExpense)}</span>
-        </AddCashDisclosure>
-      </section>
-
-      {canManageFinance ? (
-        <section className="card section">
-          <div className="record-head">
-            <div>
-              <h2 style={{ marginTop: 0 }}>Proje Şirketi Faturaları</h2>
-              <p className="muted">Faturalar proje şirketine kesilir; proje adı hizmet ayrıntısı olarak gösterilir.</p>
-            </div>
-            <span className="badge blue">{projectCompanies.length} şirket</span>
-          </div>
-          <div className="stack section">
-            {projectCompanies.map((company) => {
-              const assignments = company.projects.flatMap((project) => project.assignments);
-              const documents = company.financialDocuments;
-              const draftTotal = assignments.reduce((sum, item) => sum + Number(item.clientPricePerService) * item.serviceCount, 0);
-              return (
-                <article className="card status-card" key={company.id}>
-                  <div className="record-head">
-                    <div>
-                      <h3 style={{ margin: 0 }}>{company.name}</h3>
-                      <p className="muted">{company.projects.length} proje · {assignments.length} tamamlanan servis</p>
-                      <div className="chip-row">{company.projects.map((project) => <span className="badge gray" key={project.id}>{project.name}</span>)}</div>
-                      <div className="chip-row">
-                        {documents.length ? <span className="badge green">Kesildi · {formatTRY(documents.reduce((sum, document) => sum + Number(document.netAmount), 0))}</span> : <span className="badge yellow">Bekliyor · {formatTRY(draftTotal)}</span>}
-                      </div>
-                    </div>
-                    {documents.length ? (
-                      <div className="finance-document-actions">
-                        {documents.map((document) => <div className="finance-document-actions" key={document.id}>
-                          <PrintReportButton targetId={`project-document-${document.id}`} label="PDF / Yazdır" />
-                          <ModalAction label={<PencilLine size={17} aria-hidden="true" />} ariaLabel={`${company.name} faturasını iptal et`} buttonClassName="danger icon-button" title={`${company.name} faturası iptal edilsin mi?`} tone="danger">
-                            <form className="stack" action={cancelProjectInvoiceDocument}>
-                              <input type="hidden" name="documentId" value={document.id} /><input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />
-                              <div className="confirm-panel danger-soft"><strong>Bu fatura iptal edilecek.</strong><p>Servis kayıtları silinmez; şirket faturası yeniden oluşturulabilir.</p></div>
-                              <div className="actions"><SubmitButton>İptal et</SubmitButton></div>
-                            </form>
-                          </ModalAction>
-                        </div>)}
-                      </div>
-                    ) : (
-                      <ModalAction label="Toplu Fatura Oluştur" title={`${company.name} Toplu Faturası`}>
-                        <form className="stack" action={issueProjectInvoiceDocument}>
-                          <input type="hidden" name="projectCompanyId" value={company.id} />
-                          <input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />
-                          <PeriodOptionField currentMonth={period.month} label="Kesim dönemi" hint="Fatura hangi ay için oluşturulacak?" />
-                          <details className="document-preview-toggle">
-                            <summary>Önizle</summary>
-                            <MonthlyServiceReviewCards assignments={assignments} mode="client" monthKey={period.month} />
-                          </details>
-                          <label className="field-row">
-                            <span><strong>Not</strong><small>Fatura iç notu.</small></span>
-                            <textarea name="notes" rows={3} />
-                          </label>
-                          <div className="actions"><SubmitButton>✓ Faturayı Kes</SubmitButton></div>
-                        </form>
-                      </ModalAction>
-                    )}
-                  </div>
-                  {documents.map((document) => <FinancialDocumentReport key={document.id} document={document} title={`${company.name} Toplu Faturası`} owner={`${company.projects.length} proje`} targetId={`project-document-${document.id}`} />)}
-                </article>
-              );
-            })}
-            {projectCompanies.length === 0 ? <p className="muted">Faturalandırılacak proje şirketi yok.</p> : null}
-          </div>
-        </section>
-      ) : null}
-
-      <section className="card section">
-        <div className="record-head">
-          <div>
-            <h2 style={{ marginTop: 0 }}>Taşıyıcı Hakedişleri</h2>
-            <p className="muted">Taşeronlar yalnızca burada kesilen aylık hakediş belgelerini görüntüler.</p>
-          </div>
-          <span className="badge yellow">{subcontractors.length} taşeron</span>
+      <section className="finance-hero section">
+        <div><span>Dönem tahmini faaliyet sonucu</span><strong>{formatTRY(grossProfit)}</strong><small className={grossProfit >= 0 ? "positive" : "negative"}>Brüt marj %{margin.toFixed(1).replace(".", ",")}</small></div>
+        <div className="finance-bars" aria-label="Gelir ve maliyet karşılaştırması">
+          <FinanceBar label="Operasyon geliri" value={projectedRevenue} max={maxBar} tone="revenue" />
+          <FinanceBar label="Toplam maliyet" value={carrierCost + operatingExpense + maintenanceCost} max={maxBar} tone="cost" />
         </div>
-        <div className="stack section">
-          {subcontractors.map((subcontractor) => {
-            const document = subcontractor.financialDocuments[0] ?? null;
-            const assignments = subcontractor.vehicles.flatMap((vehicle) => vehicle.assignments);
-            const gross = assignments.reduce((sum, item) => sum + Number(item.pricePerService) * item.serviceCount, 0);
-            const expenses = subcontractor.expenses.reduce((sum, item) => sum + Number(item.amount), 0);
-            const net = gross - expenses;
-            return (
-              <article className="card status-card" key={subcontractor.id}>
-                <div className="record-head">
-                  <div>
-                    <h3 style={{ margin: 0 }}>{subcontractor.companyName}</h3>
-                    <p className="muted">{assignments.length} tamamlanan servis · {subcontractor.expenses.length} gider</p>
-                    <div className="chip-row">
-                      {document ? <span className="badge green">Kesildi · {formatTRY(Number(document.netAmount))}</span> : <span className="badge yellow">Bekliyor · {formatTRY(net)}</span>}
-                      <span className="badge gray">Brüt {formatTRY(gross)}</span>
-                      <span className="badge red">Gider {formatTRY(expenses)}</span>
-                    </div>
-                  </div>
-                  {document ? (
-                    <div className="finance-document-actions">
-                      <PrintReportButton targetId={`subcontractor-document-${document.id}`} label="PDF / Yazdır" />
-                      {canIssueSubcontractor ? (
-                        <ModalAction
-                          label={<PencilLine size={17} aria-hidden="true" />}
-                          ariaLabel={`${subcontractor.companyName} hakedişini iptal et ve düzenle`}
-                          buttonClassName="danger icon-button"
-                          title={`${subcontractor.companyName} hakedişi iptal edilsin mi?`}
-                          tone="danger"
-                        >
-                          <form className="stack" action={cancelSubcontractorEarningDocument}>
-                            <input type="hidden" name="documentId" value={document.id} />
-                            <input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />
-                            <div className="confirm-panel danger-soft">
-                              <strong>Bu hakediş iptal edilecek.</strong>
-                              <p>Servis ve gider kayıtları silinmez. İşleri düzenledikten sonra aynı ay için yeniden hakediş oluşturabilirsiniz.</p>
-                            </div>
-                            <div className="actions"><SubmitButton>İptal et ve düzenlemeye aç</SubmitButton></div>
-                          </form>
-                        </ModalAction>
-                      ) : null}
-                    </div>
-                  ) : canIssueSubcontractor ? (
-                    <ModalAction label="Hakediş Oluştur" title={`${subcontractor.companyName} Hakedişi`}>
-                      <form className="stack" action={issueSubcontractorEarningDocument}>
-                        <input type="hidden" name="subcontractorId" value={subcontractor.id} />
-                        <input type="hidden" name="_returnTo" value={`/transitos/finance?month=${period.month}&range=${period.range}`} />
-                        <PeriodOptionField currentMonth={period.month} label="Kesim dönemi" hint="Hakediş hangi ay için oluşturulacak?" />
-                        <details className="document-preview-toggle">
-                          <summary>Önizle</summary>
-                          <MonthlyServiceReviewCards assignments={assignments} mode="carrier" monthKey={period.month} />
-                          <MonthlyExpenseReviewCards expenses={subcontractor.expenses} />
-                        </details>
-                        <label className="field-row">
-                          <span><strong>Not</strong><small>Hakediş iç notu.</small></span>
-                          <textarea name="notes" rows={3} />
-                        </label>
-                        <div className="actions"><SubmitButton>✓ Hakedişi Kes</SubmitButton></div>
-                      </form>
-                    </ModalAction>
-                  ) : null}
-                </div>
-                {document ? (
-                  <FinancialDocumentReport
-                    document={document}
-                    title="Taşıyıcı Hakediş Belgesi"
-                    owner={subcontractor.companyName}
-                    targetId={`subcontractor-document-${document.id}`}
-                  />
-                ) : null}
-              </article>
-            );
-          })}
-          {subcontractors.length === 0 ? <p className="muted">Hakediş oluşturulacak taşeron yok.</p> : null}
-        </div>
+      </section>
+      <section className="finance-kpi-grid section">
+        <FinanceMetric label="Operasyon geliri" value={formatTRY(projectedRevenue)} detail={`${assignments.length} servis kaydı`} />
+        <FinanceMetric label="Taşıyıcı maliyeti" value={formatTRY(carrierCost)} detail="Planlanan servis bedelleri" />
+        <FinanceMetric label="Genel giderler" value={formatTRY(operatingExpense)} detail={`${expenses.length} gider kaydı`} />
+        <FinanceMetric label="Filo bakımı" value={formatTRY(maintenanceCost)} detail={`${maintenance.length} bakım kaydı`} />
+      </section>
+      <section className="finance-detail-grid section">
+        <article className="card finance-ledger-card"><h2>Belge durumu</h2><div className="finance-ledger-row"><span>Kesilmiş şirket faturaları</span><strong>{formatTRY(invoiced)}</strong></div><div className="finance-ledger-row"><span>Kesilmiş taşeron hakedişleri</span><strong>{formatTRY(paidEarnings)}</strong></div><a className="primary compact-button" href={`/transitos/earnings?month=${period.month}`}>Fatura ve hakediş merkezine git</a></article>
+        <article className="card finance-ledger-card"><h2>Filo görünümü</h2><div className="fleet-ring" style={{ "--fleet-progress": `${fleetTotal ? (trackedFleet / fleetTotal) * 100 : 0}%` } as React.CSSProperties}><strong>{trackedFleet}</strong><span>/ {fleetTotal}</span></div><p>Filo takip sistemine dahil edilen araçlar.</p><a className="ghost compact-button" href="/transitos/vehicles">Araç kayıtlarını yönet</a></article>
       </section>
     </AppShell>
   );
 }
 
-function PeriodOptionField({ currentMonth, label, hint }: { currentMonth: string; label: string; hint: string }) {
-  return (
-    <Field label={label} hint={hint}>
-      <input name="monthKey" type="month" defaultValue={currentMonth} required />
-    </Field>
-  );
-}
-
-function Metric({ title, value, tone }: { title: string; value: string; tone: "green" | "blue" | "yellow" | "gray" }) {
-  return (
-    <article className="card metric">
-      <span className="muted">{title}</span>
-      <strong>{value}</strong>
-      <small className={`badge ${tone}`}>Finans</small>
-    </article>
-  );
-}
+function FinanceMetric({ label, value, detail }: { label: string; value: string; detail: string }) { return <article className="card finance-kpi"><span>{label}</span><strong>{value}</strong><small>{detail}</small></article>; }
+function FinanceBar({ label, value, max, tone }: { label: string; value: number; max: number; tone: string }) { return <div className="finance-bar"><span>{label}<strong>{formatTRY(value)}</strong></span><i><b className={tone} style={{ width: `${Math.max(4, (value / max) * 100)}%` }} /></i></div>; }

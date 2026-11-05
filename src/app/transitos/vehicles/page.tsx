@@ -1,1 +1,2 @@
-export { default, dynamic } from "@/app/vehicles/page";
+export { default } from "@/app/vehicles/page";
+export const dynamic = "force-dynamic";

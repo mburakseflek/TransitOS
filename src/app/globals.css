@@ -23999,6 +23999,79 @@ body .mobile-drawer-panel {
   transition-duration: 140ms !important;
 }
 
+/* 2026 Corporate Edition — calm, editorial and operationally clear */
+:root {
+  --brand-ink: #071a2d;
+  --brand-navy: #0b2946;
+  --brand-blue: #176baf;
+  --brand-porcelain: #f5f7f8;
+  --brand-line: #dce3e8;
+  --brand-copper: #b46d41;
+}
+
+.transitos-shell { background: #eef2f4 !important; }
+.transitos-shell .sidebar {
+  background: linear-gradient(165deg, #071a2d 0%, #0b2946 72%, #123b5c 100%) !important;
+  border: 0 !important; border-radius: 0 !important; box-shadow: 18px 0 45px rgba(7,26,45,.12) !important;
+}
+.transitos-shell .sidebar .brand img { filter: brightness(0) invert(1); opacity: .96; }
+.transitos-shell .sidebar-brand-title, .transitos-shell .sidebar-brand-meta { color: #fff !important; }
+.transitos-shell .sidebar-brand-meta { opacity: .62; }
+.transitos-shell .aceternity-sidebar-link { color: rgba(255,255,255,.7) !important; border: 1px solid transparent !important; background: transparent !important; }
+.transitos-shell .aceternity-sidebar-link:hover { color: #fff !important; background: rgba(255,255,255,.07) !important; }
+.transitos-shell .aceternity-sidebar-link.active { color: #071a2d !important; background: #fff !important; box-shadow: 0 12px 30px rgba(0,0,0,.18) !important; }
+.transitos-shell .site-return-link, .transitos-shell .sidebar-logout-button { color: rgba(255,255,255,.78) !important; border-color: rgba(255,255,255,.12) !important; background: rgba(255,255,255,.04) !important; }
+.transitos-shell .content { background: #f4f6f7 !important; }
+.transitos-shell .topbar { padding: 26px 30px !important; border: 0 !important; border-radius: 22px !important; background: #fff !important; box-shadow: 0 14px 38px rgba(24,42,58,.06) !important; }
+.topbar-eyebrow { color: var(--brand-copper); font-size: .7rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.transitos-shell .topbar .title { margin: 4px 0 0 !important; color: var(--brand-ink) !important; letter-spacing: -.035em; }
+.topbar-subtitle { margin: 6px 0 0; color: #657383; font-size: .92rem; }
+.transitos-shell .card { border: 1px solid rgba(7,26,45,.08) !important; border-radius: 20px !important; background: #fff !important; box-shadow: 0 12px 34px rgba(24,42,58,.055) !important; }
+
+.settings-center-grid { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 18px; }
+.settings-center-card { padding: 24px !important; min-width: 0; }
+.settings-center-heading { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 20px; }
+.settings-center-heading h2 { margin: 0; color: var(--brand-ink); }
+.settings-center-heading p { margin: 5px 0 0; color: #687685; }
+.settings-center-heading > .badge { margin-left: auto; white-space: nowrap; }
+.settings-center-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; color: #fff; background: var(--brand-navy); flex: 0 0 auto; }
+.export-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.export-tile { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; padding: 15px; border: 1px solid var(--brand-line); border-radius: 14px; color: var(--brand-ink); text-decoration: none; transition: transform .18s ease, border-color .18s ease; }
+.export-tile:hover { transform: translateY(-2px); border-color: var(--brand-blue); }
+.export-tile svg { grid-row: span 2; color: var(--brand-blue); }.export-tile span { font-weight: 750; }.export-tile small { color: #788492; }
+.audit-timeline { max-height: 390px; overflow: auto; padding-right: 6px; }
+.audit-entry { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 13px 0; border-bottom: 1px solid #edf0f2; }
+.audit-dot { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: var(--brand-blue); background: #e9f3fa; }
+.audit-entry strong,.audit-entry small { display: block; }.audit-entry small { color: #7a8793; margin-top: 3px; }.audit-action { color: #657383; font-size: .76rem; font-weight: 700; }
+
+.finance-hero { display: grid; grid-template-columns: minmax(260px,.7fr) minmax(360px,1.3fr); gap: 34px; align-items: center; padding: 32px; border-radius: 24px; color: white; background: linear-gradient(125deg,#071a2d,#0d3557 68%,#17547e); box-shadow: 0 20px 50px rgba(7,26,45,.18); }
+.finance-hero > div:first-child span,.finance-hero > div:first-child small { display: block; opacity: .72; }.finance-hero > div:first-child strong { display: block; margin: 8px 0; font-size: clamp(2.1rem,4vw,3.8rem); letter-spacing: -.05em; }.finance-hero .positive { color: #72dfb1; }.finance-hero .negative { color: #ff9b9b; }
+.finance-bars { display: grid; gap: 18px; }.finance-bar span { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: .82rem; color: rgba(255,255,255,.72); }.finance-bar span strong { color: #fff; }.finance-bar i { display: block; height: 9px; border-radius: 99px; background: rgba(255,255,255,.1); overflow: hidden; }.finance-bar b { display: block; height: 100%; border-radius: inherit; }.finance-bar .revenue { background: #69d6b1; }.finance-bar .cost { background: #d89a70; }
+.finance-kpi-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }.finance-kpi { padding: 22px !important; }.finance-kpi span,.finance-kpi small { display: block; color: #71808e; }.finance-kpi strong { display: block; margin: 12px 0 6px; color: var(--brand-ink); font-size: 1.55rem; letter-spacing: -.035em; }
+.finance-detail-grid { display: grid; grid-template-columns: 1.3fr .7fr; gap: 18px; }.finance-ledger-card { padding: 25px !important; }.finance-ledger-card h2 { margin-top: 0; }.finance-ledger-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #e9edef; }.finance-ledger-card .compact-button { margin-top: 18px; }
+.fleet-ring { --fleet-progress: 0%; width: 118px; aspect-ratio: 1; margin: 15px 0; display: flex; align-items: baseline; justify-content: center; border-radius: 50%; padding-top: 39px; background: radial-gradient(circle at center,#fff 55%,transparent 56%),conic-gradient(var(--brand-blue) var(--fleet-progress),#e8edf0 0); }.fleet-ring strong { font-size: 1.8rem; }.fleet-ring span { color: #74808a; }
+
+.new-site-page { background: #f6f5f2 !important; color: var(--brand-ink) !important; }
+.new-site-page .new-site-header { background: rgba(246,245,242,.92) !important; border-color: rgba(7,26,45,.1) !important; }
+.new-site-page .page-hero { padding-top: clamp(80px,10vw,150px) !important; padding-bottom: clamp(70px,9vw,130px) !important; background: linear-gradient(135deg,#f6f5f2 0%,#fff 60%,#eaf0f3 100%) !important; }
+.new-site-page .page-hero h1 { color: var(--brand-ink) !important; letter-spacing: -.055em !important; max-width: 10ch; }
+.new-site-page .new-primary { background: var(--brand-ink) !important; box-shadow: 0 13px 28px rgba(7,26,45,.16) !important; }
+.new-site-page .quick-proof-row > div { background: #fff !important; border-color: rgba(7,26,45,.1) !important; box-shadow: 0 12px 30px rgba(7,26,45,.05) !important; }
+.new-site-page .page-card,.new-site-page .seo-intro-section { border-color: rgba(7,26,45,.09) !important; box-shadow: 0 18px 45px rgba(7,26,45,.055) !important; }
+
+@media (max-width: 900px) {
+  .settings-center-grid,.finance-hero,.finance-detail-grid { grid-template-columns: 1fr; }
+  .finance-kpi-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .finance-hero { padding: 24px 20px; }.finance-bars { min-width: 0; }
+}
+@media (max-width: 600px) {
+  .topbar-subtitle { font-size: .82rem; line-height: 1.45; }
+  .export-grid,.finance-kpi-grid { grid-template-columns: 1fr; }
+  .settings-center-card { padding: 18px !important; }.settings-center-heading { flex-wrap: wrap; }.settings-center-heading > .badge { margin-left: 58px; }
+  .audit-entry { grid-template-columns: auto minmax(0,1fr); }.audit-action { grid-column: 2; }
+  .finance-hero > div:first-child strong { font-size: 2rem; }
+}
+
 body .mobile-drawer-panel {
   will-change: transform;
   -webkit-backdrop-filter: none !important;

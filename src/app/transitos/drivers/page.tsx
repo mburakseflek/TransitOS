@@ -1,1 +1,2 @@
-export { default, dynamic } from "@/app/drivers/page";
+export { default } from "@/app/drivers/page";
+export const dynamic = "force-dynamic";

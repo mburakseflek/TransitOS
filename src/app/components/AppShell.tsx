@@ -31,7 +31,7 @@ const navItems = [
   { label: "Sürücüler", path: "/drivers", icon: UserRound },
   { label: "Giderler", path: "/expenses", icon: MinusCircle },
   { label: "Finans", path: "/finance", icon: ChartNoAxesCombined },
-  { label: "Hakedişler", path: "/earnings", icon: Banknote },
+  { label: "Faturalar & Hakedişler", path: "/earnings", icon: Banknote },
   { label: "Bakımlar", path: "/maintenance", icon: Wrench },
   { label: "Anketler", path: "/surveys", icon: ClipboardCheck },
   { label: "Ayarlar", path: "/settings", icon: Settings }
@@ -40,7 +40,7 @@ const navItems = [
 export async function AppShell({
   active,
   title,
-  subtitle: _subtitle,
+  subtitle,
   children
 }: {
   active: string;
@@ -66,7 +66,7 @@ export async function AppShell({
   ];
   const visibleNavItems = navItems
     .filter((item) => isNavVisible(item.label, user?.role))
-    .map((item) => user?.role === "PROJECT_OWNER" && item.label === "Hakedişler" ? { ...item, label: "Faturalar" } : item);
+    .map((item) => user?.role === "PROJECT_OWNER" && item.path === "/earnings" ? { ...item, label: "Faturalar" } : item);
   const activeNavLabel = visibleNavItems.find((item) => item.path === activePath)?.label ?? "Menü";
 
   return (
@@ -131,7 +131,9 @@ export async function AppShell({
       <section className="content magic-bento-surface">
         <div className="topbar">
           <div>
+            <span className="topbar-eyebrow">TransitOS çalışma alanı</span>
             <h1 className="title">{title}</h1>
+            <p className="topbar-subtitle">{subtitle}</p>
           </div>
           <div className="topbar-actions">
             <ExpandableProfileCard
@@ -156,8 +158,9 @@ export async function AppShell({
 
 function isNavVisible(label: string, role?: string) {
   if (label === "Bakımlar") return role === "MANAGER";
+  if (label === "Finans") return role === "MANAGER";
   if (role === "SERVICE_SUPERVISOR") {
-    return !["Giderler", "Hakedişler", "Ayarlar"].includes(label);
+    return !["Giderler", "Faturalar & Hakedişler", "Ayarlar"].includes(label);
   }
   if (role === "SUBCONTRACTOR") {
     return !["Taşeronlar", "Anketler", "Sürücüler", "Giderler", "Finans"].includes(label);

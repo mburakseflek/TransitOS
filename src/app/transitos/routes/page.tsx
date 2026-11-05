@@ -1,1 +1,2 @@
-export { default, dynamic } from "@/app/routes/page";
+export { default } from "@/app/routes/page";
+export const dynamic = "force-dynamic";

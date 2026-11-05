@@ -11,7 +11,7 @@ import {
 } from "@/app/components/FinancialDocumentView";
 import { PeriodFilter } from "@/app/components/PeriodFilter";
 import { PrintReportButton } from "@/app/components/PrintReportButton";
-import { cancelSubcontractorEarningDocument, issueSubcontractorEarningDocument } from "@/app/actions";
+import { cancelProjectInvoiceDocument, cancelSubcontractorEarningDocument, issueProjectInvoiceDocument, issueSubcontractorEarningDocument } from "@/app/actions";
 import { readSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatTRY } from "@/lib/format";
@@ -34,7 +34,7 @@ export default async function EarningsPage({
   const completedUntil = new Date(Math.min(period.endDate.getTime(), endOfCurrentDay.getTime()));
 
   if (isManager(user) || isServiceSupervisor(user)) {
-    const subcontractors = await prisma.subcontractor.findMany({
+    const [subcontractors, projectCompanies] = await Promise.all([prisma.subcontractor.findMany({
       include: {
         financialDocuments: {
           where: { type: FinancialDocumentType.SUBCONTRACTOR_EARNING, monthKey: period.month },
@@ -56,7 +56,13 @@ export default async function EarningsPage({
         }
       },
       orderBy: { companyName: "asc" }
-    });
+    }), isManager(user) ? prisma.projectCompany.findMany({
+      include: {
+        financialDocuments: { where: { type: FinancialDocumentType.PROJECT_INVOICE, monthKey: period.month }, include: { lines: { orderBy: { serviceDate: "asc" } }, createdBy: true } },
+        projects: { include: { assignments: { where: { serviceDate: { gte: period.startDate, lte: completedUntil } }, include: { route: true, vehicle: true, project: true }, orderBy: [{ serviceDate: "asc" }, { serviceTime: "asc" }] } }, orderBy: { name: "asc" } }
+      },
+      orderBy: { name: "asc" }
+    }) : Promise.resolve([])]);
     const issuedTotal = subcontractors.reduce((sum, item) => sum + Number(item.financialDocuments[0]?.netAmount ?? 0), 0);
     const pendingTotal = subcontractors.reduce((sum, subcontractor) => {
       if (subcontractor.financialDocuments.length) return sum;
@@ -67,7 +73,7 @@ export default async function EarningsPage({
     }, 0);
 
     return (
-      <AppShell active="/transitos/earnings" title="Hakedişler" subtitle="Taşeron hakedişlerini dönem bazlı oluşturun, iptal edin ve yeniden düzenleyin.">
+      <AppShell active="/transitos/earnings" title="Faturalar & Hakedişler" subtitle="Şirket faturalarını ve taşıyıcı hakedişlerini tek merkezden yönetin.">
         <PeriodFilter searchParams={params} monthlyOnly />
         <section className="grid">
           <Metric title="Kesilmiş Hakediş" value={formatTRY(issuedTotal)} tone="green" />
@@ -86,6 +92,22 @@ export default async function EarningsPage({
             <span>Kesilmeyi bekleyen: {formatTRY(pendingTotal)}</span>
           </AddCashDisclosure>
         </section>
+
+        {isManager(user) ? <section className="card section billing-center-section">
+          <div className="record-head"><div><h2 style={{ marginTop: 0 }}>Proje şirketi faturaları</h2><p className="muted">Bir şirketin tüm proje işleri aynı dönem belgesinde toplanır.</p></div><span className="badge blue">{projectCompanies.length} şirket</span></div>
+          <div className="stack section">{projectCompanies.map((company) => {
+            const assignments = company.projects.flatMap((project) => project.assignments);
+            const document = company.financialDocuments[0] ?? null;
+            const total = assignments.reduce((sum, item) => sum + Number(item.clientPricePerService) * item.serviceCount, 0);
+            return <details className="card earning-selector-card" key={company.id}>
+              <summary><span><strong>{company.name}</strong><small>{company.projects.length} proje · {assignments.length} servis</small></span><span className={document ? "badge green" : "badge yellow"}>{document ? `Kesildi · ${formatTRY(Number(document.netAmount))}` : `Bekliyor · ${formatTRY(total)}`}</span></summary>
+              <div className="section stack">
+                <div className="finance-document-actions">{document ? <><PrintReportButton targetId={`project-document-${document.id}`} label="PDF / Yazdır" /><ModalAction label={<PencilLine size={17} />} ariaLabel="Faturayı iptal et" buttonClassName="danger icon-button" title={`${company.name} faturası iptal edilsin mi?`} tone="danger"><form className="stack" action={cancelProjectInvoiceDocument}><input type="hidden" name="documentId" value={document.id} /><input type="hidden" name="_returnTo" value={`/transitos/earnings?month=${period.month}`} /><div className="actions"><SubmitButton>İptal et ve düzenlemeye aç</SubmitButton></div></form></ModalAction></> : <ModalAction label="Toplu Fatura Oluştur" title={`${company.name} Toplu Faturası`}><form className="stack" action={issueProjectInvoiceDocument}><input type="hidden" name="projectCompanyId" value={company.id} /><input type="hidden" name="monthKey" value={period.month} /><input type="hidden" name="_returnTo" value={`/transitos/earnings?month=${period.month}`} /><MonthlyServiceReviewCards assignments={assignments} mode="client" monthKey={period.month} /><Field label="Not" hint="Belgeye eklenecek açıklama."><textarea name="notes" rows={3} /></Field><div className="actions"><SubmitButton>Faturayı Kes</SubmitButton></div></form></ModalAction>}</div>
+                {document ? <FinancialDocumentReport document={document} title={`${company.name} Toplu Faturası`} owner={company.projects.map((p) => p.name).join(", ")} targetId={`project-document-${document.id}`} /> : null}
+              </div>
+            </details>;
+          })}</div>
+        </section> : null}
 
         <section className="card section">
           <div className="record-head">

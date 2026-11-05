@@ -146,12 +146,11 @@ export default async function MaintenancePage({
                     <h2>Tüm bakım kayıtları</h2>
                     <p>En yeni servis kaydı ilk sırada gösterilir.</p>
                   </div>
-                  <div className="maintenance-heading-actions"><PrintReportButton targetId="vehicle-maintenance-history" label="Bakım geçmişini yazdır" /><span className="badge blue">{records.length} kayıt</span></div>
+                  <div className="maintenance-heading-actions"><span className="badge blue">{records.length} kayıt</span></div>
                 </div>
 
                 {records.length ? (
-                  <div className="maintenance-history-list" id="vehicle-maintenance-history">
-                    <div className="maintenance-print-summary"><h2>{selectedVehicle.fleetNumber} · {selectedVehicle.plateNumber}</h2><p>Toplam {records.length} kayıt · {formatTRY(totalExpense)} bakım gideri · Son kilometre {latestOdometer.toLocaleString("tr-TR")} km</p></div>
+                  <div className="maintenance-history-list">
                     {records.map((record) => (
                       <article className="maintenance-history-card" key={record.id}>
                         <div className="maintenance-date-block">
@@ -235,14 +234,15 @@ function MaintenanceFields({ record }: { record?: any }) {
 function MaintenanceReport({ vehicle, record }: { vehicle: any; record: any }) {
   return (
     <section className="maintenance-report" id={`maintenance-report-${record.id}`}>
-      <header>
+      <header className="report-brand">
         <div>
-          <span>Şeflek Tur · Araç Bakım Raporu</span>
-          <h2>{vehicle.fleetNumber} · {vehicle.plateNumber}</h2>
-          <p>{vehicle.make ?? "-"} {vehicle.model ?? ""} {vehicle.modelYear ? `· ${vehicle.modelYear}` : ""}</p>
+          <span>TransitOS / Filo Operasyonları</span>
+          <h2>Araç Bakım Raporu</h2>
+          <p>Belge No: BKM-{record.id.slice(-8).toUpperCase()}</p>
         </div>
-        <Wrench size={30} aria-hidden="true" />
+        <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
       </header>
+      <div className="maintenance-report-vehicle"><span>Araç</span><strong>{vehicle.fleetNumber} · {vehicle.plateNumber}</strong><p>{vehicle.make ?? "-"} {vehicle.model ?? ""} {vehicle.modelYear ? `· ${vehicle.modelYear}` : ""}</p></div>
       <div className="maintenance-report-grid">
         <ReportItem label="Bakım türü" value={record.maintenanceType} />
         <ReportItem label="Bakım tarihi" value={formatDate(record.serviceDate)} />
@@ -255,7 +255,7 @@ function MaintenanceReport({ vehicle, record }: { vehicle: any; record: any }) {
       <ReportSection title="Yapılan bakımlar" value={record.workPerformed} />
       <ReportSection title="Değişen parçalar" value={record.replacedParts || "Parça değişimi belirtilmedi."} />
       <ReportSection title="Notlar" value={record.notes || "Ek not bulunmuyor."} />
-      <footer>Rapor oluşturma tarihi: {new Date().toLocaleDateString("tr-TR")}</footer>
+      <footer><span>Şeflek Tur Turizm & Yolcu Taşımacılığı</span><span>Rapor tarihi: {new Date().toLocaleDateString("tr-TR")}</span></footer>
     </section>
   );
 }

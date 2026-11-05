@@ -362,7 +362,7 @@ export function PrintReportButton({
               font-weight: 750;
               text-align: center;
             }
-            .request-card,.maintenance-history-card,.maintenance-report {
+            .maintenance-report {
               display: block;
               width: 100%;
               padding: 18px;
@@ -371,22 +371,20 @@ export function PrintReportButton({
               background: #fff;
               break-inside: avoid;
             }
-            .request-card::before,.maintenance-history-card::before,.maintenance-report::before {
-              content: "ŞEFLEK TUR · KURUMSAL RAPOR";
-              display: block;
-              margin-bottom: 18px;
-              padding-bottom: 10px;
-              border-bottom: 3px solid #0b2946;
-              color: #0b2946;
-              font-size: 13px;
-              font-weight: 900;
-              letter-spacing: .12em;
-            }
-            .request-card-head { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
-            .request-card-head strong,.request-card-head span { display: block; }.request-card-head span { color: #64748b; font-size: 10px; }
-            .request-card dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
-            .request-card dl div { padding: 10px; border: 1px solid #e5eaf0; border-radius: 8px; }.request-card dl .wide { grid-column: 1 / -1; }.request-card dt { color: #64748b; font-size: 8px; font-weight: 900; text-transform: uppercase; }.request-card dd { margin: 4px 0 0; font-size: 11px; font-weight: 750; }
-            .maintenance-history-card > div { margin-bottom: 12px; }.maintenance-history-card h3 { margin: 7px 0; }.maintenance-history-card svg,.request-card svg { display: none; }.badge { display: inline-block; margin-right: 5px; padding: 4px 7px; border: 1px solid #d8e0e6; border-radius: 999px; font-size: 8px; font-weight: 800; }
+            .maintenance-report .report-brand { display:grid; grid-template-columns:1fr auto; align-items:start; gap:16px; padding-bottom:13px; border-bottom:4px solid #0b2946; }
+            .maintenance-report .report-brand img { width:132px; height:auto; padding:8px; border-radius:8px; background:#0b2946; }
+            .maintenance-report .report-brand span { color:#176baf; font-size:9px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+            .maintenance-report .report-brand h2 { margin:5px 0 2px; font-size:25px; }
+            .maintenance-report-vehicle { margin:20px 0 14px; padding:15px 17px; background:#eef4f8; border-left:5px solid #176baf; }
+            .maintenance-report-vehicle span { color:#64748b; font-size:8px; font-weight:900; text-transform:uppercase; }
+            .maintenance-report-vehicle strong { display:block; margin-top:5px; font-size:20px; }
+            .maintenance-report-vehicle p { margin:4px 0 0; color:#64748b; font-size:10px; }
+            .maintenance-report-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+            .maintenance-report-grid > div,.maintenance-report > section { padding:12px; border:1px solid #dce3e8; border-radius:9px; background:#f8fafc; }
+            .maintenance-report-grid span { display:block; color:#64748b; font-size:8px; font-weight:900; text-transform:uppercase; }
+            .maintenance-report-grid strong { display:block; margin-top:5px; font-size:11px; }
+            .maintenance-report > section { margin-top:10px; }.maintenance-report > section h3 { margin:0 0 6px; font-size:11px; }.maintenance-report > section p { margin:0; color:#475569; font-size:10px; line-height:1.55; }
+            .maintenance-report footer { display:flex; justify-content:space-between; margin-top:22px; padding-top:10px; border-top:1px solid #dce3e8; color:#64748b; font-size:8px; }
             .no-print { display: none !important; }
           </style>
         </head>

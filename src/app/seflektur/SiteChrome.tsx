@@ -56,16 +56,24 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <section className="page-hero">
+    <section className="page-hero editorial-hero">
+      <span className="hero-route-line hero-route-line-a" aria-hidden="true" />
+      <span className="hero-route-line hero-route-line-b" aria-hidden="true" />
       <div className="page-hero-copy">
-        <span className="new-eyebrow">{eyebrow}</span>
+        <span className="new-eyebrow"><i aria-hidden="true" /> {eyebrow}</span>
         <h1>{title}</h1>
         <p>{body}</p>
         {children}
+        <div className="hero-trust-line" aria-label="Şeflek Tur hizmet özellikleri">
+          <span><b>7/24</b> operasyon</span>
+          <span><b>İstanbul</b> merkezli</span>
+          <span><b>TransitOS</b> destekli</span>
+        </div>
       </div>
       {imageUrl ? (
         <SkiperMotionFrame className="page-hero-visual" label="Şeflek Tur">
           <img src={imageUrl} alt={imageAlt ?? title} decoding="async" fetchPriority="high" />
+          <div className="hero-visual-caption"><span>Kurumsal mobilite</span><strong>Planlı. İzlenebilir. Güvenli.</strong></div>
         </SkiperMotionFrame>
       ) : null}
     </section>

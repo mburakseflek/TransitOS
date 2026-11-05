@@ -20,7 +20,6 @@ import { roleTitle } from "@/lib/permissions";
 import { ExpandableProfileCard } from "@/app/components/RegistryInterfaceKit";
 import { MarketTicker } from "@/app/components/MarketTicker";
 import { LogoutButton } from "@/app/components/LogoutButton";
-import { CorporatePagePrintButton } from "@/app/components/CorporatePagePrintButton";
 export { SubmitButton } from "@/app/components/SubmitButton";
 export { ModalAction } from "@/app/components/ModalAction";
 
@@ -102,7 +101,6 @@ export async function AppShell({
           <House size={17} />
           <span>Siteye dön</span>
         </a>
-        <CorporatePagePrintButton className="mobile-drawer-print" />
         <LogoutButton className="mobile-drawer-logout" />
       </nav>
       <aside className="sidebar aceternity-sidebar" aria-label="TransitOS ana menüsü" data-collapsible="auto">
@@ -131,15 +129,13 @@ export async function AppShell({
       </aside>
 
       <section className="content magic-bento-surface">
-        <div className="corporate-print-masthead" aria-hidden="true"><img src="/brand/seflek-logo-navy.png" alt="" /><div><strong>ŞEFLEK TUR</strong><span>TransitOS Kurumsal Rapor</span></div></div>
         <div className="topbar">
           <div>
-            <span className="topbar-eyebrow">TransitOS çalışma alanı</span>
+            <span className="topbar-eyebrow"><i aria-hidden="true" /> TransitOS / {activeNavLabel}</span>
             <h1 className="title">{title}</h1>
             <p className="topbar-subtitle">{subtitle}</p>
           </div>
           <div className="topbar-actions">
-            <CorporatePagePrintButton />
             <ExpandableProfileCard
               title={displayName}
               subtitle={currentRoleTitle}

@@ -86,7 +86,7 @@ export default async function SeflekTurPage() {
         </div>
       </PageHero>
 
-      <section className="quick-proof-row">
+      <section className="quick-proof-row editorial-proof-row">
         <div><strong>7/24</strong><span>Ulaşılabilir operasyon</span></div>
         <div><strong>TransitOS</strong><span>Dijital takip ve raporlama</span></div>
         <div><strong>Beyaz Filo</strong><span>Kurumsal araç görünümü</span></div>

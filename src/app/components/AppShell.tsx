@@ -8,6 +8,7 @@ import {
   FolderKanban,
   Gauge,
   House,
+  History,
   Menu,
   MinusCircle,
   Settings,
@@ -34,6 +35,7 @@ const navItems = [
   { label: "Faturalar & Hakedişler", path: "/earnings", icon: Banknote },
   { label: "Bakımlar", path: "/maintenance", icon: Wrench },
   { label: "Anketler", path: "/surveys", icon: ClipboardCheck },
+  { label: "Sistem Geçmişi", path: "/history", icon: History },
   { label: "Ayarlar", path: "/settings", icon: Settings }
 ] as const;
 
@@ -157,6 +159,7 @@ export async function AppShell({
 }
 
 function isNavVisible(label: string, role?: string) {
+  if (label === "Sistem Geçmişi") return role === "MANAGER" || role === "SERVICE_SUPERVISOR";
   if (label === "Bakımlar") return role === "MANAGER";
   if (label === "Finans") return role === "MANAGER";
   if (role === "SERVICE_SUPERVISOR") {

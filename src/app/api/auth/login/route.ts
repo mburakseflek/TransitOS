@@ -4,6 +4,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { recordAudit } from "@/lib/audit";
 
 const loginSchema = z.object({
   role: z.enum(["MANAGER", "SITE_MODERATOR", "SERVICE_SUPERVISOR", "SUBCONTRACTOR", "PROJECT_OWNER"]),
@@ -52,6 +53,8 @@ export async function POST(request: Request) {
         path: "/"
       });
 
+      await recordAudit(manager, { action: "LOGIN", entityType: "AUTH", entityId: manager.id, summary: `${manager.displayName} TransitOS'a giriş yaptı` });
+
       return loginSuccess(request, isFormSubmit, successPath);
     }
 
@@ -68,6 +71,8 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
       path: "/"
     });
+
+    await recordAudit({ id: undefined, displayName: "Şeflek Tur", role: "MANAGER" }, { action: "LOGIN", entityType: "AUTH", summary: "Şeflek Tur yönetici hesabı TransitOS'a giriş yaptı" });
 
     return loginSuccess(request, isFormSubmit, successPath);
   }
@@ -106,6 +111,8 @@ export async function POST(request: Request) {
     secure: process.env.NODE_ENV === "production",
     path: "/"
   });
+
+  await recordAudit(user, { action: "LOGIN", entityType: "AUTH", entityId: user.id, summary: `${user.displayName} TransitOS'a giriş yaptı` });
 
   return loginSuccess(request, isFormSubmit, successPath);
 }

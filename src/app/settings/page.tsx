@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { Clock3, Download, FileArchive, ShieldCheck } from "lucide-react";
+import { Download, FileArchive } from "lucide-react";
 import { AppShell, DeleteButton, Field, ModalAction, SubmitButton } from "@/app/components/AppShell";
 import {
   createAccessUser,
@@ -23,7 +23,7 @@ export default async function SettingsPage() {
   const sessionCookie = (await cookies()).get("transitos_session")?.value;
   const user = sessionCookie ? await readSessionToken(sessionCookie).catch(() => null) : null;
   const canManage = canManageUsers(user);
-  const [users, subcontractors, projects, companies, auditLogs] = canManage
+  const [users, subcontractors, projects, companies] = canManage
     ? await Promise.all([
       prisma.user.findMany({
         include: { subcontractor: true, serviceProjects: true, ownerProjects: true, ownerCompanies: true },
@@ -41,10 +41,9 @@ export default async function SettingsPage() {
           }
         },
         orderBy: { name: "asc" }
-      }),
-      prisma.auditLog.findMany({ orderBy: { createdAt: "desc" }, take: 80 })
+      })
     ])
-    : [[], [], [], [], []];
+    : [[], [], [], []];
 
   return (
     <AppShell active="/transitos/settings" title="Ayarlar" subtitle="Oturum, kullanıcı yetkileri ve panel erişimleri.">
@@ -69,7 +68,7 @@ export default async function SettingsPage() {
       </section>
 
       {canManage ? (
-        <section className="settings-center-grid section">
+        <section className="settings-center-grid settings-center-grid-single section">
           <article className="card settings-center-card export-center">
             <div className="settings-center-heading">
               <span className="settings-center-icon"><Download size={22} /></span>
@@ -87,23 +86,6 @@ export default async function SettingsPage() {
             </div>
           </article>
 
-          <article className="card settings-center-card history-center">
-            <div className="settings-center-heading">
-              <span className="settings-center-icon"><Clock3 size={22} /></span>
-              <div><h2>Sistem Geçmişi Merkezi</h2><p>Önemli yönetim ve operasyon işlemlerinin kronolojik kaydı.</p></div>
-              <span className="badge blue">Son {auditLogs.length} işlem</span>
-            </div>
-            <div className="audit-timeline">
-              {auditLogs.map((log) => (
-                <article className="audit-entry" key={log.id}>
-                  <span className="audit-dot"><ShieldCheck size={15} /></span>
-                  <div><strong>{log.summary}</strong><small>{log.actorName} · {formatAuditDate(log.createdAt)}</small></div>
-                  <span className="audit-action">{auditActionLabel(log.action)}</span>
-                </article>
-              ))}
-              {auditLogs.length === 0 ? <p className="muted">Yeni işlemler burada kronolojik olarak görünmeye başlayacak.</p> : null}
-            </div>
-          </article>
         </section>
       ) : null}
 
@@ -243,14 +225,6 @@ export default async function SettingsPage() {
       ) : null}
     </AppShell>
   );
-}
-
-function formatAuditDate(value: Date) {
-  return new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Istanbul" }).format(value);
-}
-
-function auditActionLabel(action: string) {
-  return ({ CREATE: "Eklendi", UPDATE: "Güncellendi", DELETE: "Silindi", ISSUE: "Kesildi", CANCEL: "İptal edildi", TRANSFER: "Aktarıldı" } as Record<string, string>)[action] ?? action;
 }
 
 function ProjectCompanyAccountFields({

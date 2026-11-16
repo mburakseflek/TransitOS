@@ -1,0 +1,95 @@
+/* Shared presentation contract; data and business rules remain in their modules. */
+.corp-v2 .corp-v2-hero h1 {
+  max-width: none !important;
+  width: 100%;
+  font-size: clamp(2rem, 3.6vw, 4.25rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -.035em !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  hyphens: none !important;
+  text-wrap: pretty;
+}
+.corp-v2 .corp-v2-hero-copy { justify-content:center; gap:0; }
+.corp-v2 .corp-v2-hero-copy > p { font-weight:400 !important; line-height:1.75; }
+.corp-v2 .corp-v2-hero-meta :is(span,b),
+.corp-v2 .corp-v2-image-note :is(span,strong) {
+  color:#e2e8ee !important;
+  -webkit-text-fill-color:#e2e8ee !important;
+}
+.corp-v2 .corp-v2-hero .new-primary,
+.corp-v2 .corp-v2-header-cta {
+  background:#c91e35 !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+body:has(.corp-v2) .whatsapp-float,
+body:has(.corp-v2) .whatsapp-float span {
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+.transitos-shell {
+  --ui-ink:#172b3d;
+  --ui-muted:#526579;
+  --ui-line:#dce3e9;
+  --ui-primary:#163b59;
+  --ui-surface:#fff;
+  --ui-surface-subtle:#f5f7fa;
+}
+.transitos-shell .content { background:#f5f7fa !important; }
+.transitos-shell .content :is(h1,h2,h3,h4) {
+  word-break:normal !important;
+  overflow-wrap:break-word;
+  hyphens:none;
+  line-height:1.25 !important;
+  letter-spacing:-.025em !important;
+}
+.transitos-shell .topbar { align-items:center; gap:24px; padding-bottom:28px !important; margin-bottom:28px; }
+.transitos-shell .topbar > div { min-width:0; }
+.transitos-shell .topbar .title { font-size:clamp(1.8rem,2.8vw,2.8rem) !important; }
+.transitos-shell .topbar-subtitle { max-width:70ch; line-height:1.65 !important; margin-top:10px; }
+.transitos-shell .content :is(.card,.section,.project-accordion,.vehicle-accordion,.route-card) {
+  border:1px solid #dce3e9 !important;
+  border-radius:14px !important;
+  box-shadow:0 3px 14px rgb(20 45 65 / 3%) !important;
+}
+.transitos-shell :is(.project-accordion,.vehicle-accordion) { margin-bottom:18px; overflow:hidden; }
+.transitos-shell :is(.project-accordion,.vehicle-accordion)[open] > summary {
+  background:#edf4f9 !important;
+  border-bottom:1px solid #cedeea !important;
+  border-radius:0 !important;
+}
+.transitos-shell :is(.project-detail-panel,.vehicle-detail-panel) { padding:24px !important; background:#f8fafc !important; }
+.transitos-shell .sidebar.aceternity-sidebar,
+.transitos-shell .sidebar.aceternity-sidebar:hover,
+.transitos-shell .sidebar.aceternity-sidebar:focus-within {
+  width:auto !important;
+  transform:none !important;
+  background:#142c40 !important;
+}
+.transitos-shell .sidebar .aceternity-sidebar-link { min-height:46px !important; margin-bottom:4px; }
+.transitos-shell .sidebar .aceternity-sidebar-link span { white-space:normal !important; line-height:1.4; }
+.transitos-shell .field-row { gap:18px; min-width:0; }
+.transitos-shell .field-row > * { min-width:0; }
+.transitos-shell :is(input,select,textarea) { max-width:100%; font-size:1rem !important; }
+.transitos-shell .form-flow-section { padding:22px !important; margin-block:20px; }
+.transitos-shell .actions { flex-wrap:wrap; gap:10px; }
+@media (max-width:1120px) {
+  .corp-v2 .corp-v2-hero { grid-template-columns:minmax(0,1fr) !important; }
+  .corp-v2 .corp-v2-hero-visual { min-height:360px; }
+  .corp-v2 .corp-v2-hero h1 { max-width:23ch !important; font-size:clamp(2.15rem,4.6vw,3.5rem) !important; }
+}
+@media (max-width:900px) {
+  .transitos-shell .topbar { flex-wrap:wrap; }
+  .transitos-shell .topbar-actions { margin-left:auto; }
+  .transitos-shell .project-detail-panel > .grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+}
+@media (max-width:560px) {
+  .corp-v2 .corp-v2-hero h1 { font-size:clamp(1.85rem,8vw,2.75rem) !important; }
+  .corp-v2 .corp-v2-hero-visual { min-height:0; }
+  .transitos-shell .content { padding-inline:16px !important; }
+  .transitos-shell :is(.project-detail-panel,.vehicle-detail-panel) { padding:16px !important; }
+  .transitos-shell .project-detail-panel > .grid { grid-template-columns:minmax(0,1fr) !important; }
+  .transitos-shell .field-row { grid-template-columns:minmax(0,1fr) !important; }
+  .transitos-shell .form-flow-section { padding:16px !important; }
+}

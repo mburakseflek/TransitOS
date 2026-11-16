@@ -7,6 +7,7 @@ import { GlobalOperationOverlay } from "@/app/components/GlobalOperationOverlay"
 import { RouteLoadingOverlay } from "@/app/components/RouteLoadingOverlay";
 import { RuntimeRecovery } from "@/app/components/RuntimeRecovery";
 import "./globals.css";
+import "./presentation.css";
 
 export const metadata: Metadata = {
   title: "Şeflek Tur Turizm & Yolcu Taşımacılığı",

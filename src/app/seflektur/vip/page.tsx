@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { FleetCard, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
-import { createCorporateMetadata } from "@/app/seflektur/seo";
+import { createCorporateMetadata, createServiceJsonLd } from "@/app/seflektur/seo";
 
 export const metadata = createCorporateMetadata({
   title: "VIP Transfer İstanbul | Şeflek Tur",
@@ -13,9 +13,16 @@ export const metadata = createCorporateMetadata({
 
 export default async function VipPage() {
   const content = await readSiteContent();
+  const structuredData = createServiceJsonLd({
+    name: "İstanbul VIP Transfer ve Özel Yolculuk",
+    description: "İstanbul'da yönetici, misafir, havalimanı, otel ve organizasyonlar için VIP transfer hizmeti.",
+    path: "/seflektur/vip",
+    serviceTypes: ["VIP transfer", "Havalimanı transferi", "Özel yolculuk"]
+  });
 
   return (
     <main className="new-site-page paged-site">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <SiteHeader />
       <PageHero
         eyebrow="VIP yolculuk"

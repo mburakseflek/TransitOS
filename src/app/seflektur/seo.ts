@@ -83,6 +83,7 @@ export function createCorporateMetadata({
       }
     },
     category: "transportation",
+    applicationName: "Şeflek Tur",
     creator: "Şeflek Tur",
     publisher: "Şeflek Tur Turizm & Yolcu Taşımacılığı",
     verification: {
@@ -94,7 +95,8 @@ export function createCorporateMetadata({
     },
     other: {
       "geo.region": "TR-34",
-      "geo.placename": "İstanbul"
+      "geo.placename": "İstanbul",
+      "format-detection": "telephone=yes"
     }
   };
 }
@@ -164,7 +166,8 @@ export function createOrganizationJsonLd(content: SiteContent) {
       "VIP transfer İstanbul",
       "Kurumsal servis ve güzergah planlama",
       "Yolcu taşımacılığı operasyon yönetimi"
-    ]
+    ],
+    slogan: "Planlı, güvenli ve izlenebilir yolcu taşımacılığı"
   };
 }
 
@@ -178,6 +181,65 @@ export const websiteJsonLd = {
   inLanguage: "tr-TR",
   publisher: { "@id": `${seflekSiteUrl}/#organization` }
 };
+
+export function createServiceJsonLd({
+  name,
+  description,
+  path,
+  image,
+  serviceTypes
+}: {
+  name: string;
+  description: string;
+  path: string;
+  image?: string;
+  serviceTypes?: string[];
+}) {
+  const url = `${seflekSiteUrl}${path}`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Service",
+        "@id": `${url}#service`,
+        name,
+        description,
+        url,
+        image: image ? `${seflekSiteUrl}${image}` : undefined,
+        provider: { "@id": `${seflekSiteUrl}/#organization` },
+        areaServed: { "@type": "City", name: "İstanbul" },
+        serviceType: serviceTypes ?? [name],
+        audience: [
+          { "@type": "BusinessAudience", audienceType: "Kurumlar ve işletmeler" },
+          { "@type": "Audience", audienceType: "Bireysel yolcular" }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Şeflek Tur", item: `${seflekSiteUrl}/seflektur` },
+          { "@type": "ListItem", position: 2, name, item: url }
+        ]
+      }
+    ]
+  };
+}
+
+export function createHomePageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${seflekSiteUrl}/seflektur#webpage`,
+    url: `${seflekSiteUrl}/seflektur`,
+    name: defaultSeflekTitle,
+    description: defaultSeflekDescription,
+    inLanguage: "tr-TR",
+    isPartOf: { "@id": `${seflekSiteUrl}/#website` },
+    about: { "@id": `${seflekSiteUrl}/#organization` },
+    primaryImageOfPage: { "@type": "ImageObject", url: `${seflekSiteUrl}/site-media/hero-home.png` }
+  };
+}
 
 export const corporateFaqJsonLd = {
   "@context": "https://schema.org",

@@ -4,7 +4,7 @@ import { readSiteContent } from "@/lib/site-content";
 import { OnboardingScreen, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { CompanyInfoList } from "@/app/seflektur/CompanyInfoList";
 import { MobileAppPromo, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
-import { corporateFaqItems, corporateFaqJsonLd, createCorporateMetadata } from "@/app/seflektur/seo";
+import { corporateFaqItems, createCorporateMetadata, createHomePageJsonLd } from "@/app/seflektur/seo";
 
 const heroFleetImage =
   "/site-media/hero-home.png";
@@ -62,10 +62,10 @@ export default async function SeflekTurPage() {
   const content = await readSiteContent();
 
   return (
-    <main className="new-site-page paged-site">
+    <main className="new-site-page paged-site home-site-page">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(corporateFaqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(createHomePageJsonLd()) }}
       />
       <SiteHeader />
 

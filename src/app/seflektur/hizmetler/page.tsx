@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Bus, Clock3, MapPinned, Route, Sparkles, UsersRound } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
-import { createCorporateMetadata } from "@/app/seflektur/seo";
+import { createCorporateMetadata, createServiceJsonLd } from "@/app/seflektur/seo";
 
 const serviceIcons = [UsersRound, Route, MapPinned, Clock3, Sparkles];
 
@@ -18,6 +18,7 @@ export default async function ServicesPage() {
 
   return (
     <main className="new-site-page paged-site">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(createServiceJsonLd({ name: "İstanbul Personel Servisi ve Yolcu Taşımacılığı", description: "İstanbul'da personel servisi, okul servisi, turizm, organizasyon ve VIP transfer planlama hizmetleri.", path: "/seflektur/hizmetler", image: "/site-media/service-personnel.png", serviceTypes: ["Personel servisi", "Okul servisi", "VIP transfer", "Turizm taşımacılığı"] })) }} />
       <SiteHeader />
       <PageHero
         eyebrow="Hizmetler"

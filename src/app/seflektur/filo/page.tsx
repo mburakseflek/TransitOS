@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Bus } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
 import { FleetCard, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
-import { createCorporateMetadata } from "@/app/seflektur/seo";
+import { createCorporateMetadata, createServiceJsonLd } from "@/app/seflektur/seo";
 
 export const metadata = createCorporateMetadata({
   title: "Şeflek Tur Filo | İstanbul Servis ve Turizm Araçları",
@@ -16,6 +16,7 @@ export default async function FleetPage() {
 
   return (
     <main className="new-site-page paged-site">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(createServiceJsonLd({ name: "Kurumsal Servis Filosu", description: "İstanbul personel, okul ve turizm taşımacılığı için farklı kapasitelere sahip kurumsal araç filosu.", path: "/seflektur/filo", image: "/site-media/hero-fleet.png", serviceTypes: ["Kurumsal filo planlama", "Personel servis aracı", "Turizm aracı"] })) }} />
       <SiteHeader />
       <PageHero
         eyebrow="Beyaz filo standardı"

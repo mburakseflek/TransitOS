@@ -22,10 +22,11 @@ const siteNavLinks = [
 export function SiteHeader() {
   return (
     <>
+      <a className="site-skip-link" href="#main-content">Ana içeriğe geç</a>
       <CorporateMobileNav links={siteNavLinks} />
       <header className="new-site-nav">
-        <Link className="navy-brand" href="/seflektur">
-          <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" decoding="async" />
+        <Link className="navy-brand" href="/seflektur" aria-label="Şeflek Tur ana sayfa">
+          <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" decoding="async" />
         </Link>
         <nav className="site-desktop-nav" aria-label="Kurumsal site menüsü">
           {siteNavLinks.map((item) => (
@@ -55,7 +56,7 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <section className="page-hero editorial-hero">
+    <section className="page-hero editorial-hero" id="main-content">
       <div className="page-hero-copy">
         <span className="new-eyebrow">{eyebrow}</span>
         <h1>{title}</h1>
@@ -69,7 +70,7 @@ export function PageHero({
       </div>
       {imageUrl ? (
         <div className="page-hero-visual">
-          <img src={imageUrl} alt={imageAlt ?? title} decoding="async" fetchPriority="high" />
+          <img src={imageUrl} alt={imageAlt ?? title} width="1280" height="960" decoding="async" fetchPriority="high" />
         </div>
       ) : null}
     </section>
@@ -80,10 +81,10 @@ export function FleetCard({ card, vip = false }: { card: SiteCard; vip?: boolean
   return (
     <article className={vip ? "new-fleet-card vip-fleet-card hover-card" : "new-fleet-card branded-fleet-card hover-card"}>
       <div className="new-fleet-photo">
-        {card.imageUrl ? <img src={card.imageUrl} alt={card.title} loading="lazy" decoding="async" /> : null}
+        {card.imageUrl ? <img src={card.imageUrl} alt={card.title} width="720" height="520" loading="lazy" decoding="async" /> : null}
         {!vip ? (
           <span className="fleet-logo-decal">
-            <img src="/brand/seflek-logo-navy.png" alt="" loading="lazy" decoding="async" />
+            <img src="/brand/seflek-logo-navy.png" alt="" width="236" height="92" loading="lazy" decoding="async" />
           </span>
         ) : null}
         <small>{card.meta}</small>
@@ -119,8 +120,8 @@ export function MobileAppPromo({
         </div>
       </div>
       <div className="mobile-app-visual">
-        {imageUrl ? <img src={imageUrl} alt={title} loading="lazy" decoding="async" /> : null}
-        <img className="mobile-app-logo" src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" loading="lazy" decoding="async" />
+        {imageUrl ? <img src={imageUrl} alt={title} width="720" height="720" loading="lazy" decoding="async" /> : null}
+        <img className="mobile-app-logo" src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" loading="lazy" decoding="async" />
       </div>
     </section>
   );
@@ -133,7 +134,7 @@ export async function SiteFooter({ tickerItems }: { tickerItems: string[] }) {
   return (
     <>
       <footer className="new-site-footer">
-        <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" loading="lazy" decoding="async" />
+        <img src="/seflek-logo-white.png" alt="Şeflek Tur" width="236" height="92" loading="lazy" decoding="async" />
         <div>
           <span>Şeflek Tur Turizm & Yolcu Taşımacılığı</span>
           <small>Kurumsal taşımacılık, belge takibi, sigorta ve operasyon standartları Şeflek Tur süreçleri kapsamında düzenli olarak kontrol edilir.</small>

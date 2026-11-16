@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${siteUrl}${route}`,
     images: routeImages[route],
     changeFrequency: route === "/" || route === "/seflektur" ? "weekly" : "monthly",
-    priority: route === "/" ? 1 : route === "/seflektur" ? 0.95 : 0.7
+    priority: route === "/seflektur" ? 1 : ["/seflektur/hizmetler", "/seflektur/teklif", "/seflektur/iletisim"].includes(route) ? 0.85 : 0.7
   }));
 }
 

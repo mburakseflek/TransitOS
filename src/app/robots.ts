@@ -28,7 +28,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: privatePaths
       },
       {
-        userAgent: ["OAI-SearchBot", "ChatGPT-User", "GPTBot", "Google-Extended", "ClaudeBot", "PerplexityBot"],
+        userAgent: ["OAI-SearchBot", "ChatGPT-User", "GPTBot", "Google-Extended", "ClaudeBot", "PerplexityBot", "Applebot", "Applebot-Extended"],
         allow: ["/", "/seflektur/", "/llms.txt"],
         disallow: privatePaths
       }

@@ -18,7 +18,7 @@ export function CorporateMobileNav({ links }: { links: readonly SiteNavLink[] })
     <>
       <div className="site-mobile-chrome" aria-label="Şeflek Tur mobil hızlı menü">
         <Link className="site-mobile-brand" href="/seflektur" aria-label="Şeflek Tur ana sayfa" onClick={() => setIsOpen(false)}>
-          <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
+          <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" />
         </Link>
         <button
           className="site-mobile-menu-button"
@@ -39,7 +39,7 @@ export function CorporateMobileNav({ links }: { links: readonly SiteNavLink[] })
       />
       <nav className={isOpen ? "site-mobile-drawer is-open" : "site-mobile-drawer"} aria-label="Mobil kurumsal site menüsü">
         <div className="site-mobile-drawer-head">
-          <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
+          <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" />
           <button type="button" aria-label="Menüyü kapat" onClick={() => setIsOpen(false)}>
             <X size={18} />
             <span>Kapat</span>

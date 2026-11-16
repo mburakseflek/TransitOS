@@ -63,7 +63,7 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <section className="page-hero editorial-hero corp-v2-hero" id="main-content">
+    <section className="corp-v2-hero" id="main-content">
       <div className="corp-v2-hero-copy">
         <span className="corp-v2-kicker">{eyebrow}</span>
         <h1>{title}</h1>

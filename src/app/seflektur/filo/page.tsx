@@ -15,7 +15,7 @@ export default async function FleetPage() {
   const content = await readSiteContent();
 
   return (
-    <main className="new-site-page paged-site">
+    <main className="new-site-page paged-site corp-v2">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(createServiceJsonLd({ name: "Kurumsal Servis Filosu", description: "İstanbul personel, okul ve turizm taşımacılığı için farklı kapasitelere sahip kurumsal araç filosu.", path: "/seflektur/filo", image: "/site-media/hero-fleet.png", serviceTypes: ["Kurumsal filo planlama", "Personel servis aracı", "Turizm aracı"] })) }} />
       <SiteHeader />
       <PageHero

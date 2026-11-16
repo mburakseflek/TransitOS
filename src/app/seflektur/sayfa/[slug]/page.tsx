@@ -35,7 +35,7 @@ export default async function CustomContentPage({ params }: { params: Promise<{ 
   }
 
   return (
-    <main className="new-site-page paged-site">
+    <main className="new-site-page paged-site corp-v2">
       <SiteHeader />
       <PageHero
         eyebrow="Şeflek Tur"

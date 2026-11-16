@@ -17,7 +17,7 @@ export default async function ServicesPage() {
   const content = await readSiteContent();
 
   return (
-    <main className="new-site-page paged-site">
+    <main className="new-site-page paged-site corp-v2">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(createServiceJsonLd({ name: "İstanbul Personel Servisi ve Yolcu Taşımacılığı", description: "İstanbul'da personel servisi, okul servisi, turizm, organizasyon ve VIP transfer planlama hizmetleri.", path: "/seflektur/hizmetler", image: "/site-media/service-personnel.png", serviceTypes: ["Personel servisi", "Okul servisi", "VIP transfer", "Turizm taşımacılığı"] })) }} />
       <SiteHeader />
       <PageHero

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, Bus, CheckCircle2, FileText, Handshake, Headphones, Mail, MapPinned, ShieldCheck, Route, Sparkles } from "lucide-react";
 import { readSiteContent } from "@/lib/site-content";
-import { OnboardingScreen, RegistryStatusPills } from "@/app/components/RegistryInterfaceKit";
 import { CompanyInfoList } from "@/app/seflektur/CompanyInfoList";
 import { MobileAppPromo, PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
 import { corporateFaqItems, createCorporateMetadata, createHomePageJsonLd } from "@/app/seflektur/seo";
@@ -62,7 +61,7 @@ export default async function SeflekTurPage() {
   const content = await readSiteContent();
 
   return (
-    <main className="new-site-page paged-site home-site-page">
+    <main className="new-site-page paged-site home-site-page corp-v2">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(createHomePageJsonLd()) }}
@@ -86,15 +85,15 @@ export default async function SeflekTurPage() {
         </div>
       </PageHero>
 
-      <section className="quick-proof-row editorial-proof-row">
+      <section className="corp-v2-proof">
         <div><strong>7/24</strong><span>Ulaşılabilir operasyon</span></div>
         <div><strong>TransitOS</strong><span>Dijital takip ve raporlama</span></div>
         <div><strong>Beyaz Filo</strong><span>Kurumsal araç görünümü</span></div>
       </section>
 
-      <section className="seo-intro-section" aria-labelledby="istanbul-ulasim-cozumleri">
-        <div className="seo-intro-copy">
-          <span className="new-eyebrow">İstanbul ulaşım çözümleri</span>
+      <section className="corp-v2-intro" aria-labelledby="istanbul-ulasim-cozumleri">
+        <div className="corp-v2-intro-copy">
+          <span className="corp-v2-section-label">İstanbul ulaşım çözümleri</span>
           <h2 id="istanbul-ulasim-cozumleri">Personel servisi, okul servisi ve VIP transfer tek operasyon disipliniyle.</h2>
           <p>
             Şeflek Tur; İstanbul genelindeki kurumlar, okullar, etkinlik ekipleri ve bireysel yolcular için
@@ -105,7 +104,7 @@ export default async function SeflekTurPage() {
             Tüm taşımacılık hizmetlerini incele <ArrowRight size={17} />
           </Link>
         </div>
-        <div className="seo-service-list" aria-label="Şeflek Tur hizmet alanları">
+        <div className="corp-v2-service-list" aria-label="Şeflek Tur hizmet alanları">
           {["Kurumsal personel taşımacılığı", "Okul ve öğrenci servisi", "Havalimanı ve VIP transfer", "Turizm ve organizasyon ulaşımı"].map((service) => (
             <div key={service}><CheckCircle2 size={19} aria-hidden="true" /><span>{service}</span></div>
           ))}
@@ -113,40 +112,34 @@ export default async function SeflekTurPage() {
         </div>
       </section>
 
-      <OnboardingScreen
-        eyebrow="Kurumsal Yolculuk"
-        title="Talep, planlama ve raporlama tek akışta ilerler."
-        body="Şeflek Tur tarafında web sitesi yalnızca tanıtım değil; hizmet talebi, taşımacı başvurusu ve TransitOS bilgilendirmesiyle canlı bir çalışma alanı gibi davranır."
-        actionHref="/seflektur/teklif"
-        actionLabel="Hizmet talebi oluştur"
-        steps={[
-          { title: "Talep alınır", body: "Hizmet veya taşımacı başvurusu yönetici paneline düşer." },
-          { title: "Operasyon planlanır", body: "Araç, sürücü, rota ve dönem bilgisi TransitOS tarafında takip edilir." },
-          { title: "Raporlanır", body: "Fatura, hakediş ve servis çıktıları anlaşılır PDF düzeninde sunulur." }
-        ]}
-      />
+      <section className="corp-v2-process">
+        <header>
+          <span className="corp-v2-section-label">Nasıl çalışıyoruz?</span>
+          <h2>Talebinizden yolculuğun sonuna kadar tek ekip.</h2>
+          <Link href="/seflektur/teklif">Planlama başlatın <ArrowRight size={17} /></Link>
+        </header>
+        <ol>
+          <li><span>01</span><div><strong>İhtiyacı dinliyoruz</strong><p>Yolcu, güzergâh, saat ve hizmet beklentisini netleştiriyoruz.</p></div></li>
+          <li><span>02</span><div><strong>Operasyonu kuruyoruz</strong><p>Uygun araç, sürücü ve çalışma planını tek merkezden oluşturuyoruz.</p></div></li>
+          <li><span>03</span><div><strong>Takip ve raporlama</strong><p>Operasyon sürecini TransitOS ile izliyor, gerekli çıktıları sunuyoruz.</p></div></li>
+        </ol>
+      </section>
 
-      <section className="page-menu-section">
-        <div className="section-title-block">
-          <span className="new-eyebrow">Sayfa seçimi</span>
-          <h2>İhtiyacınız olan bölüme doğrudan geçin.</h2>
-          <RegistryStatusPills
-            items={[
-              { label: "hizmet alanı", value: pageCards.length, tone: "blue" },
-              { label: "başvuru akışı", value: 2, tone: "green" },
-              { label: "canlı panel", value: "TransitOS", tone: "red" }
-            ]}
-          />
+      <section className="corp-v2-services">
+        <div className="corp-v2-section-head">
+          <div><span className="corp-v2-section-label">Hizmet alanlarımız</span><h2>Her yolculuk için doğru çözüm.</h2></div>
+          <p>Kurumsal servislerden özel transferlere kadar farklı ihtiyaçları aynı operasyon standardıyla yönetiyoruz.</p>
         </div>
-        <div className="page-card-grid">
-          {pageCards.map((card) => {
+        <div className="corp-v2-service-grid">
+          {pageCards.map((card, index) => {
             const Icon = card.icon;
             return (
-              <Link className="page-card hover-card" href={card.href} key={card.title}>
-                <Icon size={26} />
-                <strong>{card.title}</strong>
+              <Link className="corp-v2-service-card" href={card.href} key={card.title}>
+                <span className="corp-v2-card-number">0{index + 1}</span>
+                <Icon size={25} aria-hidden="true" />
+                <h3>{card.title}</h3>
                 <p>{card.body}</p>
-                <span>Sayfayı aç <ArrowRight size={16} /></span>
+                <span className="corp-v2-card-link">İnceleyin <ArrowRight size={16} /></span>
               </Link>
             );
           })}

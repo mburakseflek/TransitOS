@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 import { WhatsAppIcon } from "@/app/components/WhatsAppIcon";
 import { CorporateMobileNav } from "@/app/seflektur/CorporateMobileNav";
 import { readSiteContent, SiteCard } from "@/lib/site-content";
@@ -24,17 +24,24 @@ export function SiteHeader() {
     <>
       <a className="site-skip-link" href="#main-content">Ana içeriğe geç</a>
       <CorporateMobileNav links={siteNavLinks} />
-      <header className="new-site-nav">
-        <Link className="navy-brand" href="/seflektur" aria-label="Şeflek Tur ana sayfa">
-          <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" decoding="async" />
-        </Link>
-        <nav className="site-desktop-nav" aria-label="Kurumsal site menüsü">
-          {siteNavLinks.map((item) => (
-            <Link key={item.href} className={"className" in item ? item.className : undefined} href={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+      <header className="corp-v2-header">
+        <div className="corp-v2-header-inner">
+          <Link className="corp-v2-brand" href="/seflektur" aria-label="Şeflek Tur ana sayfa">
+            <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" decoding="async" />
+          </Link>
+          <nav className="corp-v2-nav" aria-label="Kurumsal site menüsü">
+            <Link href="/seflektur/hizmetler">Hizmetler</Link>
+            <Link href="/seflektur/filo">Filo</Link>
+            <Link href="/seflektur/vip">VIP Transfer</Link>
+            <Link href="/seflektur/standartlar">Standartlarımız</Link>
+            <Link href="/seflektur/referanslar">Referanslar</Link>
+            <Link href="/seflektur/iletisim">İletişim</Link>
+          </nav>
+          <div className="corp-v2-header-actions">
+            <Link className="corp-v2-portal-link" href="/seflektur/transitos">TransitOS</Link>
+            <Link className="corp-v2-header-cta" href="/seflektur/teklif">Teklif alın <ArrowRight size={16} /></Link>
+          </div>
+        </div>
       </header>
     </>
   );
@@ -56,21 +63,22 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <section className="page-hero editorial-hero" id="main-content">
-      <div className="page-hero-copy">
-        <span className="new-eyebrow">{eyebrow}</span>
+    <section className="page-hero editorial-hero corp-v2-hero" id="main-content">
+      <div className="corp-v2-hero-copy">
+        <span className="corp-v2-kicker">{eyebrow}</span>
         <h1>{title}</h1>
         <p>{body}</p>
         {children}
-        <div className="hero-trust-line" aria-label="Şeflek Tur hizmet özellikleri">
-          <span><b>7/24</b> operasyon</span>
-          <span><b>İstanbul</b> merkezli</span>
-          <span><b>TransitOS</b> destekli</span>
+        <div className="corp-v2-hero-meta" aria-label="Şeflek Tur hizmet özellikleri">
+          <span><b>7/24</b> operasyon desteği</span>
+          <span><b>İstanbul</b> merkezli planlama</span>
+          <span><b>TransitOS</b> ile takip</span>
         </div>
       </div>
       {imageUrl ? (
-        <div className="page-hero-visual">
+        <div className="corp-v2-hero-visual">
           <img src={imageUrl} alt={imageAlt ?? title} width="1280" height="960" decoding="async" fetchPriority="high" />
+          <div className="corp-v2-image-note"><span>Şeflek Tur</span><strong>Güvenli ulaşım, kontrollü operasyon.</strong></div>
         </div>
       ) : null}
     </section>
@@ -133,13 +141,24 @@ export async function SiteFooter({ tickerItems }: { tickerItems: string[] }) {
 
   return (
     <>
-      <footer className="new-site-footer">
-        <img src="/seflek-logo-white.png" alt="Şeflek Tur" width="236" height="92" loading="lazy" decoding="async" />
-        <div>
-          <span>Şeflek Tur Turizm & Yolcu Taşımacılığı</span>
-          <small>Kurumsal taşımacılık, belge takibi, sigorta ve operasyon standartları Şeflek Tur süreçleri kapsamında düzenli olarak kontrol edilir.</small>
+      <footer className="corp-v2-footer">
+        <div className="corp-v2-footer-brand">
+          <img src="/seflek-logo-white.png" alt="Şeflek Tur" width="236" height="92" loading="lazy" decoding="async" />
+          <p>İstanbul merkezli kurumsal personel, okul, turizm ve VIP taşımacılık çözümleri.</p>
         </div>
-        <small className="footer-rights">Tüm marka, belge ve operasyon hakları saklıdır. Created & designed by CreativeWork Media.</small>
+        <div className="corp-v2-footer-links">
+          <strong>Şeflek Tur</strong>
+          <Link href="/seflektur/hizmetler">Hizmetler</Link>
+          <Link href="/seflektur/filo">Filo</Link>
+          <Link href="/seflektur/referanslar">Referanslar</Link>
+        </div>
+        <div className="corp-v2-footer-links">
+          <strong>İletişim</strong>
+          <a href={`tel:${content.contactPhone.replace(/\s/g, "")}`}><Phone size={15} /> {content.contactPhone}</a>
+          <a href={`mailto:${content.contactEmail}`}>{content.contactEmail}</a>
+          <Link href="/seflektur/teklif">Hizmet talebi</Link>
+        </div>
+        <small className="corp-v2-footer-rights">© {new Date().getFullYear()} Şeflek Tur. Tüm hakları saklıdır.</small>
       </footer>
 
       {whatsappNumber ? (

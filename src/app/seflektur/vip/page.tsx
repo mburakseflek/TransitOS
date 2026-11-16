@@ -21,7 +21,7 @@ export default async function VipPage() {
   });
 
   return (
-    <main className="new-site-page paged-site">
+    <main className="new-site-page paged-site corp-v2">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <SiteHeader />
       <PageHero

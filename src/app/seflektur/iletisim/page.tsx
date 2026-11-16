@@ -16,7 +16,7 @@ export default async function ContactPage() {
   const content = await readSiteContent();
 
   return (
-    <main className="new-site-page paged-site">
+    <main className="new-site-page paged-site corp-v2">
       <SiteHeader />
       <PageHero
         eyebrow="İletişim"

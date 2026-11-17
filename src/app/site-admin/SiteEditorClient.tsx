@@ -24,6 +24,7 @@ import { saveSiteContent } from "@/app/site-actions";
 import type { CompanyDetail, CustomPage, SiteBlock, SiteCard, SiteContent } from "@/lib/site-content";
 import type { VisitorAnalytics } from "@/lib/site-analytics";
 import { VisitorAnalyticsModal } from "@/app/site-admin/VisitorAnalyticsModal";
+import { normalizeAppearance } from "@/lib/site-appearance";
 
 type EditablePageKey =
   | "gateway"
@@ -410,6 +411,8 @@ export function SiteEditorClient({
   visitorAnalytics: VisitorAnalytics;
 }) {
   const [content, setContent] = useState(initialContent);
+  const [designOpen, setDesignOpen] = useState(false);
+  const appearance = normalizeAppearance(content.appearance);
   const [notice, setNotice] = useState(saved ? "Kaydedildi." : "");
   const [activePage, setActivePage] = useState<EditablePageKey>("home");
 
@@ -516,6 +519,16 @@ export function SiteEditorClient({
   return (
     <main className="live-edit-page">
       <form action={saveSiteContent}>
+        <input type="hidden" name="appearance" value={JSON.stringify(appearance)} />
+        {designOpen ? <aside className="design-inspector" aria-label="Tasarım özellikleri">
+          <header><h2>Tasarım özellikleri</h2><button type="button" onClick={() => setDesignOpen(false)}>Kapat</button></header>
+          <p>Kurumsal sitenin genel görünümü. Yayınlamak için üst menüden Kaydet’e basın.</p>
+          <label>Vurgu rengi<input type="color" value={appearance.accent} onChange={e=>commit({...content,appearance:{...appearance,accent:e.target.value}})} /></label>
+          <label>Yazı ailesi<select value={appearance.font} onChange={e=>commit({...content,appearance:{...appearance,font:e.target.value === "serif" ? "serif" : "system"}})}><option value="system">Sistem — sade</option><option value="serif">Georgia — klasik</option></select></label>
+          {([ ["size","Metin boyutu",16,22], ["radius","Kart köşeleri",0,28], ["spacing","Kart iç boşluğu",16,48] ] as const).map(([key,label,min,max])=><label key={key}>{label} · {appearance[key]} px<input type="range" min={min} max={max} value={appearance[key]} onChange={e=>commit({...content,appearance:{...appearance,[key]:Number(e.target.value)}})} /></label>)}
+          <div className="design-inspector-sample" style={{fontFamily:appearance.font === "serif" ? "Georgia,serif" : "system-ui",fontSize:appearance.size,borderRadius:appearance.radius,padding:appearance.spacing,borderTop:`4px solid ${appearance.accent}`}}><strong>Şeflek Tur</strong><p>Yolculuğunuz için kurumsal ulaşım çözümleri.</p></div>
+          <button type="button" onClick={()=>commit({...content,appearance:normalizeAppearance(null)})}>Varsayılana dön</button>
+        </aside> : null}
         <input type="hidden" name="companyName" value={content.companyName} />
         <input type="hidden" name="brandLine" value={content.brandLine} />
         <input type="hidden" name="heroTitle" value={content.heroTitle} />
@@ -546,6 +559,7 @@ export function SiteEditorClient({
         <textarea hidden readOnly name="customPages" value={JSON.stringify(content.customPages)} />
 
         <header className="live-edit-toolbar">
+          <button type="button" className="ghost" aria-expanded={designOpen} onClick={()=>setDesignOpen(!designOpen)}>Tasarım araçları</button>
           <Link className="navy-brand" href="/seflektur">
             <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />
           </Link>

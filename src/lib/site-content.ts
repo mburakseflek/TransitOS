@@ -64,6 +64,7 @@ export type SiteContent = {
   mobileAppImageUrl: string;
   customPages: CustomPage[];
   tickerItems: string[];
+  appearance?: import("./site-appearance").SiteAppearance;
 };
 
 const dataDir = path.join(process.cwd(), "content");

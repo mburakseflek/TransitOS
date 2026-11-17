@@ -1,4 +1,5 @@
 "use server";
+import { normalizeAppearance } from "@/lib/site-appearance";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -123,7 +124,8 @@ export async function saveSiteContent(formData: FormData) {
     services: parseCards(text(formData, "services"), defaultSiteContent.services),
     privileges: parseCards(text(formData, "privileges"), defaultSiteContent.privileges),
     references: parseCards(text(formData, "references"), defaultSiteContent.references),
-    customPages: parseCustomPages(text(formData, "customPages"), defaultSiteContent.customPages)
+    customPages: parseCustomPages(text(formData, "customPages"), defaultSiteContent.customPages),
+    appearance: normalizeAppearance(JSON.parse(text(formData, "appearance") || "{}"))
   });
 
   revalidatePath("/");

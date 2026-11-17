@@ -1,4 +1,11 @@
 /* Surface/foreground pairs override legacy text-fill rules together. */
+.design-inspector { position:fixed; inset:0 0 0 auto; z-index:1000; width:min(380px,100vw); padding:24px; overflow-y:auto; color:#172b3d; background:#fff; border-left:1px solid #ccd7e0; box-shadow:-16px 0 40px #142c4022; }
+.design-inspector header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.design-inspector label { display:grid; gap:10px; margin:24px 0; color:#172b3d !important; }
+.design-inspector :is(h2,p,strong,button) { color:#172b3d !important; -webkit-text-fill-color:#172b3d !important; }
+.design-inspector :is(button,select) { min-height:44px; padding:10px; border:1px solid #b9c6d2; border-radius:8px; background:#f5f7fa; }
+.design-inspector input { max-width:100%; }
+.design-inspector-sample { margin:24px 0; background:#f5f7fa; color:#172b3d; }
 .transitos-shell .sidebar.aceternity-sidebar :is(.sidebar-brand-title,.aceternity-sidebar-link,.site-return-link,.sidebar-logout-button) { color:#f5f8fc !important; -webkit-text-fill-color:#f5f8fc !important; }
 .transitos-shell .sidebar.aceternity-sidebar .sidebar-brand-meta { color:#c3d1df !important; -webkit-text-fill-color:#c3d1df !important; }
 .transitos-shell .sidebar.aceternity-sidebar .aceternity-sidebar-link:not(.active) :is(span,svg) { color:#e2ebf4 !important; -webkit-text-fill-color:#e2ebf4 !important; }

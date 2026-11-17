@@ -1,4 +1,22 @@
 /* Shared presentation contract; data and business rules remain in their modules. */
+/* Platform-independent interaction and zoom support. */
+@supports not (overflow:clip) { .corp-v2 { overflow-x:hidden; } }
+:where(.corp-v2,.transitos-shell) { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+:where(.corp-v2,.transitos-shell) :is(button,a,summary,input,select) { touch-action:manipulation; }
+@media (hover:none) {
+  .transitos-shell :is(.card,.aceternity-sidebar-link):hover { transform:none !important; }
+}
+@media (max-width:360px) {
+  .corp-v2 .corp-v2-hero h1 { font-size:1.8rem !important; overflow-wrap:normal !important; }
+  .corp-v2 .corp-v2-hero-copy { padding:28px 16px !important; }
+}
+@media (max-height:540px) and (orientation:landscape) {
+  .site-mobile-drawer,.mobile-drawer-panel { max-height:100vh !important; max-height:100dvh !important; overflow-y:auto !important; }
+  .corp-v2 .site-mobile-chrome { position:relative !important; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .corp-v2 * { animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+}
 /* Service-led landing pages: readable content and a clear conversion path. */
 .corp-v2 .service-intent-links { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:12px; }
 .corp-v2 .service-intent-links a { padding:14px 20px; border:1px solid #bbc9d4; border-radius:10px; color:#163b59 !important; background:#fff; text-decoration:none; font-weight:650; }

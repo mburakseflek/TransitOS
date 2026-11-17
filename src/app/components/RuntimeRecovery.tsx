@@ -3,13 +3,16 @@
 import { useEffect } from "react";
 
 const recoveryKey = "transitos-runtime-recovery";
+let lastMemoryRecovery = 0;
 const recoverableError = /chunkloaderror|loading chunk|failed to fetch dynamically imported module|failed to load resource|networkerror|failed to find server action|server action.{0,40}(not found|missing)|failed to fetch.{0,20}(rsc|server component)|invalid server response/i;
 
 function reloadOnce() {
   const now = Date.now();
-  const lastRecovery = Number(window.sessionStorage.getItem(recoveryKey) ?? 0);
+  let lastRecovery = lastMemoryRecovery;
+  try { lastRecovery = Math.max(lastRecovery, Number(window.sessionStorage.getItem(recoveryKey) ?? 0) || 0); } catch { /* Storage may be unavailable in private or restricted browsers. */ }
   if (now - lastRecovery < 30_000) return;
-  window.sessionStorage.setItem(recoveryKey, String(now));
+  lastMemoryRecovery = now;
+  try { window.sessionStorage.setItem(recoveryKey, String(now)); } catch { return; /* Avoid a reload loop when recovery cannot be persisted. */ }
   window.location.reload();
 }
 

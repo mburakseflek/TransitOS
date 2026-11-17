@@ -33,7 +33,7 @@ export function PrintReportButton({
             }
             .print-document {
               width: 100%;
-              min-height: 100vh;
+              min-height: 0;
               background: #fff;
             }
             .invoice-paper,
@@ -386,6 +386,16 @@ export function PrintReportButton({
             .maintenance-report > section { margin-top:10px; }.maintenance-report > section h3 { margin:0 0 6px; font-size:11px; }.maintenance-report > section p { margin:0; color:#475569; font-size:10px; line-height:1.55; }
             .maintenance-report footer { display:flex; justify-content:space-between; margin-top:22px; padding-top:10px; border-top:1px solid #dce3e8; color:#64748b; font-size:8px; }
             .no-print { display: none !important; }
+            @media print {
+              html, body, .print-document { height:auto !important; min-height:0 !important; overflow:visible !important; }
+              .review-document,.report-page,.invoice-paper,.transitos-report { display:block !important; break-inside:auto !important; page-break-inside:auto !important; }
+              thead { display:table-header-group; }
+              tfoot { display:table-row-group; }
+              h1,h2,h3 { break-after:avoid; }
+              p { orphans:3; widows:3; }
+              .print-document > :last-child { break-after:auto !important; page-break-after:auto !important; }
+              .maintenance-report > section { break-inside:auto; overflow-wrap:anywhere; }
+            }
           </style>
         </head>
         <body>
@@ -407,8 +417,8 @@ export function PrintReportButton({
       waitForImages,
       new Promise((resolve) => setTimeout(resolve, 5000))
     ]).then(() => {
+      printWindow.addEventListener("afterprint", () => printWindow.close(), { once: true });
       printWindow.print();
-      setTimeout(() => printWindow.close(), 500);
     });
   }
 

@@ -1,0 +1,24 @@
+/* Surface/foreground pairs override legacy text-fill rules together. */
+.transitos-shell .sidebar.aceternity-sidebar :is(.sidebar-brand-title,.aceternity-sidebar-link,.site-return-link,.sidebar-logout-button) { color:#f5f8fc !important; -webkit-text-fill-color:#f5f8fc !important; }
+.transitos-shell .sidebar.aceternity-sidebar .sidebar-brand-meta { color:#c3d1df !important; -webkit-text-fill-color:#c3d1df !important; }
+.transitos-shell .sidebar.aceternity-sidebar .aceternity-sidebar-link:not(.active) :is(span,svg) { color:#e2ebf4 !important; -webkit-text-fill-color:#e2ebf4 !important; }
+.transitos-shell .sidebar.aceternity-sidebar .aceternity-sidebar-link.active { color:#142c40 !important; -webkit-text-fill-color:#142c40 !important; background:#fff !important; }
+.transitos-shell .sidebar.aceternity-sidebar .sidebar-brand-title span { color:#ff8b99 !important; -webkit-text-fill-color:#ff8b99 !important; }
+.new-site-page.corp-v2 .corp-v2-process { background:#0b3858 !important; }
+.new-site-page.corp-v2 .corp-v2-process :is(h2,strong,a) { color:#fff !important; -webkit-text-fill-color:#fff !important; }
+.new-site-page.corp-v2 .corp-v2-process :is(p,span) { color:#d3e1ec !important; -webkit-text-fill-color:#d3e1ec !important; }
+.new-site-page.corp-v2 .company-preview-card { background:#101820 !important; }
+.new-site-page.corp-v2 .company-preview-card>div:first-child :is(h2,p,span) { color:#e5edf5 !important; -webkit-text-fill-color:#e5edf5 !important; }
+.new-site-page.corp-v2 .corp-v2-service-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:24px !important; }
+.new-site-page.corp-v2 .corp-v2-service-card { grid-column:auto !important; min-height:280px; }
+.new-site-page.corp-v2 .corp-v2-service-card:last-child:nth-child(odd) { grid-column:1/-1 !important; }
+.welcome-intro { position:fixed; inset:0; z-index:2000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:24px; background:#101820; color:#fff; animation:welcome-enter 250ms ease-out; }
+.welcome-intro img { width:220px; height:auto; animation:welcome-enter 500ms ease-out; }
+.welcome-intro span { color:#e5edf5; font-size:1rem; }
+.welcome-intro button { position:absolute; right:24px; bottom:max(24px,env(safe-area-inset-bottom)); min-height:44px; padding:10px 20px; color:#fff; background:#24384b; border:1px solid #5c7185; border-radius:10px; cursor:pointer; }
+@keyframes welcome-enter { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+@media(max-width:640px) {
+  .new-site-page.corp-v2 .corp-v2-service-grid { grid-template-columns:minmax(0,1fr) !important; }
+  .welcome-intro img { width:170px; }
+}
+@media(prefers-reduced-motion:reduce) { .welcome-intro { display:none; } }

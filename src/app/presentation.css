@@ -1,4 +1,19 @@
 /* Shared presentation contract; data and business rules remain in their modules. */
+/* Service-led landing pages: readable content and a clear conversion path. */
+.corp-v2 .service-intent-links { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:12px; }
+.corp-v2 .service-intent-links a { padding:14px 20px; border:1px solid #bbc9d4; border-radius:10px; color:#163b59 !important; background:#fff; text-decoration:none; font-weight:650; }
+.corp-v2 .service-guide { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(260px,.75fr); gap:clamp(28px,6vw,80px); }
+.corp-v2 .service-guide article { padding:28px 0; border-bottom:1px solid #dce3e9; }
+.corp-v2 .service-guide h2 { font-size:clamp(1.4rem,2.3vw,2rem); line-height:1.25; letter-spacing:-.025em; }
+.corp-v2 .service-guide p,.corp-v2 .service-guide li { color:#425466 !important; line-height:1.8; }
+.corp-v2 .service-guide aside { align-self:start; padding:28px; border:1px solid #dce3e9; border-radius:16px; background:#fff; }
+.corp-v2 .service-guide aside a { display:inline-flex; min-height:48px; align-items:center; padding:12px 18px; color:#fff !important; background:#163b59; border-radius:10px; text-decoration:none; }
+@media(max-width:820px) { .corp-v2 .service-guide { grid-template-columns:minmax(0,1fr); } }
+@media(hover:none) { .corp-v2 :is(.corp-v2-service-card,.page-card):hover { transform:none !important; } }
+@supports not (height:100dvh) { body:has(.transitos-shell) .modal-window { max-height:calc(100vh - 32px) !important; } }
+@media(forced-colors:active) {
+  :is(.corp-v2,.transitos-shell) :is(a,button,input,select,textarea,summary) { forced-color-adjust:auto; border:1px solid ButtonText !important; }
+}
 .corp-v2 .corp-v2-hero h1 {
   max-width: none !important;
   width: 100%;

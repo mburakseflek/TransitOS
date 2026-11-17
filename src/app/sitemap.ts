@@ -6,6 +6,9 @@ const siteUrl = "https://www.seflektur.com";
 const staticCorporateRoutes = [
   "/seflektur",
   "/seflektur/hizmetler",
+  "/seflektur/hizmetler/personel-servisi",
+  "/seflektur/hizmetler/okul-servisi",
+  "/seflektur/hizmetler/vip-transfer",
   "/seflektur/filo",
   "/seflektur/vip",
   "/seflektur/ayricaliklar",

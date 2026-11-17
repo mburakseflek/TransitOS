@@ -29,6 +29,11 @@ export default async function ServicesPage() {
       />
 
       <section className="detail-card-grid">
+        <nav className="service-intent-links" aria-label="Hizmet rehberleri">
+          <Link href={{ pathname: "/seflektur/hizmetler/personel-servisi" }}>Personel servisi</Link>
+          <Link href={{ pathname: "/seflektur/hizmetler/okul-servisi" }}>Okul servisi</Link>
+          <Link href={{ pathname: "/seflektur/hizmetler/vip-transfer" }}>VIP transfer</Link>
+        </nav>
         {content.services.map((service, index) => {
           const Icon = serviceIcons[index % serviceIcons.length];
             return (

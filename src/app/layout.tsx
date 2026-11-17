@@ -8,6 +8,7 @@ import { RouteLoadingOverlay } from "@/app/components/RouteLoadingOverlay";
 import { RuntimeRecovery } from "@/app/components/RuntimeRecovery";
 import "./globals.css";
 import "./presentation.css";
+import "./transitos-workspace.css";
 
 export const metadata: Metadata = {
   title: "Şeflek Tur Turizm & Yolcu Taşımacılığı",

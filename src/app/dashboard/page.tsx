@@ -101,7 +101,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   }
 
   return (
-    <AppShell active="/dashboard" title="Ana Panel" subtitle="SeflekTur TransitOS Cloud v2.0 ortak veri merkezi">
+    <AppShell active="/dashboard" title="Operasyon özeti" subtitle="Günün servisleri, proje durumu ve aylık çalışma takvimi.">
       <div className="grid">
         {!projectOwnerView && !subcontractorView ? <Metric title="Taşeronlar" value={subcontractors} icon={<Users size={22} />} /> : null}
         <Metric title="Araçlar" value={vehicles} icon={<Bus size={22} />} />
@@ -177,7 +177,9 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         {canEdit ? <a className="dashboard-project-link" href={`/transitos/projects?month=${period.month}&range=1`}>Servis planlamaya git</a> : null}
       </section>
 
-      <section className="dashboard-columns section">
+      <details className="workspace-disclosure section">
+        <summary>İstanbul trafik durumu <span>Harita ve bölgesel yoğunluk</span></summary>
+        <div className="dashboard-columns workspace-disclosure-body">
         <article className="card">
           <div className="record-head">
             <div>
@@ -229,7 +231,8 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
             </div>
           )}
         </article>
-      </section>
+        </div>
+      </details>
 
     </AppShell>
   );

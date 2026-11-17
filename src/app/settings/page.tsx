@@ -68,7 +68,8 @@ export default async function SettingsPage() {
       </section>
 
       {canManage ? (
-        <section className="settings-center-grid settings-center-grid-single section">
+        <details className="workspace-disclosure section">
+          <summary>Dışa aktarma <span>Rapor ve kayıtları indirin</span></summary>
           <article className="card settings-center-card export-center">
             <div className="settings-center-heading">
               <span className="settings-center-icon"><Download size={22} /></span>
@@ -86,11 +87,13 @@ export default async function SettingsPage() {
             </div>
           </article>
 
-        </section>
+        </details>
       ) : null}
 
       {canManage ? (
-        <section className="card section company-settings-card">
+        <details className="workspace-disclosure section company-settings-card">
+          <summary>Proje şirketleri <span>{companies.length} şirket</span></summary>
+          <div className="workspace-disclosure-body">
           <div className="record-head">
             <div>
               <h2 style={{ marginTop: 0 }}>Proje Şirketleri</h2>
@@ -163,11 +166,14 @@ export default async function SettingsPage() {
             ))}
             {companies.length === 0 ? <p className="muted">Henüz proje şirketi eklenmemiş.</p> : null}
           </div>
-        </section>
+          </div>
+        </details>
       ) : null}
 
       {canManage ? (
-        <section className="card section">
+        <details className="workspace-disclosure section">
+          <summary>Kullanıcı ve yetki yönetimi <span>{users.length} kullanıcı</span></summary>
+          <div className="workspace-disclosure-body">
           <div className="record-head">
             <div>
               <h2 style={{ marginTop: 0 }}>Kullanıcı Yetkileri</h2>
@@ -221,7 +227,8 @@ export default async function SettingsPage() {
               {users.length === 0 ? <tr><td colSpan={5}>Henüz kullanıcı kaydı yok.</td></tr> : null}
             </tbody>
           </table>
-        </section>
+          </div>
+        </details>
       ) : null}
     </AppShell>
   );

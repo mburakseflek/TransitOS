@@ -1,4 +1,8 @@
 /* Shared presentation contract; data and business rules remain in their modules. */
+.new-site-page.corp-v2 { padding:0 !important; margin:0 !important; }
+@media(max-width:1120px) {
+  .new-site-page.corp-v2 .site-mobile-chrome { margin:0 !important; width:100% !important; padding:10px 16px !important; border-radius:0 !important; }
+}
 /* Platform-independent interaction and zoom support. */
 @supports not (overflow:clip) { .corp-v2 { overflow-x:hidden; } }
 :where(.corp-v2,.transitos-shell) { -webkit-text-size-adjust:100%; text-size-adjust:100%; }

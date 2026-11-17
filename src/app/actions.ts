@@ -41,10 +41,6 @@ function ratingValue(formData: FormData, key: string) {
   return Number.isFinite(value) ? Math.min(5, Math.max(1, value)) : 0;
 }
 
-function hasValue(formData: FormData, key: string) {
-  return String(formData.get(key) ?? "").trim().length > 0;
-}
-
 function ids(formData: FormData, key: string) {
   return formData.getAll(key).map(String).filter(Boolean);
 }

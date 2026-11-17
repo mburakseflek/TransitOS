@@ -21,7 +21,7 @@ export function MonthCalendarSelector({
   occupiedDays?: { date: string; vehicleName: string }[];
 }) {
   const todayValue = localDateValue(new Date());
-  const initialDates = defaultDates?.filter(Boolean) ?? [];
+  const initialDates = useMemo(() => defaultDates?.filter(Boolean) ?? [], [defaultDates]);
   const initialMonth = defaultDate?.slice(0, 7) || initialDates[0]?.slice(0, 7) || defaultMonth || todayValue.slice(0, 7);
   const [month, setMonth] = useState(initialMonth);
   const [selected, setSelected] = useState<string[]>(defaultDate ? [defaultDate] : mode === "single" ? [todayValue] : Array.from(new Set(initialDates)).sort());
@@ -52,7 +52,7 @@ export function MonthCalendarSelector({
 
     form.addEventListener("reset", resetSelection);
     return () => form.removeEventListener("reset", resetSelection);
-  }, [defaultDate, defaultDates, initialMonth, mode, todayValue]);
+  }, [defaultDate, initialDates, initialMonth, mode, todayValue]);
 
   function clearHoldTimer() {
     if (holdTimerRef.current) {

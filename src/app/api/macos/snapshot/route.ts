@@ -19,6 +19,13 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: "Bulut oturumu geçersiz." }, { status: 401 });
   }
 
+  if (user.role !== "MANAGER" && user.role !== "SUBCONTRACTOR") {
+    return NextResponse.json({ message: "Bu rol için eşitleme yetkisi bulunmuyor." }, { status: 403 });
+  }
+  if (user.role === "SUBCONTRACTOR" && !user.subcontractorId) {
+    return NextResponse.json({ message: "Taşeron hesabı bağlantısı bulunmuyor." }, { status: 403 });
+  }
+
   const subcontractorId = user.role === "SUBCONTRACTOR" ? user.subcontractorId : undefined;
   const assignments = await prisma.serviceAssignment.findMany({
     where: subcontractorId ? { vehicle: { subcontractorId } } : undefined,
@@ -126,7 +133,7 @@ export async function GET(request: Request) {
         direction: item.direction,
         serviceCount: item.serviceCount,
         pricePerService: Number(item.pricePerService),
-        clientPricePerService: Number(item.clientPricePerService),
+        ...(user.role === "MANAGER" ? { clientPricePerService: Number(item.clientPricePerService) } : {}),
         notes: null
       })),
     expenses: expenses.map((item) => ({

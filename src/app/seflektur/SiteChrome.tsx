@@ -5,6 +5,7 @@ import { WhatsAppIcon } from "@/app/components/WhatsAppIcon";
 import { CorporateMobileNav } from "@/app/seflektur/CorporateMobileNav";
 import { readSiteContent, SiteCard } from "@/lib/site-content";
 import { MarketTicker } from "@/app/components/MarketTicker";
+import { LanguagePicker } from "@/app/components/LanguagePicker";
 
 const siteNavLinks = [
   { href: "/seflektur", label: "Ana Sayfa" },
@@ -38,6 +39,7 @@ export function SiteHeader() {
             <Link href="/seflektur/iletisim">İletişim</Link>
           </nav>
           <div className="corp-v2-header-actions">
+            <LanguagePicker />
             <Link className="corp-v2-portal-link" href="/seflektur/transitos">TransitOS</Link>
             <Link className="corp-v2-header-cta" href="/seflektur/teklif">Teklif alın <ArrowRight size={16} /></Link>
           </div>

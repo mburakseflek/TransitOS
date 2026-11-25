@@ -1,4 +1,20 @@
 /* Surface/foreground pairs override legacy text-fill rules together. */
+.language-picker { display:flex; align-items:center; gap:8px; font:500 .8rem system-ui; color:#172b3d !important; }
+.language-picker>span { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.language-picker select { min-height:44px !important; width:auto !important; max-width:120px; padding:8px !important; color:#172b3d !important; -webkit-text-fill-color:#172b3d !important; background:#fff !important; border:1px solid #cbd5df !important; border-radius:8px !important; }
+.international-site { font:400 18px/1.7 system-ui,sans-serif; color:#172b3d; background:#f5f4f0; }
+.international-site>header,.international-site>section,.international-site>footer { max-width:1240px; margin:auto; padding:48px 24px; }
+.international-site>header { display:flex; justify-content:space-between; align-items:center; padding-block:16px; }
+.international-site header img { object-fit:contain; height:auto; max-width:160px; }
+.international-site .international-hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:center; gap:48px; }
+.international-site h1 { font-size:clamp(2.2rem,4.5vw,4.5rem); line-height:1.12; letter-spacing:-.035em; }
+.international-site h2 { font-size:2rem; line-height:1.25; }
+.international-site p { max-width:70ch; color:#425466; }
+.international-site img { width:100%; height:auto; border-radius:16px; }
+.international-site .international-cta { display:inline-flex; padding:14px 24px; color:#fff; background:#b91c35; border-radius:10px; text-decoration:none; }
+.international-services { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+.international-services article { background:#fff; padding:24px; border:1px solid #dce3e9; border-radius:14px; }
+@media(max-width:820px){.international-site .international-hero,.international-services{grid-template-columns:minmax(0,1fr);}.site-mobile-chrome .language-picker{order:2;}.site-mobile-chrome .site-mobile-menu-button{order:3;}}
 .design-inspector { position:fixed; inset:0 0 0 auto; z-index:1000; width:min(380px,100vw); padding:24px; overflow-y:auto; color:#172b3d; background:#fff; border-left:1px solid #ccd7e0; box-shadow:-16px 0 40px #142c4022; }
 .design-inspector header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .design-inspector label { display:grid; gap:10px; margin:24px 0; color:#172b3d !important; }

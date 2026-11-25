@@ -6,13 +6,7 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   distDir: process.env.NEXT_DIST_DIR || ".next",
   async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/seflektur",
-        permanent: true
-      }
-    ];
+    return [];
   },
   async headers() {
     return [

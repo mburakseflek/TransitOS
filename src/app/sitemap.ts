@@ -4,6 +4,7 @@ import { readSiteContent } from "@/lib/site-content";
 const siteUrl = "https://www.seflektur.com";
 
 const staticCorporateRoutes = [
+  "/eng", "/de", "/es", "/it", "/fr", "/zh",
   "/seflektur",
   "/seflektur/hizmetler",
   "/seflektur/hizmetler/personel-servisi",

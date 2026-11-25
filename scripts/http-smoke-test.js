@@ -22,8 +22,12 @@ function sessionCookie(response) {
 }
 
 async function main() {
-  const root = await request("/");
-  check("Ana giriş kurumsal siteye yönleniyor", root.status === 308 && root.headers.get("location")?.endsWith("/seflektur"), `HTTP ${root.status}`);
+  const root = await request("/", { headers: { "accept-language": "tr-TR" } });
+  check("Ana giriş kurumsal siteye yönleniyor", root.status === 307 && root.headers.get("location")?.endsWith("/seflektur"), `HTTP ${root.status}`);
+  const internationalRoot = await request("/", { headers: { "accept-language": "de-DE" } });
+  check("Yabancı dil ilk girişte İngilizceye yönleniyor", internationalRoot.status === 307 && internationalRoot.headers.get("location")?.endsWith("/eng"));
+  const preferredRoot = await request("/", { headers: { cookie: "site_language=fr", "accept-language": "tr-TR" } });
+  check("Manuel dil tercihi korunuyor", preferredRoot.headers.get("location")?.endsWith("/fr"));
 
   for (const path of ["/seflektur", "/login", "/api/market", "/api/macos/health"]) {
     const response = await request(path);

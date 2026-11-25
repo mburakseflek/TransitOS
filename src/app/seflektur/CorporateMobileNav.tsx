@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { LanguagePicker } from "@/app/components/LanguagePicker";
 
 type SiteNavLink = {
   href: Route;
@@ -28,6 +29,7 @@ export function CorporateMobileNav({ links }: { links: readonly SiteNavLink[] })
   return (
     <>
       <div className="site-mobile-chrome" aria-label="Şeflek Tur mobil hızlı menü">
+        <LanguagePicker />
         <Link className="site-mobile-brand" href="/seflektur" aria-label="Şeflek Tur ana sayfa" onClick={() => setIsOpen(false)}>
           <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" />
         </Link>

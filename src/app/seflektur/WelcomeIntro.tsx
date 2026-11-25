@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { CorporateLocale } from "@/lib/corporate-routes";
 
-export function WelcomeIntro() {
+export function WelcomeIntro({ copy = {} }: { locale?: CorporateLocale; copy?:Record<string,string> }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -17,7 +18,7 @@ export function WelcomeIntro() {
   if (!visible) return null;
   return <div className="welcome-intro" aria-label="Şeflek Tur karşılama">
     <img src="/seflek-logo-white.png" alt="Şeflek Tur" width="236" height="92" />
-    <span>Yolculuğunuz güvenle başlar.</span>
-    <button type="button" onClick={() => setVisible(false)}>Geç</button>
+    <span>{copy["Yolculuğunuz güvenle başlar."] || "Yolculuğunuz güvenle başlar."}</span>
+    <button type="button" onClick={() => setVisible(false)}>{copy["Geç"] || "Geç"}</button>
   </div>;
 }

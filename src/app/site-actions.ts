@@ -146,6 +146,7 @@ export async function saveSiteContent(formData: FormData) {
   revalidatePath("/seflektur/transitos");
   revalidatePath("/site-admin");
   revalidatePath("/[locale]", "page");
+  revalidatePath("/[locale]", "layout");
   redirect("/site-admin?saved=1");
 }
 

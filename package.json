@@ -26,6 +26,7 @@
     "test:roles": "node scripts/role-smoke-test.js",
     "test:http": "node scripts/http-smoke-test.js",
     "test:integrity": "node scripts/system-integrity-test.js",
+    "test:locale": "node scripts/corporate-locale-test.js",
     "seo:indexnow": "node scripts/submit-indexnow.js"
   },
   "prisma": {

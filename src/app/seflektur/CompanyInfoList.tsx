@@ -1,6 +1,7 @@
 "use client";
 
 import type { CompanyDetail } from "@/lib/site-content";
+import type { CorporateLocale } from "@/lib/corporate-routes";
 
 function cleanPhone(phone: string) {
   const digits = phone.replace(/\D/g, "");
@@ -24,6 +25,8 @@ function actionMessage(action: CompanyDetail["action"], label: string, value: st
 }
 
 export function CompanyInfoList({
+  locale = "tr",
+  copy = {},
   phone,
   email,
   address,
@@ -31,6 +34,8 @@ export function CompanyInfoList({
   taxNumber,
   details = []
 }: {
+  locale?: CorporateLocale;
+  copy?: Record<string,string>;
   phone: string;
   email: string;
   address: string;
@@ -50,7 +55,8 @@ export function CompanyInfoList({
   function openItem(item: CompanyDetail) {
     const url = actionUrl(item.action, item.value);
     if (!url) return;
-    if (window.confirm(actionMessage(item.action, item.label, item.value))) {
+    const message = locale === "tr" ? actionMessage(item.action, item.label, item.value) : `${copy["Devam edilsin mi?"] || "Continue?"}\n${item.value}`;
+    if (window.confirm(message)) {
       if (item.action === "map") {
         window.open(url, "_blank", "noopener,noreferrer");
       } else {
@@ -65,7 +71,7 @@ export function CompanyInfoList({
         const clickable = item.action !== "none";
         const content = (
           <>
-            <dt>{item.label}</dt>
+            <dt>{copy[item.label] || item.label}</dt>
             <dd>{item.value}</dd>
           </>
         );

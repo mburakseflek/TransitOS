@@ -5,6 +5,7 @@ import type { Route } from "next";
 import { Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { LanguagePicker } from "@/app/components/LanguagePicker";
+import { type CorporateLocale, corporateHref } from "@/lib/corporate-routes";
 
 type SiteNavLink = {
   href: Route;
@@ -12,7 +13,8 @@ type SiteNavLink = {
   className?: string;
 };
 
-export function CorporateMobileNav({ links }: { links: readonly SiteNavLink[] }) {
+export function CorporateMobileNav({ links, locale = "tr", copy = {} }: { links: readonly SiteNavLink[]; locale?: CorporateLocale; copy?:Record<string,string> }) {
+  const t = (value: string) => copy[value] || value;
   const [isOpen, setIsOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -29,36 +31,36 @@ export function CorporateMobileNav({ links }: { links: readonly SiteNavLink[] })
   return (
     <>
       <div className="site-mobile-chrome" aria-label="Şeflek Tur mobil hızlı menü">
-        <LanguagePicker />
-        <Link className="site-mobile-brand" href="/seflektur" aria-label="Şeflek Tur ana sayfa" onClick={() => setIsOpen(false)}>
+        <LanguagePicker current={locale} />
+        <Link className="site-mobile-brand" href={corporateHref(locale,"/seflektur")} aria-label="Şeflek Tur" onClick={() => setIsOpen(false)}>
           <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" />
         </Link>
         <button
           className="site-mobile-menu-button"
           ref={menuButton}
           type="button"
-          aria-label={isOpen ? "Menüyü kapat" : "Menüyü aç"}
+          aria-label={t(isOpen ? "Menüyü kapat" : "Menüyü aç")}
           aria-expanded={isOpen}
           aria-controls="corporate-mobile-menu"
           onClick={() => setIsOpen((current) => !current)}
         >
           <Menu size={22} />
-          <span>Menü</span>
+          <span>{t("Menü")}</span>
         </button>
       </div>
       <button
         className={isOpen ? "site-mobile-nav-backdrop is-open" : "site-mobile-nav-backdrop"}
         type="button"
-        aria-label="Menüyü kapat"
+        aria-label={t("Menüyü kapat")}
         tabIndex={isOpen ? 0 : -1}
         onClick={() => setIsOpen(false)}
       />
       <nav id="corporate-mobile-menu" inert={!isOpen} aria-hidden={!isOpen} className={isOpen ? "site-mobile-drawer is-open" : "site-mobile-drawer"} aria-label="Mobil kurumsal site menüsü">
         <div className="site-mobile-drawer-head">
           <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" />
-          <button type="button" aria-label="Menüyü kapat" onClick={() => setIsOpen(false)}>
+          <button type="button" aria-label={t("Menüyü kapat")} onClick={() => setIsOpen(false)}>
             <X size={18} />
-            <span>Kapat</span>
+            <span>{t("Kapat")}</span>
           </button>
         </div>
         {links.map((item) => (

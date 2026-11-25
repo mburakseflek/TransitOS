@@ -1,6 +1,7 @@
 "use client";
 
 import { Mail, MapPin, Phone } from "lucide-react";
+import type { CorporateLocale } from "@/lib/corporate-routes";
 
 function cleanPhone(phone: string) {
   const digits = phone.replace(/\D/g, "");
@@ -10,16 +11,20 @@ function cleanPhone(phone: string) {
 }
 
 export function ContactActions({
+  locale = "tr",
+  copy = {},
   phone,
   email,
   address
 }: {
+  locale?: CorporateLocale;
+  copy?: Record<string,string>;
   phone: string;
   email: string;
   address: string;
 }) {
   function confirmAndOpen(message: string, url: string) {
-    if (window.confirm(message)) {
+    if (window.confirm(locale === "tr" ? message : `${copy["Devam edilsin mi?"] || "Continue?"}\n${url}`)) {
       window.location.href = url;
     }
   }
@@ -32,7 +37,7 @@ export function ContactActions({
         onClick={() => confirmAndOpen(`${phone} numarası aranacak. Devam edilsin mi?`, `tel:${cleanPhone(phone)}`)}
       >
         <Phone size={26} />
-        <span>Telefon</span>
+        <span>{copy["Telefon"] || "Telefon"}</span>
         <strong>{phone}</strong>
       </button>
 
@@ -42,7 +47,7 @@ export function ContactActions({
         onClick={() => confirmAndOpen(`${email} adresine e-posta oluşturulsun mu?`, `mailto:${email}`)}
       >
         <Mail size={26} />
-        <span>E-posta</span>
+        <span>{copy["E-posta"] || "E-posta"}</span>
         <strong>{email}</strong>
       </button>
 
@@ -52,7 +57,7 @@ export function ContactActions({
         onClick={() => confirmAndOpen(`Adres için yol tarifi açılsın mı?\n${address}`, `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`)}
       >
         <MapPin size={26} />
-        <span>Adres</span>
+        <span>{copy["Adres"] || "Adres"}</span>
         <strong>{address}</strong>
       </button>
     </section>

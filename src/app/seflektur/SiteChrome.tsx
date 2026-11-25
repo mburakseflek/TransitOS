@@ -6,6 +6,7 @@ import { CorporateMobileNav } from "@/app/seflektur/CorporateMobileNav";
 import { readSiteContent, SiteCard } from "@/lib/site-content";
 import { MarketTicker } from "@/app/components/MarketTicker";
 import { LanguagePicker } from "@/app/components/LanguagePicker";
+import { type CorporateLocale, translate, corporateHref, controlCopy } from "@/lib/corporate-locale";
 
 const siteNavLinks = [
   { href: "/seflektur", label: "Ana Sayfa" },
@@ -20,28 +21,29 @@ const siteNavLinks = [
   { href: "/seflektur/teklif", label: "Hizmet Talebi", className: "new-nav-cta" }
 ] as const;
 
-export function SiteHeader() {
+export function SiteHeader({ locale = "tr" }: { locale?: CorporateLocale }) {
+  const t = (value: string) => translate(locale, value);
   return (
     <>
-      <a className="site-skip-link" href="#main-content">Ana içeriğe geç</a>
-      <CorporateMobileNav links={siteNavLinks} />
+      <a className="site-skip-link" href="#main-content">{t("Ana içeriğe geç")}</a>
+      <CorporateMobileNav locale={locale} copy={controlCopy(locale)} links={siteNavLinks.map(link => ({ ...link, href:corporateHref(locale, link.href), label:t(link.label) }))} />
       <header className="corp-v2-header">
         <div className="corp-v2-header-inner">
-          <Link className="corp-v2-brand" href="/seflektur" aria-label="Şeflek Tur ana sayfa">
+          <Link className="corp-v2-brand" href={corporateHref(locale, "/seflektur")} aria-label={t("Şeflek Tur ana sayfa")}>
             <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" width="236" height="92" decoding="async" />
           </Link>
-          <nav className="corp-v2-nav" aria-label="Kurumsal site menüsü">
-            <Link href="/seflektur/hizmetler">Hizmetler</Link>
-            <Link href="/seflektur/filo">Filo</Link>
-            <Link href="/seflektur/vip">VIP Transfer</Link>
-            <Link href="/seflektur/standartlar">Standartlarımız</Link>
-            <Link href="/seflektur/referanslar">Referanslar</Link>
-            <Link href="/seflektur/iletisim">İletişim</Link>
+          <nav className="corp-v2-nav" aria-label={t("Kurumsal site menüsü")}>
+            <Link href={corporateHref(locale, "/seflektur/hizmetler")}>{t("Hizmetler")}</Link>
+            <Link href={corporateHref(locale, "/seflektur/filo")}>{t("Filo")}</Link>
+            <Link href={corporateHref(locale, "/seflektur/vip")}>{t("VIP Transfer")}</Link>
+            <Link href={corporateHref(locale, "/seflektur/standartlar")}>{t("Standartlarımız")}</Link>
+            <Link href={corporateHref(locale, "/seflektur/referanslar")}>{t("Referanslar")}</Link>
+            <Link href={corporateHref(locale, "/seflektur/iletisim")}>{t("İletişim")}</Link>
           </nav>
           <div className="corp-v2-header-actions">
-            <LanguagePicker />
-            <Link className="corp-v2-portal-link" href="/seflektur/transitos">TransitOS</Link>
-            <Link className="corp-v2-header-cta" href="/seflektur/teklif">Teklif alın <ArrowRight size={16} /></Link>
+            <LanguagePicker current={locale} />
+            <Link className="corp-v2-portal-link" href={corporateHref(locale, "/seflektur/transitos")}>{t("TransitOS")}</Link>
+            <Link className="corp-v2-header-cta" href={corporateHref(locale, "/seflektur/teklif")}>{t("Teklif alın ")}<ArrowRight size={16} /></Link>
           </div>
         </div>
       </header>
@@ -50,6 +52,7 @@ export function SiteHeader() {
 }
 
 export function PageHero({
+  locale = "tr",
   eyebrow,
   title,
   body,
@@ -57,6 +60,7 @@ export function PageHero({
   imageAlt,
   children
 }: {
+  locale?: CorporateLocale;
   eyebrow: string;
   title: string;
   body: string;
@@ -64,6 +68,7 @@ export function PageHero({
   imageAlt?: string;
   children?: ReactNode;
 }) {
+  const t = (value: string) => translate(locale, value);
   return (
     <section className="corp-v2-hero" id="main-content">
       <div className="corp-v2-hero-copy">
@@ -71,23 +76,24 @@ export function PageHero({
         <h1>{title}</h1>
         <p>{body}</p>
         {children}
-        <div className="corp-v2-hero-meta" aria-label="Şeflek Tur hizmet özellikleri">
-          <span><b>7/24</b> operasyon desteği</span>
-          <span><b>İstanbul</b> merkezli planlama</span>
-          <span><b>TransitOS</b> ile takip</span>
+        <div className="corp-v2-hero-meta" aria-label={t("Şeflek Tur hizmet özellikleri")}>
+          <span><b>{t("7/24")}</b>{t(" operasyon desteği")}</span>
+          <span><b>{t("İstanbul")}</b>{t(" merkezli planlama")}</span>
+          <span><b>{t("TransitOS")}</b>{t(" ile takip")}</span>
         </div>
       </div>
       {imageUrl ? (
         <div className="corp-v2-hero-visual">
           <img src={imageUrl} alt={imageAlt ?? title} width="1280" height="960" decoding="async" fetchPriority="high" />
-          <div className="corp-v2-image-note"><span>Şeflek Tur</span><strong>Güvenli ulaşım, kontrollü operasyon.</strong></div>
+          <div className="corp-v2-image-note"><span>{t("Şeflek Tur")}</span><strong>{t("Güvenli ulaşım, kontrollü operasyon.")}</strong></div>
         </div>
       ) : null}
     </section>
   );
 }
 
-export function FleetCard({ card, vip = false }: { card: SiteCard; vip?: boolean }) {
+export function FleetCard({ card, vip = false, locale = "tr" }: { card: SiteCard; vip?: boolean; locale?: CorporateLocale }) {
+  const t = (value: string) => translate(locale, value);
   return (
     <article className={vip ? "new-fleet-card vip-fleet-card hover-card" : "new-fleet-card branded-fleet-card hover-card"}>
       <div className="new-fleet-photo">
@@ -103,30 +109,33 @@ export function FleetCard({ card, vip = false }: { card: SiteCard; vip?: boolean
         <h3>{card.title}</h3>
         <strong>{card.subtitle}</strong>
         <p>{card.body}</p>
-        <span className="card-more">Detayları incele <ArrowRight size={15} /></span>
+        <span className="card-more">{t("Detayları incele ")}<ArrowRight size={15} /></span>
       </div>
     </article>
   );
 }
 
 export function MobileAppPromo({
+  locale = "tr",
   title,
   body,
   imageUrl
 }: {
+  locale?: CorporateLocale;
   title: string;
   body: string;
   imageUrl: string;
 }) {
+  const t = (value: string) => translate(locale, value);
   return (
     <section className="mobile-app-promo hover-card">
       <div>
-        <span className="new-eyebrow">TransitOS Mobile</span>
+        <span className="new-eyebrow">{t("TransitOS Mobile")}</span>
         <h2>{title}</h2>
         <p>{body}</p>
         <div className="store-badges">
-          <span>App Store</span>
-          <span>Google Play</span>
+          <span>{t("App Store")}</span>
+          <span>{t("Google Play")}</span>
         </div>
       </div>
       <div className="mobile-app-visual">
@@ -137,7 +146,8 @@ export function MobileAppPromo({
   );
 }
 
-export async function SiteFooter({ tickerItems }: { tickerItems: string[] }) {
+export async function SiteFooter({ tickerItems, locale = "tr" }: { tickerItems: string[]; locale?: CorporateLocale }) {
+  const t = (value: string) => translate(locale, value);
   const content = await readSiteContent();
   const whatsappNumber = whatsappLinkNumber(content.whatsappNumber || content.contactPhone);
 
@@ -146,21 +156,21 @@ export async function SiteFooter({ tickerItems }: { tickerItems: string[] }) {
       <footer className="corp-v2-footer">
         <div className="corp-v2-footer-brand">
           <img src="/seflek-logo-white.png" alt="Şeflek Tur" width="236" height="92" loading="lazy" decoding="async" />
-          <p>İstanbul merkezli kurumsal personel, okul, turizm ve VIP taşımacılık çözümleri.</p>
+          <p>{t("İstanbul merkezli kurumsal personel, okul, turizm ve VIP taşımacılık çözümleri.")}</p>
         </div>
         <div className="corp-v2-footer-links">
-          <strong>Şeflek Tur</strong>
-          <Link href="/seflektur/hizmetler">Hizmetler</Link>
-          <Link href="/seflektur/filo">Filo</Link>
-          <Link href="/seflektur/referanslar">Referanslar</Link>
+          <strong>{t("Şeflek Tur")}</strong>
+          <Link href={corporateHref(locale, "/seflektur/hizmetler")}>{t("Hizmetler")}</Link>
+          <Link href={corporateHref(locale, "/seflektur/filo")}>{t("Filo")}</Link>
+          <Link href={corporateHref(locale, "/seflektur/referanslar")}>{t("Referanslar")}</Link>
         </div>
         <div className="corp-v2-footer-links">
-          <strong>İletişim</strong>
+          <strong>{t("İletişim")}</strong>
           <a href={`tel:${content.contactPhone.replace(/\s/g, "")}`}><Phone size={15} /> {content.contactPhone}</a>
           <a href={`mailto:${content.contactEmail}`}>{content.contactEmail}</a>
-          <Link href="/seflektur/teklif">Hizmet talebi</Link>
+          <Link href={corporateHref(locale, "/seflektur/teklif")}>{t("Hizmet talebi")}</Link>
         </div>
-        <small className="corp-v2-footer-rights">© {new Date().getFullYear()} Şeflek Tur. Tüm hakları saklıdır.</small>
+        <small className="corp-v2-footer-rights">© {new Date().getFullYear()} Şeflek Tur. {t("Tüm hakları saklıdır.")}</small>
       </footer>
 
       {whatsappNumber ? (
@@ -169,10 +179,10 @@ export async function SiteFooter({ tickerItems }: { tickerItems: string[] }) {
           href={`https://wa.me/${whatsappNumber}`}
           target="_blank"
           rel="noreferrer"
-          aria-label="WhatsApp sohbeti başlat"
+          aria-label={t("WhatsApp sohbeti başlat")}
         >
           <WhatsAppIcon />
-          <span>WhatsApp</span>
+          <span>{t("WhatsApp")}</span>
         </a>
       ) : null}
 

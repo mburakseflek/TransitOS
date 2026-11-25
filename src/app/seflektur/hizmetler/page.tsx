@@ -1,10 +1,5 @@
-import Link from "next/link";
-import { ArrowRight, Bus, Clock3, MapPinned, Route, Sparkles, UsersRound } from "lucide-react";
-import { readSiteContent } from "@/lib/site-content";
-import { PageHero, SiteFooter, SiteHeader } from "@/app/seflektur/SiteChrome";
-import { createCorporateMetadata, createServiceJsonLd } from "@/app/seflektur/seo";
-
-const serviceIcons = [UsersRound, Route, MapPinned, Clock3, Sparkles];
+import ServicesView from "@/app/seflektur/views/ServicesView";
+import { createCorporateMetadata } from "@/app/seflektur/seo";
 
 export const metadata = createCorporateMetadata({
   title: "İstanbul Personel Servisi ve Okul Servisi | Şeflek Tur",
@@ -13,60 +8,4 @@ export const metadata = createCorporateMetadata({
   path: "/seflektur/hizmetler"
 });
 
-export default async function ServicesPage() {
-  const content = await readSiteContent();
-
-  return (
-    <main className="new-site-page paged-site corp-v2">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(createServiceJsonLd({ name: "İstanbul Personel Servisi ve Yolcu Taşımacılığı", description: "İstanbul'da personel servisi, okul servisi, turizm, organizasyon ve VIP transfer planlama hizmetleri.", path: "/seflektur/hizmetler", image: "/site-media/service-personnel.png", serviceTypes: ["Personel servisi", "Okul servisi", "VIP transfer", "Turizm taşımacılığı"] })) }} />
-      <SiteHeader />
-      <PageHero
-        eyebrow="Hizmetler"
-        title="Her yolculuk tipi için ayrı planlama disiplini."
-        body="Şeflek Tur; okul, personel, turizm, günlük yolculuk ve VIP ulaşım taleplerini farklı operasyon ihtiyaçlarına göre planlar."
-        imageUrl={content.services[0]?.imageUrl || content.fleet[0]?.imageUrl}
-        imageAlt="Servis ve turizm taşımacılığı"
-      />
-
-      <section className="detail-card-grid">
-        <nav className="service-intent-links" aria-label="Hizmet rehberleri">
-          <Link href={{ pathname: "/seflektur/hizmetler/personel-servisi" }}>Personel servisi</Link>
-          <Link href={{ pathname: "/seflektur/hizmetler/okul-servisi" }}>Okul servisi</Link>
-          <Link href={{ pathname: "/seflektur/hizmetler/vip-transfer" }}>VIP transfer</Link>
-        </nav>
-        {content.services.map((service, index) => {
-          const Icon = serviceIcons[index % serviceIcons.length];
-            return (
-              <article className="detail-card hover-card" key={service.title}>
-                {service.imageUrl ? (
-                  <div className="service-image">
-                    <img src={service.imageUrl} alt={service.title} loading="lazy" decoding="async" />
-                    <Icon size={28} />
-                  </div>
-                ) : <Icon size={28} />}
-                <div className="detail-card-body">
-                  <small>{service.meta}</small>
-                  <h2>{service.title}</h2>
-                  <strong>{service.subtitle}</strong>
-                  <p>{service.body}</p>
-                </div>
-              </article>
-            );
-        })}
-      </section>
-
-      <section className="page-cta-band hover-card">
-        <div>
-          <Bus size={26} />
-          <h2>İhtiyacınıza göre servis veya VIP yolculuk planlayalım.</h2>
-          <p>Yolcu sayısı, güzergah, çalışma saati ve hizmet tipini iletin; size uygun planlama hazırlansın.</p>
-        </div>
-        <Link className="new-primary" href="/seflektur/teklif">
-          Hizmet talebi oluştur <ArrowRight size={18} />
-        </Link>
-      </section>
-
-      <SiteFooter tickerItems={content.tickerItems} />
-    </main>
-  );
-}
+export default function Page() { return <ServicesView />; }

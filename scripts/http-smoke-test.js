@@ -28,6 +28,22 @@ async function main() {
   check("Yabancı dil ilk girişte İngilizceye yönleniyor", internationalRoot.status === 307 && internationalRoot.headers.get("location")?.endsWith("/eng"));
   const preferredRoot = await request("/", { headers: { cookie: "site_language=fr", "accept-language": "tr-TR" } });
   check("Manuel dil tercihi korunuyor", preferredRoot.headers.get("location")?.endsWith("/fr"));
+  for (const locale of ["eng", "de", "es", "it", "fr", "zh"]) {
+    for (const section of ["", "/services", "/fleet", "/contact"]) {
+      const response = await request(`/${locale}${section}`);
+      check(`Sabit dil sayfası: /${locale}${section}`, response.ok, `HTTP ${response.status}`);
+    }
+  }
+  const { SignJWT } = require("jose");
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET || "local-dev-secret");
+  for (const role of ["SUBCONTRACTOR", "PROJECT_OWNER", "SERVICE_SUPERVISOR", "SITE_MODERATOR"]) {
+    const token = await new SignJWT({ id: "read-only-http-test", displayName: "Test", role })
+      .setProtectedHeader({ alg: "HS256" }).setExpirationTime("1m").sign(secret);
+    const response = await request("/api/dashboard", { headers: { cookie: `transitos_session=${token}` } });
+    check(`Genel şirket özeti rol sınırı: ${role}`, response.status === 401);
+    const snapshot = await request("/api/macos/snapshot", { headers: { authorization: `Bearer ${token}` } });
+    check(`Bağlantısız/uygunsuz rol eşitleme engeli: ${role}`, snapshot.status === 403);
+  }
 
   for (const path of ["/seflektur", "/login", "/api/market", "/api/macos/health"]) {
     const response = await request(path);

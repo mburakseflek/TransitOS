@@ -95,6 +95,12 @@ function parseCompanyDetails(value: string, fallback: CompanyDetail[]) {
 export async function saveSiteContent(formData: FormData) {
   await requireSiteEditor();
   const existing = await readSiteContent();
+  let appearance = existing.appearance;
+  const appearanceInput = text(formData, "appearance");
+  if (appearanceInput) {
+    try { appearance = normalizeAppearance(JSON.parse(appearanceInput)); }
+    catch { /* Keep the saved design when a malformed editor payload arrives. */ }
+  }
   await writeSiteContent({
     ...existing,
     companyName: text(formData, "companyName") || defaultSiteContent.companyName,
@@ -125,7 +131,7 @@ export async function saveSiteContent(formData: FormData) {
     privileges: parseCards(text(formData, "privileges"), defaultSiteContent.privileges),
     references: parseCards(text(formData, "references"), defaultSiteContent.references),
     customPages: parseCustomPages(text(formData, "customPages"), defaultSiteContent.customPages),
-    appearance: normalizeAppearance(JSON.parse(text(formData, "appearance") || "{}"))
+    appearance
   });
 
   revalidatePath("/");
@@ -139,6 +145,7 @@ export async function saveSiteContent(formData: FormData) {
   revalidatePath("/seflektur/sayfa/[slug]", "page");
   revalidatePath("/seflektur/transitos");
   revalidatePath("/site-admin");
+  revalidatePath("/[locale]", "page");
   redirect("/site-admin?saved=1");
 }
 

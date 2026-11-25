@@ -28,6 +28,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .map((page) => `/seflektur/sayfa/${page.slug}`);
 
   const routes = Array.from(new Set([...staticCorporateRoutes, ...customRoutes]));
+  for (const locale of ["eng", "de", "es", "it", "fr", "zh"]) {
+    for (const section of ["services", "fleet", "contact"]) routes.push(`/${locale}/${section}`);
+  }
   const routeImages: Record<string, string[]> = {
     "/seflektur": [`${siteUrl}/site-media/hero-home.png`],
     "/seflektur/hizmetler": [`${siteUrl}/site-media/service-personnel.png`, `${siteUrl}/site-media/service-school.png`],

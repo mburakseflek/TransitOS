@@ -1,8 +1,19 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { readSessionToken } from "@/lib/auth";
+import { languages } from "@/lib/languages";
 
 export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname === "/") {
+    const preferred = request.cookies.get("site_language")?.value;
+    const language = request.headers.get("accept-language")?.split(",")[0]?.toLowerCase() || "tr";
+    const code = preferred && languages.some(item => item.code === preferred)
+      ? preferred : language.startsWith("tr") ? "tr" : "eng";
+    const response = NextResponse.redirect(new URL(code === "tr" ? "/seflektur" : `/${code}`, request.url));
+    response.headers.set("Cache-Control", "private, no-store");
+    response.headers.set("Vary", "Cookie, Accept-Language");
+    return response;
+  }
   const token = request.cookies.get("transitos_session")?.value;
   const user = token ? await readSessionToken(token).catch(() => null) : null;
 
@@ -18,6 +29,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
     "/dashboard/:path*",
     "/projects/:path*",
     "/vehicles/:path*",

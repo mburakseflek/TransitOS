@@ -10,6 +10,10 @@
 .international-site h1 { font-size:clamp(2.2rem,4.5vw,4.5rem); line-height:1.12; letter-spacing:-.035em; }
 .international-site h2 { font-size:2rem; line-height:1.25; }
 .international-site p { max-width:70ch; color:#425466; }
+.international-site > nav { max-width:1240px; margin:auto; padding:8px 24px; display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+.international-site > nav a { display:inline-flex; align-items:center; min-height:44px; color:#172b3d; text-underline-offset:5px; }
+.international-site :is(h1,h2,h3,p,a,address) { overflow-wrap:anywhere; -webkit-text-fill-color:currentColor; }
+.international-site :focus-visible { outline:3px solid #b91c35; outline-offset:4px; }
 .international-site img { width:100%; height:auto; border-radius:16px; }
 .international-site .international-cta { display:inline-flex; padding:14px 24px; color:#fff; background:#b91c35; border-radius:10px; text-decoration:none; }
 .international-services { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }

@@ -8,8 +8,9 @@ import { createServiceJsonLd } from "@/app/seflektur/seo";
 
 
 export default async function VipView({ locale = "tr" }: { locale?: CorporateLocale } = {}) {
-  const t = (value: string | undefined) => translate(locale, value);
-  const content = localizeSiteContent(await readSiteContent(), locale);
+  const originalContent = await readSiteContent();
+  const t = (value: string | undefined) => translate(locale, value, locale === "tr" ? undefined : originalContent.translations?.[locale]);
+  const content = localizeSiteContent(originalContent, locale);
   const structuredData = createServiceJsonLd({
     name: "İstanbul VIP Transfer ve Özel Yolculuk",
     description: "İstanbul'da yönetici, misafir, havalimanı, otel ve organizasyonlar için VIP transfer hizmeti.",
@@ -43,8 +44,10 @@ export default async function VipView({ locale = "tr" }: { locale?: CorporateLoc
         </Link>
       </section>
 
+      <DesignBlocks page="vip" locale={locale} />
       <SiteFooter locale={locale} tickerItems={content.tickerItems} />
     </main>
   );
 }
 
+import { DesignBlocks } from "../DesignBlocks";

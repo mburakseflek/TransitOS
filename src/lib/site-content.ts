@@ -65,6 +65,8 @@ export type SiteContent = {
   customPages: CustomPage[];
   tickerItems: string[];
   appearance?: import("./site-appearance").SiteAppearance;
+  translations?: import("./site-translations").SiteTranslations;
+  designBlocks?: import("./design-blocks").PageDesignBlocks;
 };
 
 const dataDir = path.join(process.cwd(), "content");
@@ -610,6 +612,7 @@ export const readSiteContent = cache(loadSiteContent);
 
 export async function writeSiteContent(content: SiteContent) {
   if (await writeDatabaseContent(content)) return;
+  if (shouldUseContentDatabase()) throw new Error("İçerik veritabanına kaydedilemedi. Mevcut içerik korunuyor; lütfen tekrar deneyin.");
 
   await ensureContentDir();
   await fs.writeFile(contentPath, `${JSON.stringify(content, null, 2)}\n`, "utf8");

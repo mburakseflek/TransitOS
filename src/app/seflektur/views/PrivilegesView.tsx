@@ -14,8 +14,9 @@ const privileges = [
 
 
 export default async function PrivilegesView({ locale = "tr" }: { locale?: CorporateLocale } = {}) {
-  const t = (value: string | undefined) => translate(locale, value);
-  const content = localizeSiteContent(await readSiteContent(), locale);
+  const originalContent = await readSiteContent();
+  const t = (value: string | undefined) => translate(locale, value, locale === "tr" ? undefined : originalContent.translations?.[locale]);
+  const content = localizeSiteContent(originalContent, locale);
 
   return (
     <main lang={locale === "eng" ? "en" : locale === "zh" ? "zh-Hans" : locale} className="new-site-page paged-site corp-v2">
@@ -48,8 +49,10 @@ export default async function PrivilegesView({ locale = "tr" }: { locale?: Corpo
         </Link>
       </section>
 
+      <DesignBlocks page="privileges" locale={locale} />
       <SiteFooter locale={locale} tickerItems={content.tickerItems} />
     </main>
   );
 }
 
+import { DesignBlocks } from "../DesignBlocks";

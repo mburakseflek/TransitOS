@@ -3,10 +3,10 @@ import { corporateTranslations, normalizedCorporateTranslations } from "./corpor
 import { type CorporateLocale, corporateHref } from "./corporate-routes";
 export { type CorporateLocale, corporateSections, corporateHref } from "./corporate-routes";
 
-export function translate(locale: CorporateLocale, value: string | undefined): string {
+export function translate(locale: CorporateLocale, value: string | undefined, overrides?: Record<string,string>): string {
   if (!value || locale === "tr") return value || "";
   const key = value.replace(/\s+/g, " ").trim();
-  const translated = (corporateTranslations[key] || normalizedCorporateTranslations.get(key.toLocaleLowerCase("tr")))?.[locale];
+  const translated = overrides?.[key] ?? (corporateTranslations[key] || normalizedCorporateTranslations.get(key.toLocaleLowerCase("tr")))?.[locale];
   if (!translated) return value;
   return `${/^\s/.test(value) ? " " : ""}${translated}${/\s$/.test(value) ? " " : ""}`;
 }
@@ -29,7 +29,7 @@ export function localizeCorporateJsonLd(value: unknown, locale: CorporateLocale)
 // addresses and operational data remain the original values; nothing is saved.
 export function localizeSiteContent(content: SiteContent, locale: CorporateLocale): SiteContent {
   if (locale === "tr") return content;
-  const t = (value: string | undefined) => translate(locale, value);
+  const t = (value: string | undefined) => translate(locale, value, content.translations?.[locale]);
   const cards = (items: SiteContent["fleet"]) => items.map(item => ({ ...item, title:t(item.title), subtitle:t(item.subtitle), body:t(item.body), meta:t(item.meta) }));
   return { ...content,
     heroTitle:t(content.heroTitle), heroSubtitle:t(content.heroSubtitle), companySummary:t(content.companySummary),

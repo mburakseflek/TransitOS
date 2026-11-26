@@ -21,8 +21,9 @@ const siteNavLinks = [
   { href: "/seflektur/teklif", label: "Hizmet Talebi", className: "new-nav-cta" }
 ] as const;
 
-export function SiteHeader({ locale = "tr" }: { locale?: CorporateLocale }) {
-  const t = (value: string) => translate(locale, value);
+export async function SiteHeader({ locale = "tr" }: { locale?: CorporateLocale }) {
+  const content = await readSiteContent();
+  const t = (value: string) => translate(locale, value, locale === "tr" ? undefined : content.translations?.[locale]);
   return (
     <>
       <a className="site-skip-link" href="#main-content">{t("Ana içeriğe geç")}</a>
@@ -147,8 +148,8 @@ export function MobileAppPromo({
 }
 
 export async function SiteFooter({ tickerItems, locale = "tr" }: { tickerItems: string[]; locale?: CorporateLocale }) {
-  const t = (value: string) => translate(locale, value);
   const content = await readSiteContent();
+  const t = (value: string) => translate(locale, value, locale === "tr" ? undefined : content.translations?.[locale]);
   const whatsappNumber = whatsappLinkNumber(content.whatsappNumber || content.contactPhone);
 
   return (

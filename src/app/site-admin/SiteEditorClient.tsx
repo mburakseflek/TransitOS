@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
+const DesignStudio = dynamic(() => import("./DesignStudio").then(module => module.DesignStudio));
 import type { ChangeEvent, PointerEvent, ReactNode } from "react";
 import { useRef, useState } from "react";
 import {
@@ -48,16 +50,6 @@ const cropPresets: Record<CropPreset, { label: string; aspect: number; width: nu
   card: { label: "Kart görseli", aspect: 4 / 3, width: 1400, height: 1050 },
   logo: { label: "Logo alanı", aspect: 3 / 2, width: 1200, height: 800 }
 };
-
-function cardsToText(cards: SiteCard[]) {
-  return cards.map((card) => [
-    card.title,
-    card.subtitle,
-    card.body,
-    card.imageUrl,
-    card.meta ?? ""
-  ].join(" | ")).join("\n");
-}
 
 function emptyCard(title = "Yeni içerik"): SiteCard {
   return {
@@ -411,12 +403,16 @@ export function SiteEditorClient({
   visitorAnalytics: VisitorAnalytics;
 }) {
   const [content, setContent] = useState(initialContent);
+  const [history, setHistory] = useState<SiteContent[]>([]);
+  const [future, setFuture] = useState<SiteContent[]>([]);
   const [designOpen, setDesignOpen] = useState(false);
   const appearance = normalizeAppearance(content.appearance);
   const [notice, setNotice] = useState(saved ? "Kaydedildi." : "");
   const [activePage, setActivePage] = useState<EditablePageKey>("home");
 
   function commit(next: SiteContent, message = "Düzenleme yapıldı. Değişikliklerin yayına alınması için Kaydet'e basın.") {
+    setHistory(previous => [...previous.slice(-29), content]);
+    setFuture([]);
     setContent(next);
     setNotice(message);
   }
@@ -520,15 +516,9 @@ export function SiteEditorClient({
     <main className="live-edit-page">
       <form action={saveSiteContent}>
         <input type="hidden" name="appearance" value={JSON.stringify(appearance)} />
-        {designOpen ? <aside className="design-inspector" aria-label="Tasarım özellikleri">
-          <header><h2>Tasarım özellikleri</h2><button type="button" onClick={() => setDesignOpen(false)}>Kapat</button></header>
-          <p>Kurumsal sitenin genel görünümü. Yayınlamak için üst menüden Kaydet’e basın.</p>
-          <label>Vurgu rengi<input type="color" value={appearance.accent} onChange={e=>commit({...content,appearance:{...appearance,accent:e.target.value}})} /></label>
-          <label>Yazı ailesi<select value={appearance.font} onChange={e=>commit({...content,appearance:{...appearance,font:e.target.value === "serif" ? "serif" : "system"}})}><option value="system">Sistem — sade</option><option value="serif">Georgia — klasik</option></select></label>
-          {([ ["size","Metin boyutu",16,22], ["radius","Kart köşeleri",0,28], ["spacing","Kart iç boşluğu",16,48] ] as const).map(([key,label,min,max])=><label key={key}>{label} · {appearance[key]} px<input type="range" min={min} max={max} value={appearance[key]} onChange={e=>commit({...content,appearance:{...appearance,[key]:Number(e.target.value)}})} /></label>)}
-          <div className="design-inspector-sample" style={{fontFamily:appearance.font === "serif" ? "Georgia,serif" : "system-ui",fontSize:appearance.size,borderRadius:appearance.radius,padding:appearance.spacing,borderTop:`4px solid ${appearance.accent}`}}><strong>Şeflek Tur</strong><p>Yolculuğunuz için kurumsal ulaşım çözümleri.</p></div>
-          <button type="button" onClick={()=>commit({...content,appearance:normalizeAppearance(null)})}>Varsayılana dön</button>
-        </aside> : null}
+        <input type="hidden" name="translations" value={JSON.stringify(content.translations || {})} />
+        <input type="hidden" name="designBlocks" value={JSON.stringify(content.designBlocks || {})} />
+        {designOpen ? <DesignStudio content={content} onChange={commit} onClose={()=>setDesignOpen(false)} /> : null}
         <input type="hidden" name="companyName" value={content.companyName} />
         <input type="hidden" name="brandLine" value={content.brandLine} />
         <input type="hidden" name="heroTitle" value={content.heroTitle} />
@@ -550,15 +540,17 @@ export function SiteEditorClient({
         <input type="hidden" name="mobileAppTitle" value={content.mobileAppTitle} />
         <input type="hidden" name="mobileAppBody" value={content.mobileAppBody} />
         <input type="hidden" name="mobileAppImageUrl" value={content.mobileAppImageUrl} />
-        <textarea hidden readOnly name="fleet" value={cardsToText(content.fleet)} />
-        <textarea hidden readOnly name="vipFleet" value={cardsToText(content.vipFleet)} />
-        <textarea hidden readOnly name="services" value={cardsToText(content.services)} />
-        <textarea hidden readOnly name="privileges" value={cardsToText(content.privileges)} />
-        <textarea hidden readOnly name="references" value={cardsToText(content.references)} />
+        <textarea hidden readOnly name="fleet" value={JSON.stringify(content.fleet)} />
+        <textarea hidden readOnly name="vipFleet" value={JSON.stringify(content.vipFleet)} />
+        <textarea hidden readOnly name="services" value={JSON.stringify(content.services)} />
+        <textarea hidden readOnly name="privileges" value={JSON.stringify(content.privileges)} />
+        <textarea hidden readOnly name="references" value={JSON.stringify(content.references)} />
         <textarea hidden readOnly name="tickerItems" value={content.tickerItems.join("\n")} />
         <textarea hidden readOnly name="customPages" value={JSON.stringify(content.customPages)} />
 
         <header className="live-edit-toolbar">
+          <button type="button" disabled={!history.length} onClick={()=>{const previous=history.at(-1);if(previous){setFuture(items=>[content,...items]);setContent(previous);setHistory(items=>items.slice(0,-1));setNotice("Son işlem geri alındı.");}}}>Geri al</button>
+          <button type="button" disabled={!future.length} onClick={()=>{const next=future[0];if(next){setHistory(items=>[...items,content]);setContent(next);setFuture(items=>items.slice(1));setNotice("İşlem yinelendi.");}}}>Yinele</button>
           <button type="button" className="ghost" aria-expanded={designOpen} onClick={()=>setDesignOpen(!designOpen)}>Tasarım araçları</button>
           <Link className="navy-brand" href="/seflektur">
             <img src="/brand/seflek-logo-navy.png" alt="Şeflek Tur" />

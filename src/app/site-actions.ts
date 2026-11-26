@@ -1,5 +1,7 @@
 "use server";
 import { normalizeAppearance } from "@/lib/site-appearance";
+import { normalizeSiteTranslations } from "@/lib/site-translations";
+import { normalizeDesignBlocks } from "@/lib/design-blocks";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -34,6 +36,12 @@ function lines(value: string) {
 }
 
 function parseCards(value: string, fallback: SiteCard[]) {
+  if (value.trim().startsWith("[")) {
+    try {
+      const cards: unknown = JSON.parse(value);
+      if (Array.isArray(cards) && cards.length <= 500 && cards.every(c => c && ["title","subtitle","body","imageUrl"].every(k => typeof c[k] === "string"))) return cards;
+    } catch { return fallback; }
+  }
   const parsed = lines(value).map((line) => {
     const [title = "", subtitle = "", body = "", imageUrl = "", meta = ""] = line.split("|").map((item) => item.trim());
     return { title, subtitle, body, imageUrl, meta };
@@ -131,7 +139,9 @@ export async function saveSiteContent(formData: FormData) {
     privileges: parseCards(text(formData, "privileges"), defaultSiteContent.privileges),
     references: parseCards(text(formData, "references"), defaultSiteContent.references),
     customPages: parseCustomPages(text(formData, "customPages"), defaultSiteContent.customPages),
-    appearance
+    appearance,
+    designBlocks: formData.has("designBlocks") ? normalizeDesignBlocks(JSON.parse(text(formData,"designBlocks") || "{}")) : existing.designBlocks,
+    translations: formData.has("translations") ? normalizeSiteTranslations(JSON.parse(text(formData,"translations") || "{}")) : existing.translations
   });
 
   revalidatePath("/");

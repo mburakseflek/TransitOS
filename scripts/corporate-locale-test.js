@@ -23,6 +23,28 @@ for (const locale of locales) {
 }
 console.log(`PASS Fixed dictionaries (${Object.keys(corporateTranslations).length} entries), routing and Turkish-only TransitOS`);
 
+const pickerSource = fs.readFileSync(require.resolve("../src/app/components/LanguagePicker.tsx"),"utf8");
+const pickerAst = ts.createSourceFile("LanguagePicker.tsx",pickerSource,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+let selectionBody;
+function findSelection(node) {
+  if(ts.isJsxAttribute(node) && node.name.getText(pickerAst)==="onClick" && node.initializer && ts.isJsxExpression(node.initializer)) {
+    const expression=node.initializer.expression;
+    if(expression && ts.isArrowFunction(expression) && expression.parameters[0]?.name.getText(pickerAst)==="event") selectionBody=expression.body.getText(pickerAst);
+  }
+  ts.forEachChild(node,findSelection);
+}
+findSelection(pickerAst);
+assert.ok(selectionBody,"Language selection handler exists");
+const selectLanguage = new Function("event","document","language",selectionBody);
+for(const blocked of [false,true]) {
+  let prevented=false,preference="";
+  const document={set cookie(value){if(blocked)throw new Error("Storage blocked");preference=value;}};
+  assert.doesNotThrow(()=>selectLanguage({preventDefault(){prevented=true;}},document,{code:"eng"}));
+  assert.equal(prevented,false,"Language links must keep native navigation");
+  if(!blocked)assert.ok(preference.startsWith("site_language=eng;"));
+}
+console.log("PASS Native language navigation is preserved with cookies allowed or blocked");
+
 const base = process.env.TRANSITOS_TEST_URL || "http://127.0.0.1:3100";
 const pattern = html => [...html.matchAll(/<section\b[^>]*class="([^"]*)"/g)].map(match=>match[1]);
 async function main() {
@@ -39,6 +61,8 @@ async function main() {
       const html = await localized.text();
       assert.deepEqual(pattern(html),reference,`Shared section layout: ${url}`);
       assert.ok(html.includes('class="corp-v2-header"'),url);
+      const portal=html.match(/<a\b[^>]*class="corp-v2-portal-link"[^>]*>/)?.[0];
+      assert.ok(portal?.includes('href="/transitos/dashboard"'),`Direct TransitOS entry: ${url}`);
       assert.ok(html.includes('class="corp-v2-footer"'),url);
       assert.ok(html.includes('aria-label="Language / Dil"'),url);
       assert.ok(html.includes('corporate-overlay-dialog corporate-language-dialog'),url);

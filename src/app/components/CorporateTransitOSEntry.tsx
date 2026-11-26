@@ -13,7 +13,7 @@ export function CorporateTransitOSEntry() {
   return (
     <Link
       className="global-transitos-fixed-button"
-      href="/login?next=/transitos/dashboard"
+      href="/transitos/dashboard"
       aria-label="TransitOS operasyon paneline giriş yap"
     >
       <MonitorCog size={25} strokeWidth={2.3} aria-hidden="true" />

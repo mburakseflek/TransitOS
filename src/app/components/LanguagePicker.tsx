@@ -19,9 +19,10 @@ export function LanguagePicker({current="tr"}:{current?:string}) {
    <div className="corporate-dialog-heading"><strong>Language / Dil</strong><button type="button" onClick={close} aria-label="Close / Kapat"><X size={22} aria-hidden="true" /></button></div>
    <nav aria-label="Language / Dil">{languages.map(language=><a key={language.code} href={languagePath(language.code,pathname)} lang={language.code==="eng"?"en":language.code} hrefLang={language.code==="eng"?"en":language.code} aria-current={selected===language.code?"true":undefined} onClick={event=>{
     if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
-    event.preventDefault();
-    document.cookie="site_language="+language.code+"; Path=/; Max-Age=31536000; SameSite=Lax";
-    window.location.assign(languagePath(language.code,pathname));
+    // Keep the native link navigation even if privacy settings reject cookies.
+    // Preference persistence must never be a prerequisite for opening a language.
+    try { document.cookie="site_language="+language.code+"; Path=/; Max-Age=31536000; SameSite=Lax"; }
+    catch { /* The explicit locale URL still works without storage. */ }
    }}><span>{language.label}</span>{selected===language.code?<Check size={18} aria-hidden="true"/>:null}</a>)}</nav>
   </CorporateDialog>
  </div>;

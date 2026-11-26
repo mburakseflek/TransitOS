@@ -16,7 +16,7 @@ const siteNavLinks = [
   { href: "/seflektur/ayricaliklar", label: "Ayrıcalıklar" },
   { href: "/seflektur/standartlar", label: "Belgeler" },
   { href: "/seflektur/referanslar", label: "Referanslar" },
-  { href: "/seflektur/transitos", label: "TransitOS" },
+  { href: "/transitos/dashboard", label: "TransitOS" },
   { href: "/seflektur/iletisim", label: "İletişim" },
   { href: "/seflektur/teklif", label: "Hizmet Talebi", className: "new-nav-cta" }
 ] as const;
@@ -42,7 +42,7 @@ export function SiteHeader({ locale = "tr" }: { locale?: CorporateLocale }) {
           </nav>
           <div className="corp-v2-header-actions">
             <LanguagePicker current={locale} />
-            <Link className="corp-v2-portal-link" href={corporateHref(locale, "/seflektur/transitos")}>{t("TransitOS")}</Link>
+            <Link className="corp-v2-portal-link" href="/transitos/dashboard">{t("TransitOS")}</Link>
             <Link className="corp-v2-header-cta" href={corporateHref(locale, "/seflektur/teklif")}>{t("Teklif alın ")}<ArrowRight size={16} /></Link>
           </div>
         </div>

@@ -15,3 +15,10 @@
 - At 844×390, the menu stayed within the viewport and was scrollable.
 - At 320×640, the language dialog stayed inside the viewport; choosing English on contact opened `/eng/contact` with language `en` and active marker `English`.
 - No operational records, invoice calculations or database schema were changed. These are browser checks, not physical-device certification.
+
+## Desktop follow-up
+
+- The deployed version was tested on the public desktop site: all six foreign-language selections opened their correct URL, main language and translated heading. The reported failure was not reproduced in that browser session.
+- Language anchors now retain native navigation even if storing a preference cookie throws. The selection handler is tested with both writable and blocked cookie storage.
+- Desktop/mobile header TransitOS links and the floating entry now target `/transitos/dashboard`, not the corporate product-description page. Without a session, browser verification reached `/login?next=%2Ftransitos%2Fdashboard`.
+- Build, lint (zero errors) and the 48-page localization suite passed after the changes.

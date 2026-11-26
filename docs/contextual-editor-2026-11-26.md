@@ -1,0 +1,11 @@
+# Selection-first moderator editor
+
+Reference: Adobe Photoshop web workspace/property panel and contextual-task-bar patterns (https://helpx.adobe.com/uk/photoshop/web/get-set-up/learn-the-basics/workspace-overview.html). The editor adopts selection-specific tools, not Photoshop's image-processing functions or branding.
+
+The preview is now the editing canvas. Clicking text, an image, a button, a card or a section opens only matching controls in the right inspector. Double-click text (or use “Sayfanın üzerinde yaz”) to select and replace it directly. Plain text only: no HTML/scripts. Empty replacement is supported. Preview links never navigate while editing. Parent selection lets users move from a heading to its card/section. Keyboard Enter starts text editing and Escape finishes it.
+
+Saved visual overrides are isolated by locale and one of eight corporate page keys. Server validation restricts DOM target grammar, value types, sizes, colors, animations and URL protocols. Overrides require the original text signature to match; a changed template/source fails closed rather than targeting unrelated content. Original CMS and operational records are not modified by these overrides. Public overrides are applied after hydration by a scoped client component; original SEO metadata and server-rendered copy remain unchanged. Major future template structural changes require checking stored targets.
+
+Preview readiness waits for the public page's hydration signal before mounting editor listeners/DOM decorations. Text changes preserve element/icon structure. Visual overrides and block data are separate; new blocks still use the existing append-only page content area. Existing operational UI is not editable through this tool.
+
+Verified locally in the browser: moderator login with disposable local test user, selection-specific text/image/button/card inspector, direct text replacement, save, separate public page showing the replacement, reopening editor, per-language selection, and restoring the original heading. Temporary local credentials/content are removed after verification. Build, TypeScript and targeted lint checks are also run. Touch/browser/OS combinations are not exhaustively certified.

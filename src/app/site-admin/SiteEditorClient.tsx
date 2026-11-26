@@ -518,6 +518,7 @@ export function SiteEditorClient({
         <input type="hidden" name="appearance" value={JSON.stringify(appearance)} />
         <input type="hidden" name="translations" value={JSON.stringify(content.translations || {})} />
         <input type="hidden" name="designBlocks" value={JSON.stringify(content.designBlocks || {})} />
+        <input type="hidden" name="visualEdits" value={JSON.stringify(content.visualEdits || {})} />
         {designOpen ? <DesignStudio content={content} onChange={commit} onClose={()=>setDesignOpen(false)} /> : null}
         <input type="hidden" name="companyName" value={content.companyName} />
         <input type="hidden" name="brandLine" value={content.brandLine} />

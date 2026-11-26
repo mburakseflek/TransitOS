@@ -2,6 +2,7 @@
 import { normalizeAppearance } from "@/lib/site-appearance";
 import { normalizeSiteTranslations } from "@/lib/site-translations";
 import { normalizeDesignBlocks } from "@/lib/design-blocks";
+import { normalizeVisualEdits } from "@/lib/visual-editor";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -140,6 +141,7 @@ export async function saveSiteContent(formData: FormData) {
     references: parseCards(text(formData, "references"), defaultSiteContent.references),
     customPages: parseCustomPages(text(formData, "customPages"), defaultSiteContent.customPages),
     appearance,
+    visualEdits: formData.has("visualEdits") ? normalizeVisualEdits(JSON.parse(text(formData,"visualEdits") || "{}")) : existing.visualEdits,
     designBlocks: formData.has("designBlocks") ? normalizeDesignBlocks(JSON.parse(text(formData,"designBlocks") || "{}")) : existing.designBlocks,
     translations: formData.has("translations") ? normalizeSiteTranslations(JSON.parse(text(formData,"translations") || "{}")) : existing.translations
   });

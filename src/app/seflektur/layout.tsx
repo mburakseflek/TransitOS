@@ -4,6 +4,7 @@ import { readSiteContent } from "@/lib/site-content";
 import { SiteVisitTracker } from "@/app/seflektur/SiteVisitTracker";
 import { WelcomeIntro } from "@/app/seflektur/WelcomeIntro";
 import { appearanceCss } from "@/lib/site-appearance";
+import { VisualEdits } from "./VisualEdits";
 
 export const metadata = createCorporateMetadata({
   path: "/seflektur"
@@ -26,6 +27,7 @@ export default async function SeflekTurLayout({ children }: { children: ReactNod
       <SiteVisitTracker />
       <WelcomeIntro />
       {children}
+      <VisualEdits edits={content.visualEdits} />
     </>
   );
 }

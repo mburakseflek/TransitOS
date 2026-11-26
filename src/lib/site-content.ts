@@ -67,6 +67,7 @@ export type SiteContent = {
   appearance?: import("./site-appearance").SiteAppearance;
   translations?: import("./site-translations").SiteTranslations;
   designBlocks?: import("./design-blocks").PageDesignBlocks;
+  visualEdits?: import("./visual-editor").VisualEdits;
 };
 
 const dataDir = path.join(process.cwd(), "content");

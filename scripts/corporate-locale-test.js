@@ -41,6 +41,9 @@ async function main() {
       assert.ok(html.includes('class="corp-v2-header"'),url);
       assert.ok(html.includes('class="corp-v2-footer"'),url);
       assert.ok(html.includes('aria-label="Language / Dil"'),url);
+      assert.ok(html.includes('corporate-overlay-dialog corporate-language-dialog'),url);
+      assert.ok(html.includes('corporate-overlay-dialog corporate-menu-dialog'),url);
+      assert.ok(!html.includes('class="site-mobile-nav-backdrop'),url);
       assert.ok(!html.includes('class="international-site"'),url);
       count++;
     }
